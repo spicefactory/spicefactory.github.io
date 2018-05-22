@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>14 Remoting</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>14 Remoting</h1>
+
+<p class="paragraph">Parsley is a client-side application framework and does not require any particular server-side technology
+to be useful. Nevertheless in this chapter we want to describe some common scenarios when integrating remoting solutions with
+Parsley.</p>
+
+<p class="paragraph">For a general discussion on how to integrate services into the application architecture see <a href="mvc.php#intro">11&nbsp;Building MVC Architectures</a>.</p>
+
+<p class="paragraph">Of course apart from AMF based remoting solutions presented in this chapter you can also integrate HTTP Services or
+WebServices into your controller actions. The approach is similar to that presented in the MVC chapter: You write a
+controller action class that registers handlers for messages or events dispatched from the View or from Mediators,
+transform them into any kind of asynchronous service invocation, wait for the result, and finally dispatch an application
+message containing the result through Parsleys Messaging Framework.</p>
+<h2><a name="flex"></a>14.1 Flex Remoting</h2>
+
+<p class="paragraph">For remoting the framework can help you in two respects. First you can declare your RemoteObjects
+in a Parsley configuration class alongside other objects and inject them into your commands.
+Second (since version 2.2) you can use the convenient support for asynchronous commands to 
+also route result and faults of remote invocations in a decoupled manner.</p>
+
+<p class="subheadline"> Configuration </p>
+
+<p class="paragraph">Since Parsley offers MXML-based container configuration you can easily integrate the existing MXML tags
+for RemoteObjects with other Parsley configuration tags:</p>
+
+<pre><code>&lt;Objects 
+    xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns="http://www.spicefactory.org/parsley"&gt;
+
+    &lt;fx:Declarations&gt;
+		
+        &lt;fx:RemoteObject 
+            id="loginService" 
+            destination="loginService" 
+            showBusyCursor="true"
+        /&gt;
+
+        &lt;!-- other object definitions --&gt;
+        
+    &lt;/fx:Declarations&gt;
+    
+&lt;/Objects&gt; 
+</code></pre>
+
+<p class="paragraph">You can then chose to inject those RemoteObjects into
+controller actions. But due to the nature of RemoteObjects not being type-safe you'd need to stick with id-based
+injection then:</p>
+
+<pre><code><span style="color:#FF0000;">[Inject(id="loginService")]</span>
+public var service:RemoteObject;
+
+public function execute (message: LoginMessage): AsyncToken {
+    return service.login(message.username, message.password);
+}
+
+</code></pre>
+
+<p class="paragraph">For Commands the framework will manage the AsyncToken for you. 
+Other objects can then listen for the results:</p>
+
+<pre><code>[CommandResult]
+public function loginResult (user: User, trigger:LoginMessage) : void {
+    [...]
+}
+[CommandError]
+public function loginFault (fault: Fault, trigger:LoginMessage) : void {
+    [...]
+}
+</code></pre>
+
+<p class="paragraph">Note that if you want result handlers inside the command itself,
+you have to omit both the metadata and the trigger parameter as this
+mapping information is not required. The framework knows that it has to invoke
+the result handler on the command for the results produced by that command.</p>
+
+
+<p class="subheadline"> Using BusinessDelegates </p>
+
+<p class="paragraph">If you prefer to use delegates instead of injecting the RemoteObjects directly you could define
+both the RemoteObjects and the delegates in Parsley MXML:</p>
+
+<pre><code>&lt;Objects 
+    xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns="http://www.spicefactory.org/parsley"&gt;
+
+    &lt;fx:Script&gt;
+        &lt;![CDATA[
+            import com.bookstore.services.*;
+        ]]&gt;
+    &lt;/fx:Script&gt;
+    
+    &lt;fx:Declarations&gt;
+    
+        &lt;fx:RemoteObject 
+            id="loginService" 
+            destination="loginService" 
+            showBusyCursor="true"
+        /&gt;
+
+	    &lt;Object id="loginDelegate" type="{LoginDelegate}"&gt;
+	        &lt;ConstructorArgs&gt;
+	            &lt;ObjectRef idRef="loginService"/&gt;
+	        &lt;/ConstructorArgs&gt;
+	    &lt;/Object&gt;
+       
+        &lt;!-- other objects --&gt;
+        
+    &lt;/fx:Declarations&gt;
+    
+&lt;/Objects&gt; 
+</code></pre>
+
+<p class="paragraph">With delegates you can then return to injection by type:</p>
+
+<pre><code><span style="color:#FF0000;">[Inject]</span>
+public var loginDelegate:LoginDelegate;
+
+public function execute (message: LoginMessage): AyncToken {
+    return loginDelegate.login(message.username, message.password);
+}
+</code></pre>
+<h2><a name="pimento"></a>14.2 Pimento Data Services</h2>
+
+<p class="paragraph">Pimento integrates JPA/Hibernate and Spring with Flex, Flash and AIR clients. It is another Open Source Project
+under the Spicefactory umbrella. See the <a href="http://www.spicefactory.org/pimento/" target="_blank">Pimento Info Page</a> for more details.</p>
+
+<p class="paragraph">The Pimento Support extension for Parsley (available on the Parsley download page) includes custom configuration tags for 
+Pimento for MXML and XML that allow you to define the Pimento configuration and custom services.</p>
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Objects 
+    xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:pimento="http://www.spicefactory.org/parsley/pimento"&gt;
+    
+    &lt;fx:Declarations&gt;
+    
+        &lt;pimento:Config
+            url="http://localhost:8080/test/service/"
+            timeout="3000"
+        /&gt;
+    
+        &lt;!-- other objects --&gt;
+        
+    &lt;/fx:Declarations&gt;
+    
+&lt;/Objects&gt; 
+</code></pre>
+
+<p class="paragraph">This minimal setup is all that is required to be able to inject Pimentos AS3 EntityManager into any object
+(in this case a command mapped to a message):</p>
+
+<pre><code>[Inject]
+public var entityManager:EntityManager;
+
+public function execute (message:DeleteCartMessage) : ServiceRequest {
+    return entitiyManager.remove(message.cart);
+} 
+</code></pre>
+
+<p class="paragraph">You can additionally configure custom services with parameters and return values managed by Pimento:</p>
+
+<pre><code>&lt;pimento:Service
+    name="loginService"
+    type="{LoginServiceImpl}"
+/&gt;
+</code></pre>
+
+<p class="paragraph">The service interfaces and remote stubs are usually generated by Pimentos Ant task. These services can then
+of course be injected into other objects, too.</p>
+
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;objects 
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:pimento="http://www.spicefactory.org/parsley/pimento"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spicefactory.org/parsley 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-core.xsd 
+    http://www.spicefactory.org/parsley/pimento 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-pimento.xsd"
+    &gt;
+    &lt;pimento:config 
+        url="http://localhost/test/service/"
+        timeout="3000"
+    /&gt;
+    &lt;pimento:service
+        name="loginService"
+        type="com.bookstore.services.LoginServiceImpl"
+    /&gt;
+&lt;/objects&gt;
+</code></pre>
+
+<p class="paragraph">Since this is an XML extension it has to be initialized explicitly before using the <code>XmlContextBuilder</code>:</p>
+
+<pre><code>PimentoXmlSupport.initialize();
+</code></pre>
+<h2><a name="cinnamon"></a>14.3 Cinnamon Remoting</h2>
+
+<p class="paragraph">If you don't need Pimentos data management capabilities and just want to use AMF-based Flex/Flash-to-Java
+Remoting you can stick with Cinnamon instead. See the <a href="http://www.spicefactory.org/pimento/" target="_blank">Pimento/Cinnamon Info Page</a> 
+for more details.</p>
+
+<p class="paragraph">The Pimento Support extension for Parsley (available on the Parsley download page) includes custom configuration tags for Cinnamon for MXML and XML that allow you to define
+the channel and services.</p>
+
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Objects 
+    xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:cinnamon="http://www.spicefactory.org/parsley/cinnamon"&gt;
+
+    &lt;fx:Script&gt;
+        &lt;![CDATA[
+            import com.bookstore.services.*;
+        ]]&gt;
+    &lt;/fx:Script&gt;
+    
+    &lt;fx:Declarations&gt;
+        
+        &lt;cinnamon:Channel
+            url="http://localhost:8080/test/service/"
+            timeout="3000"
+        /&gt;
+        &lt;cinnamon:Service
+            name="loginService"
+            type="{LoginServiceImpl}"
+        /&gt;
+        &lt;cinnamon:Service
+            name="cartService"
+            type="{CartServiceImpl}"
+        /&gt;
+    
+        &lt;!-- other objects --&gt;
+        
+    &lt;/fx:Declarations&gt;
+    
+&lt;/Objects&gt; 
+</code></pre>
+
+<p class="paragraph">If you define only a single channel (like in most use cases) you don't have to explicitly refer to it in the service definitions.
+Parsley will automatically wire the single channel to all services then.
+In case of multiple channels you'd have to set the id property for the channel and reference it in service definitions:</p>
+
+<pre><code>&lt;cinnamon:Channel
+    id="<span style="color:#FF0000;">mainChannel</span>"
+    url="http://localhost:8080/test/service/"
+    timeout="3000"
+/&gt;
+&lt;cinnamon:Service
+    name="loginService"
+    type="{LoginServiceImpl}"
+    channel="<span style="color:#FF0000;">mainChannel</span>"
+/&gt;
+</code></pre>
+
+<p class="paragraph">You can then inject services into your command (or other object):</p>
+
+<pre><code>[Inject]
+public var loginService:LoginService;
+
+public function execute (event:LoginMessage) : ServiceRequest {
+    return loginService.login(event.username, event.password);
+} 
+</code></pre>
+
+<p class="paragraph">With Cinnamon there is no need for BusinessDelegates: The remote services implement business interfaces themselves, so you
+can directly inject them into actions. These interfaces are usually generated by Cinnamons Ant Task, automatically porting
+existing Java service interfaces to AS3.</p>
+
+
+
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;objects 
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:pimento="http://www.spicefactory.org/parsley/cinnamon"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spicefactory.org/parsley 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-core.xsd 
+    http://www.spicefactory.org/parsley/cinnamon 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-cinnamon.xsd"
+    &gt;
+    &lt;cinnamon:channel
+        url="http://localhost:8080/test/service/"
+        timeout="3000"
+    /&gt;
+    &lt;cinnamon:service
+        name="loginService"
+        type="com.bookstore.services.LoginServiceImpl"
+    /&gt;
+    &lt;cinnamon:service
+        name="cartService"
+        type="com.bookstore.services.CartServiceImpl"
+    /&gt;
+&lt;/objects&gt;
+</code></pre>
+
+<p class="paragraph">Since this is an XML extension it has to be initialized explicitly before using the <code>XmlContextBuilder</code>:</p>
+
+<pre><code>CinnamonXmlSupport.initialize();
+</code></pre>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

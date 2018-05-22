@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><!-- saved from url=(0014)about:internet --><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" href="../../../../../style.css" type="text/css" media="screen"><link rel="stylesheet" href="../../../../../print.css" type="text/css" media="print"><link rel="stylesheet" href="../../../../../override.css" type="text/css"><meta name="keywords" content="PropertyMapperBuilder,org.spicefactory.lib.xml.mapper.PropertyMapperBuilder,ATTRIBUTE,CHILD_TEXT_NODE,defaultNamingStrategy,elementName,elementName,namingStrategy,nodeKind,objectType,objectType,property,xmlNames,addMapper,addPropertyHandler,build,build,choiceId,createChildElementMapperBuilder,customMapper,decorate,defaultNamingStrategy,defaultSimpleMappingType,forNamespace,forUnqualifiedElements,getChoiceById,getChoiceByType,ignoreProperty,ignoreUnmappedAttributes,ignoreUnmappedChildren,isMappableProperty,mapAllToAttributes,mapAllToChildTextNodes,mapToAttribute,mapToChildElement,mapToChildElementChoice,mapToChildTextNode,mapToChoiceId,mapToChoiceType,mapToObject,mapToObject,mapToObject,mapToTextNode,mapToXml,mapToXml,mapToXml,mappedClasses,mergeInto,mergedMappings,newMapperBuilder,populateTypeChoices,postProcess,toObject,toXML,updateElementName,validate,withRootElement,withoutRootElement"><title>org.spicefactory.lib.xml.mapper.PropertyMapperBuilder</title></head><body><script language="javascript" type="text/javascript" src="../../../../../asdoc.js"></script><script language="javascript" type="text/javascript" src="../../../../../help.js"></script><script language="javascript" type="text/javascript" src="../../../../../cookies.js"></script><script language="javascript" type="text/javascript"><!--
+				asdocTitle = 'PropertyMapperBuilder - Parsley + Spicelib API';
+				var baseRef = '../../../../../';
+				window.onload = configPage;
+			--></script>
+<script type="text/javascript">
+			scrollToNameAnchor();
+		</script><table class="titleTable" cellpadding="0" cellspacing="0" id="titleTable" style="display:none"><tr><td class="titleTableTitle" align="left">Parsley + Spicelib API</td><td class="titleTableTopNav" align="right"><a href="../../../../../package-summary.html" onclick="loadClassListFrame('../../../../../all-classes.html')">All Packages</a>&nbsp;|&nbsp;<a href="../../../../../class-summary.html" onclick="loadClassListFrame('../../../../../all-classes.html')">All Classes</a>&nbsp;|&nbsp;<a href="../../../../../all-index-A.html" onclick="loadClassListFrame('../../../../../index-list.html')">Index</a>&nbsp;|&nbsp;<a id="framesLink1" href="../../../../../index.html?org/spicefactory/lib/xml/mapper/PropertyMapperBuilder.html&amp;org/spicefactory/lib/xml/mapper/class-list.html">Frames</a><a id="noFramesLink1" style="display:none" href="" onclick="parent.location=document.location"> No Frames </a></td><td class="titleTableLogo" align="right" rowspan="3"><img src="../../../../../images/logo.jpg" class="logoImage" alt=" Adobe Logo " title=" Adobe Logo "></td></tr><tr class="titleTableRow2"><td class="titleTableSubTitle" id="subTitle" align="left">PropertyMapperBuilder</td><td class="titleTableSubNav" id="subNav" align="right"><a href="#propertySummary">Properties</a>&nbsp;| <a href="#methodSummary">Methods</a></td></tr><tr class="titleTableRow3"><td colspan="3">&nbsp;</td></tr></table><script language="javascript" type="text/javascript" xml:space="preserve">
+				<!--
+				
+					if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("PropertyMapperBuilder"); titleBar_setSubNav(false,true,false,false,false,false,false,false,true,false,false	,false,false,false,false,false);}	
+				-->
+			</script><div xmlns:fn="http://www.w3.org/2005/xpath-functions" class="MainContent"><table class="classHeaderTable" cellpadding="0" cellspacing="0"><tr><td class="classHeaderTableLabel">Package</td><td><a href="package-detail.html" onclick="javascript:loadClassListFrame('class-list.html')">org.spicefactory.lib.xml.mapper</a></td></tr><tr><td class="classHeaderTableLabel">Class</td><td class="classSignature">public  class  PropertyMapperBuilder</td></tr><tr><td class="classHeaderTableLabel">Inheritance</td><td class="inheritanceList">PropertyMapperBuilder  <img src="../../../../../images/inherit-arrow.gif" title="Inheritance" alt="Inheritance" class="inheritArrow"> Object</td></tr><tr><td class="classHeaderTableLabel">Subclasses</td><td> <a href="../../../../../org/spicefactory/lib/xml/mapper/MetadataMapperBuilder.html">MetadataMapperBuilder</a></td></tr></table><p></p><p></p><p></p>
+ Builder that creates PropertyMapper instances.
+ 
+ <p>The main entry point for most basic use cases covered by the builtin PropertyMapper implementation.
+ Use the various <code>map</code> methods to create a mapper that maps properties of a class
+ to XML attributes, child elements or text nodes.</p>
+ 
+               <p>This class is primarily intended for internal use. In most cases the most convenient way to create
+ mappings is the use of the <code>XmlObjectMappings</code> class and its DSL to quickly set up mappings
+ that support metadata configuration.</p>
+ 
+            <p></p><br/><hr></div><a name="propertySummary"></a><div class="summarySection"><div class="summaryTableTitle">Public Properties</div><table cellspacing="0" cellpadding="3" class="summaryTable " id="summaryTableProperty"><tr><th>&nbsp;</th><th colspan="2">Property</th><th class="summaryTableOwnerCol">Defined By</th></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a href="#defaultNamingStrategy" class="signatureLink">defaultNamingStrategy</a> : <a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a><div class="summaryTableDescription">[static] 
+	 The default naming strategy to use for transforming property names to
+	 XML attribute or element names.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a href="#elementName" class="signatureLink">elementName</a> : QName<div class="summaryTableDescription">[read-only] 
+	 The name of the mapped XML element.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a href="#namingStrategy" class="signatureLink">namingStrategy</a> : <a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a><div class="summaryTableDescription">[read-only] 
+	 The naming strategy to use for transforming property names to XML attribute and element names.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a href="#objectType" class="signatureLink">objectType</a> : <a href="../../../../../org/spicefactory/lib/reflect/ClassInfo.html">ClassInfo</a><div class="summaryTableDescription">[read-only] 
+	 The mapped object type.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr></table></div><a name="methodSummary"></a><div class="summarySection"><div class="summaryTableTitle">Public Methods </div><table cellspacing="0" cellpadding="3" class="summaryTable " id="summaryTableMethod"><tr><th>&nbsp;</th><th colspan="2">Method</th><th class="summaryTableOwnerCol">Defined By</th></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#PropertyMapperBuilder()" class="signatureLink">PropertyMapperBuilder</a>(objectType:Class, elementName:QName, namingStrategy:<a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a> = null, domain:ApplicationDomain = null)</div><div class="summaryTableDescription">
+	 Creates a new instance for building a mapper that maps the specified objectType to the XML element
+	 with the specified name.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#addPropertyHandler()" class="signatureLink">addPropertyHandler</a>(handler:<a href="../../../../../org/spicefactory/lib/xml/mapper/PropertyHandler.html">PropertyHandler</a>):void</div><div class="summaryTableDescription">
+	 Adds a custom property handler to this builder.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#build()" class="signatureLink">build</a>():<a href="../../../../../org/spicefactory/lib/xml/XmlObjectMapper.html">XmlObjectMapper</a></div><div class="summaryTableDescription">
+	 Builds the final mapper based on the instructions that were given through the various
+	 mapmethods of this class.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#createChildElementMapperBuilder()" class="signatureLink">createChildElementMapperBuilder</a>(propertyName:String, type:Class = null, elementName:QName = null):<a href="../../../../../org/spicefactory/lib/xml/mapper/PropertyMapperBuilder.html">PropertyMapperBuilder</a></div><div class="summaryTableDescription">
+	 Convenient short cut to produce a mapper for a child element that will then be mapped
+	 to a property of the class mapped by this builder.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#ignoreProperty()" class="signatureLink">ignoreProperty</a>(propertyName:String):void</div><div class="summaryTableDescription">
+	 Instructs this builder not to map the property with the specified name.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#ignoreUnmappedAttributes()" class="signatureLink">ignoreUnmappedAttributes</a>():void</div><div class="summaryTableDescription">
+	 Instructs this builder to ignore attributes in XML that are not mapped to properties.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#ignoreUnmappedChildren()" class="signatureLink">ignoreUnmappedChildren</a>():void</div><div class="summaryTableDescription">
+	 Instructs this builder to ignore child elements in XML that are not mapped to properties.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#mapAllToAttributes()" class="signatureLink">mapAllToAttributes</a>():void</div><div class="summaryTableDescription">
+	 Maps all properties of the mapped class to attribute of the mapped XML element.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#mapAllToChildTextNodes()" class="signatureLink">mapAllToChildTextNodes</a>():void</div><div class="summaryTableDescription">
+	 Maps all properties of the mapped class to text nodes of child elements of the mapped XML element.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#mapToAttribute()" class="signatureLink">mapToAttribute</a>(propertyName:String, attributeName:QName = null):void</div><div class="summaryTableDescription">
+	 Maps the property with the specified name to the XML attribute with the specified name.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#mapToChildElement()" class="signatureLink">mapToChildElement</a>(propertyName:String, mapper:<a href="../../../../../org/spicefactory/lib/xml/XmlObjectMapper.html">XmlObjectMapper</a>):void</div><div class="summaryTableDescription">
+	 Maps the property with the specified name to the object mapped to the specified XML element.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#mapToChildElementChoice()" class="signatureLink">mapToChildElementChoice</a>(propertyName:String, choice:<a href="../../../../../org/spicefactory/lib/xml/mapper/Choice.html">Choice</a>):void</div><div class="summaryTableDescription">
+	 Maps the property with the specified name to the objects of a choice of mapped child elements.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#mapToChildTextNode()" class="signatureLink">mapToChildTextNode</a>(propertyName:String, childName:QName = null):void</div><div class="summaryTableDescription">
+	 Maps the property with the specified name to the XML text node of the child element with the specified name.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#mapToTextNode()" class="signatureLink">mapToTextNode</a>(propertyName:String):void</div><div class="summaryTableDescription">
+	 Maps the property with the specified name to the XML text node inside the mapped XML element.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr></table></div><a name="protectedMethodSummary"></a><div class="summarySection"><div class="summaryTableTitle">Protected Methods </div><table cellspacing="0" cellpadding="3" class="summaryTable " id="summaryTableProtectedMethod"><tr><th>&nbsp;</th><th colspan="2">Method</th><th class="summaryTableOwnerCol">Defined By</th></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#isMappableProperty()" class="signatureLink">isMappableProperty</a>(property:<a href="../../../../../org/spicefactory/lib/reflect/Property.html">Property</a>):Boolean</div><div class="summaryTableDescription">
+	 Checks whether the specified property can still be mapped.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#updateElementName()" class="signatureLink">updateElementName</a>(newName:QName):void</div><div class="summaryTableDescription">
+	 Updates the XML element name to apply to this mapping.</div></td><td class="summaryTableOwnerCol">PropertyMapperBuilder</td></tr></table></div><script language="javascript" type="text/javascript"><!--
+										showHideInherited();
+										--></script><div class="MainContent"><div class="detailSectionHeader">Property Detail</div><a name="propertyDetail"></a><a name="defaultNamingStrategy"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">defaultNamingStrategy</td><td class="detailHeaderType">property</td></tr></table><div class="detailBody"><code>public static var defaultNamingStrategy:<a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a></code><p></p><p></p><p>
+	 The default naming strategy to use for transforming property names to
+	 XML attribute or element names.
+	 </p></div><a name="propertyDetail"></a><a name="elementName"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">elementName</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code>elementName:QName</code>&nbsp;&nbsp;[read-only] <p></p><p></p><p>
+	 The name of the mapped XML element.
+	 </p><br/><span class="label"> Implementation </span><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;public function get elementName():QName</code><br/></div><a name="propertyDetail"></a><a name="namingStrategy"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">namingStrategy</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code>namingStrategy:<a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a></code>&nbsp;&nbsp;[read-only] <p></p><p></p><p>
+	 The naming strategy to use for transforming property names to XML attribute and element names.
+	 </p><br/><span class="label"> Implementation </span><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;public function get namingStrategy():<a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a></code><br/></div><a name="propertyDetail"></a><a name="objectType"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">objectType</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code>objectType:<a href="../../../../../org/spicefactory/lib/reflect/ClassInfo.html">ClassInfo</a></code>&nbsp;&nbsp;[read-only] <p></p><p></p><p>
+	 The mapped object type.
+	 </p><br/><span class="label"> Implementation </span><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;public function get objectType():<a href="../../../../../org/spicefactory/lib/reflect/ClassInfo.html">ClassInfo</a></code><br/></div><a name="constructorDetail"></a><div class="detailSectionHeader">Constructor Detail</div><a name="PropertyMapperBuilder()"></a><a name="PropertyMapperBuilder(Class,QName,org.spicefactory.lib.xml.NamingStrategy,flash.system.ApplicationDomain)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">PropertyMapperBuilder</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">Constructor</td></tr></table><div class="detailBody"><code>public function PropertyMapperBuilder(objectType:Class, elementName:QName, namingStrategy:<a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a> = null, domain:ApplicationDomain = null)</code><p></p><p>
+	 Creates a new instance for building a mapper that maps the specified objectType to the XML element
+	 with the specified name.
+	 
+	 </p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">objectType</span>:Class</code> &mdash; the type of the object to map to the XML element
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">elementName</span>:QName</code> &mdash; the name of the XML element to map
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">namingStrategy</span>:<a href="../../../../../org/spicefactory/lib/xml/NamingStrategy.html">NamingStrategy</a></code> (default = <code>null</code>)<code></code> &mdash; the naming strategy to use for transforming property names to XML attribute and element names
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">domain</span>:ApplicationDomain</code> (default = <code>null</code>)<code></code> &mdash; the ApplicationDomain to use for reflecting on the mapped type
+	 </td></tr></table></div><a name="methodDetail"></a><div class="detailSectionHeader">Method Detail</div><a name="addPropertyHandler()"></a><a name="addPropertyHandler(org.spicefactory.lib.xml.mapper.PropertyHandler)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">addPropertyHandler</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td></tr></table><div class="detailBody"><code> public function addPropertyHandler(handler:<a href="../../../../../org/spicefactory/lib/xml/mapper/PropertyHandler.html">PropertyHandler</a>):void</code><p></p><p></p><p>
+	 Adds a custom property handler to this builder.
+	 May be used in rare cases where the property mapping mechanisms offered by this builder are not sufficient.
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">handler</span>:<a href="../../../../../org/spicefactory/lib/xml/mapper/PropertyHandler.html">PropertyHandler</a></code> &mdash; the handler to add to this builder
+	 </td></tr></table></p></div><a name="build()"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">build</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function build():<a href="../../../../../org/spicefactory/lib/xml/XmlObjectMapper.html">XmlObjectMapper</a></code><p></p><p></p><p>
+	 Builds the final mapper based on the instructions that were given through the various
+	 mapmethods of this class. The returned mapper instance is lazy-initializing, so the real
+	 mapper does not get created until it is used for the first time through a call to <code>mapToObject</code>
+	 or <code>mapToXml</code>. So calling some of the mapmethods of this builder will still modify the 
+	 behaviour of the returned mapper. This mechanism makes it easier to build a nested structure of mappers
+	 with circular references.
+	 
+	 </p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../../org/spicefactory/lib/xml/XmlObjectMapper.html">XmlObjectMapper</a></code> &mdash; the mapper produced based on instructions given to this class
+	 </td></tr></table></div><a name="createChildElementMapperBuilder()"></a><a name="createChildElementMapperBuilder(String,Class,QName)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">createChildElementMapperBuilder</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function createChildElementMapperBuilder(propertyName:String, type:Class = null, elementName:QName = null):<a href="../../../../../org/spicefactory/lib/xml/mapper/PropertyMapperBuilder.html">PropertyMapperBuilder</a></code><p></p><p></p><p>
+	 Convenient short cut to produce a mapper for a child element that will then be mapped
+	 to a property of the class mapped by this builder.
+	 
+	 <p>This is equivalent to creating the <code>PropertyMapperBuilder</code> yourself,
+	 and then passing the mapper produced by that builder to <code>mapToChildElement</code></p>.
+	 
+	 <p>Note that you must not pass the mapper created by the returned builder to this builder.
+	 This will be done automatically for you.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">propertyName</span>:String</code> &mdash; the name of the property to create a child element mapper for
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">type</span>:Class</code> (default = <code>null</code>)<code></code> &mdash; the type the child element will be mapped to (the type of the specified property if omitted)
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">elementName</span>:QName</code> (default = <code>null</code>)<code></code> &mdash; the name of the mapped child element (if omitted the same name as the property in the same
+	 namespace as the XML element mapped by this builder)
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../../org/spicefactory/lib/xml/mapper/PropertyMapperBuilder.html">PropertyMapperBuilder</a></code> &mdash; a new PropertyMapperBuilder
+	 </td></tr></table></div><a name="ignoreProperty()"></a><a name="ignoreProperty(String)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">ignoreProperty</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function ignoreProperty(propertyName:String):void</code><p></p><p></p><p>
+	 Instructs this builder not to map the property with the specified name.
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">propertyName</span>:String</code> &mdash; the name of the property to exclude from the mapping
+	 </td></tr></table></p></div><a name="ignoreUnmappedAttributes()"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">ignoreUnmappedAttributes</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function ignoreUnmappedAttributes():void</code><p></p><p></p><p>
+	 Instructs this builder to ignore attributes in XML that are not mapped to properties.
+	 </p></div><a name="ignoreUnmappedChildren()"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">ignoreUnmappedChildren</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function ignoreUnmappedChildren():void</code><p></p><p></p><p>
+	 Instructs this builder to ignore child elements in XML that are not mapped to properties.
+	 </p></div><a name="isMappableProperty()"></a><a name="isMappableProperty(org.spicefactory.lib.reflect.Property)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">isMappableProperty</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> protected function isMappableProperty(property:<a href="../../../../../org/spicefactory/lib/reflect/Property.html">Property</a>):Boolean</code><p></p><p></p><p>
+	 Checks whether the specified property can still be mapped.
+	 Returns false if the specified property has already been mapped or if 
+	 it has been added to the list of properties that should be ignored.
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">property</span>:<a href="../../../../../org/spicefactory/lib/reflect/Property.html">Property</a></code> &mdash; the property to check
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code>Boolean</code> &mdash; true if the specified property can still be mapped
+	 </td></tr></table></div><a name="mapAllToAttributes()"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">mapAllToAttributes</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function mapAllToAttributes():void</code><p></p><p></p><p>
+	 Maps all properties of the mapped class to attribute of the mapped XML element.
+	 Has the same effect as calling <code>mapToAttribute</code> for all properties of the class.
+	 </p></div><a name="mapAllToChildTextNodes()"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">mapAllToChildTextNodes</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function mapAllToChildTextNodes():void</code><p></p><p></p><p>
+	 Maps all properties of the mapped class to text nodes of child elements of the mapped XML element.
+	 Has the same effect as calling <code>mapToChildTextNode</code> for all properties of the class.
+	 </p></div><a name="mapToAttribute()"></a><a name="mapToAttribute(String,QName)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">mapToAttribute</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function mapToAttribute(propertyName:String, attributeName:QName = null):void</code><p></p><p></p><p>
+	 Maps the property with the specified name to the XML attribute with the specified name.
+	 
+	 <p>Example:</p>
+	 
+	 <pre><code>public class Song {
+	     public var year:int;
+	     public var title:String;
+	     public var artist:String;
+	 }
+	 
+	 &lt;song
+	     year="1989" 
+	     title="Monkey Gone To Heaven"
+	     artist="Pixies"
+	 /&gt;</code></pre>
+	 
+	 <p>Calling <code>mapToAttribute("year")</code> for the Song class shown above would map the year property to the
+	 attribute in the song tag with the same name.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">propertyName</span>:String</code> &mdash; the name of the mapped property
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">attributeName</span>:QName</code> (default = <code>null</code>)<code></code> &mdash; the name of the mapped XML attribute
+	 </td></tr></table></p></div><a name="mapToChildElement()"></a><a name="mapToChildElement(String,org.spicefactory.lib.xml.XmlObjectMapper)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">mapToChildElement</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function mapToChildElement(propertyName:String, mapper:<a href="../../../../../org/spicefactory/lib/xml/XmlObjectMapper.html">XmlObjectMapper</a>):void</code><p></p><p></p><p>
+	 Maps the property with the specified name to the object mapped to the specified XML element.
+	 
+	 <p>Mapping to child elements allows you to build a hierarchy of nested mappers since it is the responsibility
+	 of the specified mapper to handle the mapping of the child element itself.</p>
+	 
+	 <p>Example:</p>
+	 
+	 <pre><code>public class Album {
+	 
+	    public var year:int;
+	    public var title:String;
+	    public var artist:String;
+	    public var songs:Array;
+	    
+	 }
+	 
+	 public class Song {
+	 
+	    public var duration:String;
+	    public var title:String;
+	    
+	 }
+	 
+	 &lt;album year="2000" artist="Goldfrapp" title="Felt Mountain"&gt;
+	    &lt;song title="Lovely Head" duration="3:50"/&gt;
+	    &lt;song title="Pilots" duration="4:30"/&gt;
+	    &lt;song title="Deer Stop" duration="4:07"/&gt;
+	    &lt;song title="Utopia" duration="4:18"/&gt;
+	 &lt;/album&gt;</code></pre>
+	 
+	 <p>In this example the song child elements will be mapped into the songs property of
+	 the Album class. This is how you would set up such a mapper:</p>
+	 
+	 <pre><code>var songBuilder:PropertyMapperBuilder = new PropertyMapperBuilder(Song, new QName("song"));
+	 songBuilder.mapAllToAttributes();
+	 
+	 var albumBuilder:PropertyMapperBuilder = new PropertyMapperBuilder(Album, new QName("album"));
+	 albumBuilder.mapToChildElement("songs", songBuilder.build());
+	 albumBuilder.mapAllToAttributes();</code></pre>
+	 
+	 <p>For the song element we simply map all properties to attributes. For the album element
+	 we map the songs Array property to the song child element, passing the mapper that we have
+	 built for the child element. We then map all remaining properties to attributes.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">propertyName</span>:String</code> &mdash; the name of the property to map to the child element
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">mapper</span>:<a href="../../../../../org/spicefactory/lib/xml/XmlObjectMapper.html">XmlObjectMapper</a></code> &mdash; the mapper responsible for mapping the child elements to objects
+	 </td></tr></table></p></div><a name="mapToChildElementChoice()"></a><a name="mapToChildElementChoice(String,org.spicefactory.lib.xml.mapper.Choice)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">mapToChildElementChoice</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function mapToChildElementChoice(propertyName:String, choice:<a href="../../../../../org/spicefactory/lib/xml/mapper/Choice.html">Choice</a>):void</code><p></p><p></p><p>
+	 Maps the property with the specified name to the objects of a choice of mapped child elements.
+	 
+	 <p>This is a variant for the child element mapping mechanism that allows for even greater flexibility.
+	 With choices you can map several different child elements into a single Array property (or single valued property).</p>
+	 
+	 <p>Example:</p>
+	 
+	 <pre><code>public class Order {
+	 
+	     public var products:Array;
+	     
+	 }
+	 
+	 public class Album {
+	 
+	     public var artist:String;
+	     public var title:String;
+	     public var duration:String;
+	     
+	 }
+	 
+	 public class Book {
+	 
+	     public var author:String;
+	     public var title:String;
+	     public var pageCount:String;  
+	 
+	 }
+	 
+	 &lt;order&gt;
+	     &lt;album artist="Goldfrapp" title="Felt Mountain"  duration="38:50"/&gt;
+	     &lt;album artist="Unkle" title="Never, Never, Land"  duration="49:27"/&gt;
+	     &lt;book author="Karen Duve" title"Rain" pageCount="256"/&gt;
+	     &lt;book author="Judith Hermann" title"Summerhouse, Later" pageCount="224"/&gt;
+	 &lt;/order&gt;</code></pre>
+	 
+	 <p> This time we map the products Array property of the Order class to multiple different
+	 child elements. This is how you set up the mapper: </p>
+	 
+	 <pre><code>var albumBuilder:PropertyMapperBuilder = new PropertyMapperBuilder(Album, new QName("album"));
+	 albumBuilder.mapAllToAttributes();
+	 
+	 var bookBuilder:PropertyMapperBuilder = new PropertyMapperBuilder(Book, new QName("book"));
+	 bookBuilder.mapAllToAttributes();
+	 
+	 var orderBuilder:PropertyMapperBuilder = new PropertyMapperBuilder(Order, new QName("order"));
+	 var choice:Choice = new Choice();
+	 choice.addMapper(albumBuilder.build());
+	 choice.addMapper(bookBuilder.build());
+	 orderBuilder.mapAllToChildElementChoice("products", choice);</code></pre>
+
+	 <p>The mappers for the Book and Album classes are simple: Both simply map all
+	 properties to attributes. For the Order class we create a Choice instance,
+	 add all child element mappers to it and finally map the products property of the Order
+	 class to the choice.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">propertyName</span>:String</code> &mdash; the name of the property to map to the specified choice of child elements
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">choice</span>:<a href="../../../../../org/spicefactory/lib/xml/mapper/Choice.html">Choice</a></code> &mdash; the choice instance containing all mappers for the child elements
+	 </td></tr></table></p></div><a name="mapToChildTextNode()"></a><a name="mapToChildTextNode(String,QName)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">mapToChildTextNode</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function mapToChildTextNode(propertyName:String, childName:QName = null):void</code><p></p><p></p><p>
+	 Maps the property with the specified name to the XML text node of the child element with the specified name.
+	 
+	 <p>Example:</p>
+	 
+	 <pre><code>public class Song {
+	     public var year:int;
+	     public var title:String;
+	     public var artist:String;
+	 }
+	 
+	 &lt;song&gt;
+	    &lt;year&gt;1989&lt;/year&gt; 
+	    &lt;title&gt;Monkey Gone To Heaven&lt;/title&gt;
+	    &lt;artist&gt;Pixies&lt;/artist&gt;
+	 &lt;/song&gt;</code></pre>
+	 
+	 <p>Calling <code>mapToChildTextNode("year")</code> for the Song class shown above would map the year property to the
+	 text node of the child element with the same name.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">propertyName</span>:String</code> &mdash; the name of the mapped property
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">childName</span>:QName</code> (default = <code>null</code>)<code></code> &mdash; the name of the XML element that contains the mapped text node
+	 </td></tr></table></p></div><a name="mapToTextNode()"></a><a name="mapToTextNode(String)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">mapToTextNode</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function mapToTextNode(propertyName:String):void</code><p></p><p></p><p>
+	 Maps the property with the specified name to the XML text node inside the mapped XML element.
+	 
+	 <p>This is different from mapping to child text nodes. It maps a property to the text node that belongs to the
+	 same element. Since this can only apply for a single property it is often combined with attribute mapping.</p>
+	 
+	 <p>Example:</p>
+	 
+	 <pre><code>public class Song {
+	 
+	     public var year:int;
+	     public var title:String;
+	     public var artist:String;
+	     
+	 }
+	 
+	 &lt;song year="2000" artist="Goldfrapp"&gt;Felt Mountain&lt;/song&gt;</code></pre>
+	 
+	 <p>Calling <code>mapToTextNode("title")</code> for the Song class shown above would map the title property to the
+	 text node of the song element ("Felt Mountain").</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">propertyName</span>:String</code> &mdash; the name of the property to map to the text node
+	 </td></tr></table></p></div><a name="updateElementName()"></a><a name="updateElementName(QName)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">updateElementName</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> protected function updateElementName(newName:QName):void</code><p></p><p></p><p>
+	 Updates the XML element name to apply to this mapping.
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">newName</span>:QName</code> &mdash; the new name to apply to this mapping
+	 </td></tr></table></p></div><br/><br/><hr><br/><p></p><center class="copyright"><footer></footer><br/>Mon Feb 6 2012, 01:04 AM +01:00  </center></div></body></html><!--<br/>Mon Feb 6 2012, 01:04 AM +01:00  -->

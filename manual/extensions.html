@@ -1,0 +1,1306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>13 Extending the Framework</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>13 Extending the Framework</h1>
+
+<p class="paragraph">All previous chapters demonstrated the Parsley feature set from the perspective of an application
+developer. But since Parsley provides such basic IOC capabilites like Dependency Injection or fully
+decoupled Messaging it is equally important that the framework is easy to extend. If you are going
+to build your own framwork, whether inhouse or Open Source, you wouldn't want to reinvent the wheel
+for these basic features and prefer to integrate with existing solutions.</p>
+
+<p class="paragraph">So extensibility is an area a lot of thought has been put into. And hopefully when starting
+to build your own extensions you will enjoy the huge number of available extensions points,
+the flexibility and the ease of use. One extension point where Parsley particularly shines
+is the <code>ObjectDefinitionDecorator</code> interface which allows you to write a single 
+extension class and use it as a custom Metadata, MXML or XML configuration tag.</p>
+
+<p class="paragraph">When browsing the Parsley code base you'll notice that almost everything in the internal API
+lives behind interfaces. This makes it easy to create your own implementations for a particular aspect
+of the framework and switch it while still using the default implementations for other internal services.</p>
+<h2><a name="points"></a>13.1 Available Extension Points</h2>
+
+<p class="paragraph">Let's start with a quick overview over the extensible parts of the framework.</p>
+
+<ul>
+<li> <a href="extensions.php#metadata">13.2&nbsp;Custom Metadata Tags</a>: An extension point also used by all builtin
+metadata tags like <code>[Inject]</code> or <code>[MessageHandler]</code>. </li>
+
+<li> <a href="extensions.php#mxml_xml">13.3&nbsp;Custom MXML and XML Tags</a>: Like with metadata this extension point is also used
+by all builtin tags like <code>&lt;Object&gt;</code> or <code>&lt;MapCommand&gt;</code>. </li>
+
+<li> <a href="extensions.php#config_processors">13.6&nbsp;Custom Configuration Mechanisms</a>: This hook is also used by all builtin mechanisms
+like MXML, XML or ActionScript configuration. </li>
+
+<li> <a href="extensions.php#kernel">13.7&nbsp;Replacing IOC Kernel Services</a>: All central services live behind interfaces and can be replaced. 
+These are - amongst others - the <code>ViewManager</code>, the <code>MessageRouter</code> and the core 
+<code>Context</code> interface. </li>
+</ul>
+
+<p class="paragraph">Other sections in this chapter deal with information about internal APIs that are useful
+for more than just one of the extension points listed above:</p>
+
+<ul>
+<li> <a href="extensions.php#definitions">13.4&nbsp;Working with ObjectDefinitions</a>: APIs used by custom Metadata, MXML and XML tags. </li>
+
+<li> <a href="extensions.php#scopes">13.5&nbsp;Working with Scopes</a>: Scope-wide managers may be used to orchestrate a set of related custom tags 
+that indirectly interact which each other. </li>
+
+<li> <a href="extensions.php#init">13.8&nbsp;Initializing Extension Modules</a>: Instruction on how to package an extension module. </li>
+</ul>
+
+<p class="paragraph">Finally there are further features of the framework that do not even require to directly
+talk to the framework API or implement framework interfaces, but nevertheless may be often
+used in a way similar to other types of extensions. These are:</p>
+
+<ul>
+<li> <a href="lifecycle.php#factories">8.2&nbsp;Using Factories</a>: Instead of configuring an object directly you can configure 
+a factory that produces the final target instance. </li>
+
+<li> <a href="lifecycle.php#observer">8.6&nbsp;Lifecycle Observer Methods</a>: Transparently observe the lifecycle of other objects and
+perform additional configuration tasks once they are created. </li>
+</ul>
+
+<p class="paragraph">The two links above both point to the lifecycle chapter, these features are not discussed
+in this chapter.</p>
+<h2><a name="metadata"></a>13.2 Custom Metadata Tags</h2>
+
+<p class="paragraph">Being one of the most widely used extension points it allows to create custom metadata you can add
+to any object managed by Parsley. Like with most other extension points all the builtin tags of the core framework
+like <code>[Inject]</code> or <code>[MessageHandler]</code> are implemented as extensions themselves.</p>
+
+
+
+
+<h3><a name="metadata_decorator"></a>13.2.1 The ObjectDefinitionDecorator Interface</h3>
+
+<p class="paragraph">Every custom metadata tag has to implements a simple interface with just one method:</p>
+
+<pre><code>public interface ObjectDefinitionDecorator {
+    
+    function decorate (builder:ObjectDefinitionBuilder) : void;
+    
+}
+</code></pre>
+
+<p class="paragraph">The method will be invoked by the container for each configuration tag it encounters for
+an object that was added to the container. It doesn't matter whether it is a builtin configuration tag
+or a custom extension tag, or whether it is a metadata tag, an MXML or XML tag. As long as the tag
+is mapped to a class that implements this interface the container will invoke it for each tag on each object.</p>
+
+<p class="paragraph">The <code>builder</code> parameter it passes to the decorator can be used to specify configuration options for the
+object definition it currently processes.</p>
+
+
+
+
+<h3><a name="metadata_tasks"></a>13.2.2 Tasks performed by Custom Metadata</h3>
+
+<p class="paragraph">A custom metadata tag usually performs one or both of the following two tasks:</p>
+
+<ul>
+<li> Apply one or more of the existing framework features. The framework's configuration DSL accessible through 
+the <code>ObjectDefinitionBuilder</code> instance passed to the decorator gives convenient access to core features,
+like specifying injections to be performed or registering some of the built-in object processors like for a 
+message handler. See <a href="extensions.php#definitions">13.4&nbsp;Working with ObjectDefinitions</a> for more details. </li>
+
+<li> Add new functionality. Sometimes none of the existing features are sufficient for solving a problem. In this
+case you can apply a custom <code>ObjectProcessor</code> that configures each instance created from a definition.
+See <a href="extensions.php#metadata_processor">13.2.4&nbsp;The ObjectProcessor Interface</a> for details. </li>
+</ul>
+
+<p class="paragraph">For your own applications you usually implement two types of custom metadata tags. One type is a fully generic,
+reusable extension. In this case you are of course invited to blog about it, post on our forum or contribute the
+tag to the framework, if you think that it is generally useful. The other type of tag would be specific to your application.
+Even if it is just reused in a few areas of a single application, a tag may very well help removing a lot of unnecessary
+plumbing.</p>
+
+
+
+
+<h3><a name="metadata_sample"></a>13.2.3 Sample Implementations</h3>
+
+<p class="paragraph">As the builtin tags all use this extension point themselves, you can examine these implementations
+as a starting point for you own tags. Most of the tag implementations reside in the <code>parsley-config</code>
+source folder in the package <code>org.spicefactory.parsley.tag</code>. As you'll see most of them are fairly
+simply, only delegating to the configuration DSL. You should always strive to reduce the logic in your tag 
+implementations, making it easier to apply the feature programmatically in cases where using metadata is not appropiate.</p>
+
+<p class="paragraph">To give a simple example, lets assume that you have an application that dispatches NavigationEvents managed by
+Parsley whenever the user navigates to a new tab or window. Instead of using the generic <code>MessageHandler</code>
+tag for getting notified you could create a custom tag that applies only for these navigation events:</p>
+
+<pre><code>[NavigateTo("addUserForm")]
+public function handleNavigation () : void 
+</code></pre>
+
+<p class="paragraph">The implementation for this tag would look like this:</p>
+
+<pre><code>[Metadata(types="method", multiple="true")]
+public class NavigateTo implements ObjectDefinitionDecorator {
+
+    [DefaultProperty]
+    public var target:String;
+
+    [Target]
+    public var method:String;
+
+    public var scope:String = ScopeName.GLOBAL;    
+
+    public function decorate (builder:ObjectDefinitionBuilder) : void {
+        
+        MessageHandler
+            .forMethod(method)
+                .scope(scope)
+                .type(NavigationEvent)
+                .selector(target)
+                    .apply(builder);
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">The <code>[Metadata]</code> tag is required to configure the metadata tag, it is explained in <a href="extensions.php#metadata_register">13.2.5&nbsp;Registering Metadata Tags</a>.</p>
+
+<p class="paragraph">The <code>[DefaultProperty]</code> tag marks a property that can be used without attribute name. Without that tag you'd need to always
+explicitly specify the attribute name, so the example from above would read: <code>[NavigateTo(target="addUserForm")]</code>.</p>
+
+<p class="paragraph">The <code>[Target]</code> attribute tells the framework that this is the property that holds the name of the member of the class
+(property or method). For metadata to be placed on the class level this is not required of course.</p>
+
+<p class="paragraph">The
+<code>scope</code> property allows to define handlers only interested in navigation events for a particular scope.</p>
+
+<p class="paragraph">Finally we use these property values in building a regular <code>MessageHandler</code> and applying it to 
+the <code>ObjectDefinitionBuilder</code>.
+We are passing the scope value, using the global scope as the default in case the attribute is omitted. The name of the navigation 
+target is used as the selector for the handler, while the message type (<code>NavigationEvent</code>) is hard-coded in this case.</p>
+
+
+
+
+<h3><a name="metadata_processor"></a>13.2.4 The ObjectProcessor Interface</h3>
+
+<p class="paragraph">In the simple example in the preceding section we merely applied an existing feature using the configuration DSL.
+When you want to add custom functionality not provided out of the box, some more work is required. In many cases this
+involves performing some configuration task on the target object once it gets instantiated, but before it is passed
+to the application. For this purpose an <code>ObjectProcessor</code> can be used. This is the interface that needs
+to be implemented:</p>
+
+<pre><code>public interface ObjectProcessor {
+    
+    function init (target: ManagedObject) : void;
+
+    function destroy (target: ManagedObject) : void;
+    
+}
+</code></pre>
+
+<p class="paragraph">Again, fairly simple. The <code>init</code> method will be invoked after the object was instantiated, but before its
+<code>[Init]</code> method will be invoked (this is the default order which can be changed in configuration). 
+Likewise the <code>destroy</code> method will be invoked
+when the object was removed from the Context.</p>
+
+
+<p class="subheadline"> The 1:N Relationship between Decorators and Processors </p>
+
+<p class="paragraph">Understanding this concept is important before implementing your first <code>ObjectProcessor</code>. 
+There is a 1:N relationship between a decorator and a processor. When you implement
+the <code>ObjectDefinitionDecorator</code> interface like shown in preceding sections, it will be invoked once for a particular
+definition in your Context. If it is a definition created by an <code>&lt;Object&gt;</code> tag or any other tag which represents a
+singleton, then the decorator will also map to only one processor. But for other types of objects, like those declared
+with <code>&lt;DynamicObject&gt;</code> or <code>&lt;Command&gt;</code> multiple instances may be created from a single definition.
+In this case one decorator can map to multiple processors, as a new processor might get created for each new instance. 
+Whether you need a new processor instance for each new target instance solely depends on whether you keep state inside
+your processor that only applies to one target. In this case you should implement the <code>StatefulProcessor</code>
+subinterface which adds a <code>clone</code> method to create new instances for each new target.</p>
+
+<p class="paragraph">With this mechanism you have the option to keep state that only
+applies to a single target instance inside the processor. This greatly simplifies a lot of common tasks performed by processors
+as most processors need to unregister some configuration artifact in the <code>destroy</code> method which they
+created and applied in the <code>init</code> method, like adding and removing a message handler which always points
+to one concrete target only.</p>
+
+
+<p class="subheadline"> Example: The MessageDispatcherProcessor </p>
+
+<p class="paragraph">All that may sound more complicated than it actually is, so let's look at an example for a fairly simple stateful processor, 
+the implementation for the builtin <code>[MessageDispatcher] tag</code>
+tag.</p>
+
+<pre><code>public class MessageDispatcherProcessor implements PropertyProcessor, StatefulProcessor {
+    
+    private var scope:String;
+    
+    private var property: Property;
+    
+    private var dispatcher:MessageDispatcher;
+    
+    
+    function MessageDispatcherProcessor (scope:String = null) {
+        this.scope = scope;
+    }
+    
+    
+    /* implementing PropertyProcessor */
+    
+    public function targetProperty (property: Property): void {
+        this.property = property;
+    }
+    
+    
+    /* implementing ObjectProcessor */
+
+    public function init (target: ManagedObject) : void {
+        this.dispatcher = new MessageDispatcher(target.context.scopeManager, scope);
+        property.setValue(target.instance, dispatcher.dispatchMessage);
+    }
+    
+    public function destroy (target: ManagedObject) : void {
+        dispatcher.disable();
+    }
+
+
+    /* implementing StatefulProcessor */
+    
+    public function clone () : StatefulProcessor {
+        return new MessageDispatcherProcessor(scope);
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">The <code>init</code> methods simply creates the dispatcher function (using a utility class) and injects
+it into the target property. Later the dispatcher gets disabled once the object gets removed from the Context
+to prevent it from getting used after the target instance became unmanaged. Since this is tied to the lifecycle
+of one particular instance the processor is stateful. Therefore it implements <code>StatefulProcessor</code> in 
+addition to <code>PropertyProcessor</code>, both subinterfaces of <code>ObjectProcessor</code>. The <code>clone</code>
+method only passes the scope name to the constructor of the new processor instance, as that does not change
+from target to target. The dispatcher is not getting passed, like the property instance which will get passed
+into the new instance by the framework anyway.</p>
+
+<p class="paragraph">Finally, in the corresponding decorator, which represents the actual tag you can use in metadata,
+MXML and XML, you need to add the processor to the definition:</p>
+
+<pre><code>[Metadata(name="MessageDispatcher", types="property")]
+[XmlMapping(elementName="message-dispatcher")]
+public class MessageDispatcherDecorator implements ObjectDefinitionDecorator {
+
+    [Target]
+    public var property:String;
+    
+    public var scope:String;
+    
+    
+    public function decorate (builder:ObjectDefinitionBuilder) : void {
+        builder
+            .property(property)
+            .process(new MessageDispatcherProcessor(scope))
+            .mustWrite()
+            .expectType(Function);
+    }
+    
+</code></pre>
+
+<p class="paragraph">Here we simply create a new instance of our processor and apply it to the <code>ObjectDefinitionBuilder</code>. 
+You can also see that it is convenient to implement <code>PropertyProcessor</code>. You could do the reflection yourself,
+but the syntax above is a handy shortcut for just passing the name of the property as a String, and then relying
+on the framework to check whether the property actually exists on the target class and whether the validation rules
+you specified are met by that property. In this case we know the property must be writable and of type <code>Function</code>.
+If everything is correct, the framework will then pass the <code>Property</code> instance (from Spicelib Reflect API)
+to the <code>targetProperty</code> method of your <code>PropertyProcessor</code>.</p>
+
+<p class="paragraph">Finally in rare cases you may also want to override the default phase the processor gets invoked in.
+By default all processor get invoked in the <code>preInit</code> phase except for the processor for the <code>[Init]</code>
+method itseld, which executes in the <code>init</code> phase. If you need your processor to be applied as a final step
+eben after the init method had been called you can specify a phase explicitly:</p>
+
+<pre><code>public function decorate (builder:ObjectDefinitionBuilder) : void {
+    builder
+        .property(property)
+        .process(new MyCustomProcessor(comeParam))
+        .mustWrite()
+        .initIn(InitPhase.postInit());
+}
+</code></pre>
+
+<p class="paragraph">If in very rare cases you even need ordering within a particular phase, you can pass an additional order
+attribute (the default is 0):</p>
+
+<pre><code>public function decorate (builder:ObjectDefinitionBuilder) : void {
+    builder
+        .property(property)
+        .process(new MyCustomProcessor(comeParam))
+        .mustWrite()
+        .initIn(InitPhase.postInit(<span style="color:#FF0000;">10</span>));
+}
+</code></pre>
+
+
+
+<h3><a name="metadata_register"></a>13.2.5 Registering Metadata Tags</h3>
+
+<p class="paragraph">Finally you have to tell the framework and the Flex compiler about your custom metadata.</p>
+
+<p class="paragraph">The Parsley support for metadata configuration tags is built on top of the Spicelib Reflection API which
+offers the capability to map attributes of metadata tags to properties of classes, bringing AS3 metadata a bit closer
+to the type-safe nature of Java Annotations for example. See <a href="reflection.php#metadata_mapping">19.8&nbsp;Mapping classes to metadata tags</a> in the Spicelib Manual
+for details.</p>
+
+<p class="paragraph">Making the custom tag available for metadata configuration requires three steps:</p>
+
+
+<p class="subheadline"> 1. Add the <code>[Metadata]</code> tag to the class declaration: </p>
+
+<pre><code>[Metadata(types="method")]
+public class NavigatorTo implements ObjectDefinitionDecorator {
+</code></pre>
+
+<p class="paragraph">With the types attribute we specify on which declarations we want the tag to be processed. In this case
+we only allow it on method declarations. Other tags may be placed on properties or on the class level.</p>
+
+
+<p class="subheadline"> 2. Add the class to the Spicelib Metadata Support: </p>
+
+<pre><code>Metadata.registerMetadataClass(NavigatorTo);
+</code></pre>
+
+<p class="paragraph">This must happen before you create your first Parsley <code>Context</code>.</p>
+
+
+<p class="subheadline"> 3. Add the metadata tag to mxmlc or compc compiler arguments: </p>
+
+<pre><code>-keep-as3-metadata+=NavigatorTo
+</code></pre>
+
+<p class="paragraph">If you create a reusable library containing Parsley tag extensions it is recommended to compile the library into an SWC.
+In this case you no longer have to explicitly add the compiler flag for applications that use this SWC as they will be automatically
+included for all applications that use this SWC. In this case you only have to provide the compiler argument to compc when
+creating the SWC.</p>
+
+<p class="paragraph">For some general explanations on metadata configuration, like metadata inheritance or inconsistencies of the Flex compiler
+in dealing with metadata, see <a href="config.php#metadata">3.1&nbsp;Configuration with AS3 Metadata</a>.</p>
+<h2><a name="mxml_xml"></a>13.3 Custom MXML and XML Tags</h2>
+
+<p class="paragraph">In many applications you may be able to stick to the builtin tags like <code>&lt;Object&gt;</code> or <code>&lt;Command&gt;</code>
+for your MXML or XML configuration files. But in case you want to add custom options the format is easy to extend.
+Like with the metadata extension point, all the builtin tags like <code>&lt;Object&gt;</code> or <code>&lt;Command&gt;</code> are implemented
+as extensions themselves.</p>
+
+
+
+
+<h3><a name="mxml_xml_structure"></a>13.3.1 The Structure of Configuration Files</h3>
+
+<p class="paragraph">Although technically there are a lot of differences between MXML and XML configuration, they are very similar
+from the framework's perspective. This means that you usually only have to create one implementation of one of the 
+available interfaces and will then be able to use the same tag in MXML and XML configuration.</p>
+
+<p class="paragraph">The following example shows all the existing types of MXML and XML tags in a single configuration artefact.</p>
+
+<img class="doc_img" src="config_structure.gif" />
+
+<p class="paragraph">This example shows an MXML configuration class, but apart from minor syntactical differences the structure for
+XML configuration files is exactly the same, and the same set of interfaces is supported.</p>
+
+<p class="paragraph">As you see, you'll have two choices for tags on the root level: tags that implement <code>RootConfigurationElement</code>
+or literal values. In case of literal values they are interpreted as an instance that should be added to the Context as is.
+The class may have metadata tags for configuration which the framework will process, but the tag cannot have those 
+framework specific MXML child tags. In case of tags implementing <code>RootConfigurationElement</code> the framework will
+invoke the <code>process</code> method. For details see <a href="extensions.php#mxml_xml_root">13.3.2&nbsp;The RootConfigurationElement Interface</a> and <a href="extensions.php#mxml_xml_sample">13.3.4&nbsp;Example: The MessageConfirmation Tag</a>.</p>
+
+<p class="paragraph">The <code>NestedConfigurationElement</code> shares some similarities with the interface for root tags. It can be used wherever
+tags allow child tags that represent values, like the <code>&lt;Property&gt;</code>, <code>&lt;ConstructorArgs&gt;</code> or <code>&lt;Array&gt;</code> tags.
+Like with root tags in any of these places literal values are allowed and are used as is, while for the tags implementing the
+framework interface their <code>resolve</code> method will be invoked first to determine the actual value represented by that tag.
+For details see <a href="extensions.php#mxml_xml_nested">13.3.3&nbsp;The NestedConfigurationElement Interface</a>.</p>
+
+<p class="paragraph">Finally there are places where tags implementing <code>ObjectDefinitionDecorator</code> can be used. Amongst other places they can
+be used as immediate children of the root tags <code>&lt;Object&gt;</code> or <code>&lt;DynamicObject&gt;</code>. 
+This is the same interface that custom metadata tags have to implement. Thus a single implementation of that interface can be used
+as metadata, MXML or XML, allowing for a great level of flexibility.</p>
+
+<p class="paragraph">The reason that they are allowed immediately below tags like <code>&lt;Object&gt;</code> is that they contain logic to configure
+an object, in the case of MXML or XML usage always the object defined by its parent tag. Custom metadata tags can support nested
+decorator tags, too. For this they must have a DefaultProperty of type Array that expects elements of type <code>ObjectDefinitionDecorator</code>.
+And of course the tag must contain logic that knows how to apply the decorators to the corresponding definition.</p>
+
+<p class="paragraph">Most of the builtin metadata tags support MXML or XML configuration, too. Consider the following metadata tag:</p>
+
+<pre><code>[MessageHandler(scope="local")]
+public function handleMessage (msg:MyMessage) : void
+</code></pre>
+
+<p class="paragraph">The equivalent XML configuration would be:</p>
+
+<pre><code>&lt;object type="com.foo.MyClass"&gt;
+    &lt;message-handler method="handleMessage" scope="local"/&gt;
+&lt;/object&gt;
+</code></pre>
+
+<p class="paragraph">As you see the major difference is that you have to specify the method name in XML. This is not needed with metadata
+as the name will be deduced from the property the tag is placed upon.</p>
+
+
+
+
+<h3><a name="mxml_xml_root"></a>13.3.2 The RootConfigurationElement Interface</h3>
+
+<p class="paragraph">This interface can be implemented by tags that are intended for use on the top level of MXML or XML configuration
+files.</p>
+
+<pre><code>public interface RootConfigurationElement {
+    
+    function process (registry: ObjectDefinitionRegistry) : void;
+    
+}
+</code></pre>
+
+<p class="paragraph">In many cases the implementation of the <code>process</code> method creates, configures and registers a single definition
+for an object. Many of the builtin tags like <code>&lt;Object&gt;</code> behave like that. But it is not a requirement. The tag
+can alternatively register multiple object definitions or even none at all and instead do any other kind of processing.</p>
+
+<p class="paragraph">The <code>ObjectDefinitionRegistry</code> instance passed to the <code>process</code> method gives access to the object definition builders.
+For instruction on how to use the DSL see <a href="extensions.php#definitions">13.4&nbsp;Working with ObjectDefinitions</a>.</p>
+
+
+
+
+<h3><a name="mxml_xml_nested"></a>13.3.3 The NestedConfigurationElement Interface</h3>
+
+<p class="paragraph">This interface is similar to <code>RootConfigurationElement</code>, but comes with a subtle difference: In contrast to
+the root tag which basically can perform any kind of processing, this tag has to represent exactly one value. The reason
+is that such a tag is only used in places where a value is expected. For child tags of the <code>&lt;Array&gt;</code> tag for example
+it is expected that each child tag represents an element of that Array. Therefor the interface is slightly different:</p>
+
+<pre><code>public interface NestedConfigurationElement {
+    
+    function resolve (registry: ObjectDefinitionRegistry) : Object;
+    
+} 
+</code></pre>
+
+<p class="paragraph">The <code>resolve</code> method must return a value. This is interpreted as the actual value the tag represents.
+But there can be one more level of indirection: The returned value can represent something which needs to be resolved
+at the time the value is applied to the instance it belongs to. This applies for the <code>&lt;ObjectRef&gt;</code> tag for
+example. That tag has to resolve an id value or an object type at the time the target object is configured.
+Such a return value must implement the <code>ResolvableValue</code> interface. For examples you may examine
+the <code>NestedObjectTag</code> or <code>ObjectReferenceTag</code> classes.</p> 
+
+
+
+
+<h3><a name="mxml_xml_sample"></a>13.3.4 Example: The MessageConfirmation Tag</h3>
+
+<p class="paragraph">One of the simplest tag implementations is the <code>&lt;MessageConfirmation&gt;</code> utility tag, so it serves
+well as a quick example. The tag allows a message type and optional selector to be defined that should trigger
+a confirmation dialog before proceeding with message processing. It can be used like this in MXML configuration
+classes:</p>
+
+<pre><code>&lt;MessageConfirmation
+    type="{DeleteUserMessage}"
+    scope="local"
+    title="Confirmation"
+    text="Do you really want to delete this user?"
+/&gt;
+</code></pre>
+
+<p class="paragraph">So whenever a message of type <code>DeleteUserMessage</code> is dispatched this utility will kick in first
+and show the dialog using the provided text. When the user clicks cancel, message processing will be cancelled.
+When she clicks Ok, processing of the message resumes, invoking any <code>[MessageHandler]</code> that was defined
+for that message type.</p>
+
+<p class="paragraph">This is how the implementation looks like:</p>
+
+<pre><code>public class MessageConfirmationTag implements RootConfigurationElement {
+
+    public var text:String;
+    
+    public var title:String;
+    
+    public var scope:String = ScopeName.GLOBAL;
+    
+    public var type:Class;
+    
+    public var selector:*;
+    
+    public function process (registry: ObjectDefinitionRegistry) : void {
+        
+        var builder:ObjectDefinitionBuilder 
+                = registry.builders.forClass(MessageConfirmation);
+        
+        builder
+            .constructorArgs(title, text);
+                
+        MessageHandler
+            .forMethod("showAlert")
+                .type(type)
+                .selector(selector)
+                .scope(scope)
+                    .apply(builder);
+        
+        builder
+            .asSingleton()
+                .register();
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">It should be almost self-explanatory. It is a good example for how clean and simple the use of the configuration DSL
+can make the implementation of such a tag. It merely uses the values of the properties set by the user to talk to the API
+to define constructor arguments and a message receiver for the actual utility class. Note that the tag as such does not
+contain the actual processing logic. This has been moved into the <code>MessageConfirmation</code> class that is configured
+and registered by this tag. It is always good to keep configuration and runtime logic separate.</p>
+
+
+
+
+<h3><a name="mxml_xml_namespace_mxml"></a>13.3.5 Creating Custom MXML Namespaces</h3>
+
+<p class="paragraph">Creating a namespace for your custom MXML tags is not required. You can use them like any other class in MXML:
+map a tag prefix to the package of your tag and use it as is. But if you create a larger collection of reusable tags
+your users will probably be happy if you provide a single namespace that holds all the tags of the extension.</p>
+
+<p class="paragraph">Creating such a namespace is a Flex SDK feature. Nothing is specific to Parsley in this respect, so you can 
+simply look up the Flex documentation on that feature. But for the sake of completeness, we'll give a short summary
+of the necessary steps here.</p>
+
+<p class="paragraph">First you need to create a manifest file, that list all the tags that should be included in the namespace.
+If you checkout the Parsley project from SVN you can find the manifest files for all Parsley namespaces in the
+<code>manifest</code> folder. This is an example for how such a file might look like:</p>
+
+<pre><code>&lt;componentPackage&gt;
+    &lt;component id="Objects" class="com.foo.ObjectsTag"/&gt;
+    &lt;component id="Object" class="com.foo.ObjectTag"/&gt;
+    &lt;component id="View" class="com.foo.ViewTag"/&gt;
+    &lt;component id="DynamicObject" class="com.foo.DynamicObjectTag"/&gt;
+    &lt;component id="NestedObject" class="com.foo.NestedObjectTag"/&gt;
+&lt;/componentPackage&gt;
+</code></pre>
+
+<p class="paragraph">It is a simple mapping of a tag name to the fully qualified class name. As you see the tag name does not
+have to be the same as the class name.</p>
+
+<p class="paragraph">To compile such a namespace into your SWC the following compiler options need to be specified for <code>compc</code>:</p>
+
+<pre><code>-namespace http://www.myNamespaceUrl.com ${project.dir}/manifest/myNamespace-manifest.xml
+-include-namespaces=http://www.myNamespaceUrl.com
+</code></pre>
+
+
+
+
+<h3><a name="mxml_xml_namespace_xml"></a>13.3.6 Creating Custom XML Namespaces</h3>
+
+<p class="paragraph">In contrast to MXML creating a namespace for custom tags is required for XML. It's the only way to expand
+the basic feature set of the Parsley XML tags. The XML support is built on top of the Spicelib XML-Object-Mapper.
+For full documentation see <a href="xmlmapper.php#intro">20&nbsp;XML to Object Mapper</a>. But often the full feature set is not required. 
+For basic tags that can also be used in MXML they often only utilize attributes for configuration and avoid
+any complex structure. Since mapping to attributes is the default behaviour of the XML-Object-Mapper, nothing
+has to be configured explicitly then. You'd only need to create the namespace and list the classes that should
+belong to that namespace:</p>
+
+<pre><code>XmlConfigurationNamespaceRegistry
+    .getNamespace("http://www.myNamespaceUrl.com")
+    .mappedClasses(SomeTag, SomeOtherTag, YetAnotherTag);
+</code></pre>
+
+<p class="paragraph">You can then use the new namespace alongside the builtin Parsley namespace:</p>
+
+<pre><code>&lt;objects xmlns="http://www.spicefactory.org/parsley" 
+    <span style="color:#FF0000;">xmlns:myNS="http://www.myNamespaceUrl.com"</span>&gt;
+    
+    &lt;object type="com.foo.NormalObject"/&gt;
+    
+    <span style="color:#FF0000;">&lt;myNS:some-tag /&gt;</span> 
+
+    <span style="color:#FF0000;">&lt;myNS:yet-another-tag /&gt;</span> 
+    
+&lt;/objects&gt;
+</code></pre>
+
+<p class="paragraph">For the mechanism and supported interfaces see <a href="extensions.php#mxml_xml_structure">13.3.1&nbsp;The Structure of Configuration Files</a> as it is the same as
+for MXML configuration classes.</p>
+<h2><a name="definitions"></a>13.4 Working with ObjectDefinitions</h2>
+
+<p class="paragraph">In the proceeding sections you were introduced to the mechanisms of creating custom tags, either as metadata, MXML or XML.
+With all of these types of tags you often need to create an <code>ObjectDefinition</code> or modify and existing one.
+This can be done with the help of the configuration DSL. This section lists the most important options. For further
+details you may want to browse the ASDoc for the DSL.</p>
+
+
+
+
+<h3><a name="definitions_create"></a>13.4.1 Creating New Definitions</h3>
+
+<p class="paragraph">This is usually only required in MXML or XML tags as metadata tags is most often used to configure existing definitions.
+If you implement <code>RootConfigurationElement</code> or <code>NestedConfigurationElement</code> for a custom MXML or XML tag,
+then the provided <code>ObjectDefinitionRegistry</code> instance can be used to obtain a new builder for an <code>ObjectDefinition</code>:</p>
+
+<pre><code>public function process (registry: ObjectDefinitionRegistry) : void {
+
+    var builder:ObjectDefinitionBuilder = registry.builders.forClass(MessageConfirmation);
+                
+    [...]
+    
+}
+</code></pre>
+
+<p class="paragraph">Things you can do with such a builder will be explained in the following sections.
+When implementing <code>ObjectDefinitionDecorator</code> for a custom metadata tag, a builder has already
+been created and will be passed to the decorator:</p>
+
+<pre><code>public function decorate (builder:ObjectDefinitionBuilder) : void {
+</code></pre>
+
+
+
+<h3><a name="definitions_properties"></a>13.4.2 Defining Property Values</h3>
+
+<p class="paragraph">You can define literal values or injections.</p>
+
+<p class="subheadline"> Literal Values </p>
+
+<pre><code>builder
+    .property("firstName")
+        .value("Ann");
+</code></pre>
+
+<p class="subheadline"> Injection by Type </p>
+
+<p class="paragraph">If the type can be deduced from reflecting on the property type:</p>
+
+<pre><code>builder
+    .property("service")
+        .value(Inject.byType());
+</code></pre>
+
+<p class="paragraph">If the type cannot be determined through reflection, it can be specified explicitly:</p>
+
+<pre><code>builder
+    .property("service")
+        .value(Inject.byType(LoginService));
+</code></pre>
+
+<p class="subheadline"> Injection by Id </p>
+
+<pre><code>builder
+    .property("service")
+        .value(Inject.byId("loginService"));
+</code></pre>
+
+<p class="paragraph">This is equivalent to using <code>[Inject(id="loginService")]</code> on the property declaration.</p>
+
+
+
+
+<h3><a name="definitions_constructor"></a>13.4.3 Defining Constructor Arguments</h3>
+
+<p class="paragraph">Like for properties literal values and injections can be specified.</p>
+
+<p class="subheadline"> Literal Values </p>
+
+<pre><code>builder.constructorArgs("Alison", "Goldfrapp");
+</code></pre>
+
+<p class="subheadline"> Injection by Type </p>
+
+<p class="paragraph">If the type for all parameters can be deduced from reflecting on the parameters of the constructor
+yo can simply omit all parameters:</p>
+
+<pre><code>builder.constructorArgs();
+</code></pre>
+
+<p class="paragraph">Note that there is a bug in current Flash Players that reports <code>'*'</code> as the type for constructor arguments
+instead of the actual declared type if you reflect on a class before any instances of that class have been created.</p> 
+
+<p class="paragraph">If the types cannot be determined through reflection, it can be specified explicitly:</p>
+
+<pre><code>builder
+    .constructorArgs(
+        Inject.byType(LoginService),
+        Inject.byType(CartService),
+        Inject.byType(ProductService)
+    );
+</code></pre>
+
+<p class="subheadline"> Injection by Id </p>
+
+<pre><code>builder.constructorArgs(Inject.byId("loginService"));
+</code></pre>
+
+<p class="paragraph">Of course any mechanisms can be mixed, like an injection by type with a literal value:</p>
+
+<pre><code>builder
+    .constructorArgs(
+        Inject.byId("loginService")
+        "http://www.someDomain.com/"
+    );
+</code></pre>
+
+
+
+
+<h3><a name="definitions_standard_messaging"></a>13.4.4 Standard Message Receivers</h3>
+
+<p class="paragraph">If you want to apply one of the builtin message receivers like <code>[MessageHandler]</code>
+or <code>[CommandResult]</code> programmatically, they are all available through their corresponding API:</p>
+
+<pre><code>var builder: ObjectDefinitionBuilder = ...;
+
+MessageHandler
+    .forMethod("intercept")
+        .type(LoginMessage)
+        .scope("local")
+            .apply(builder);
+
+CommandResult
+    .forMethod("result")
+        .type(SaveUserMessage)
+        .scope("window")
+            .apply(builder);
+            
+CommandStatus
+    .forProperty("status")
+        .type(LoadConfigMessage)
+        .selector("loadServices")       
+            .apply(builder);
+</code></pre>     
+           
+
+
+
+<h3><a name="definitions_custom_messaging"></a>13.4.5 Custom Message Receivers</h3>
+
+<p class="paragraph">In cases where you created a custom message receiver by directly implementing one of the core
+receiver interfaces like <code>MessageTarget</code> or <code>CommandObserver</code> or extending one of the builtin
+receivers, you can pass a custom factory function for these receivers:</p>
+
+<pre><code>var builder: ObjectDefinitionBuilder = ...;
+
+var factory:Function = function (): Object {
+    return new MyCustomMessageReceiver(someParam, anotherParam);
+};
+		
+builder.method("handleMessage").process(new MethodReceiverProcessor(factory, ScopeName.LOCAL));
+</code></pre>
+
+<p class="paragraph">The factory function will be invoked for each instance that gets created from the target definition.</p>
+
+<p class="paragraph">The framework will do the rest for you. Like registering that receiver when the object gets
+created and removing it again when the object gets removed from the Context. It also takes care
+of the complex proxy handling for singleton definitions. In those cases a receiver proxy will
+be registered even before the target instance will be created, to avoid scenarios where an instance
+"misses" a message just because it was created after the sender at container startup.</p>
+
+
+
+
+<h3><a name="definitions_instantiators"></a>13.4.6 Custom Instantiators</h3>
+
+<p class="paragraph">This is a hook that allows you to define the way how the target instance gets instantiated.
+In this case any constructor arguments that were already specified will be ignored since it is
+this instantiator who is responsible for creating the object then. This is how an instantiator
+can be specified:</p>
+
+<pre><code>var builder: ObjectDefinitionBuilder = ...;
+
+builder.instantiate(new MyInstantiator());
+</code></pre>
+
+<p class="paragraph">And this is the interface that must be implemented:</p>
+
+<pre><code>public interface ObjectInstantiator {
+    
+    function instantiate (target:ManagedObject) : Object;
+    
+}
+</code></pre>
+
+<p class="paragraph">It simply has to return the new instance that should be added to the Context. The specified <code>target</code>
+parameter gives access to the ObjectDefinition and the associated Context. The property <code>target.instance</code>
+is null still at this point. Obviously, because this will become the instance that this method returns.</p>
+
+
+
+
+<h3><a name="definitions_processors"></a>13.4.7 Custom ObjectProcessors</h3>
+
+<p class="paragraph">This is a hook for performing configuration logic when the object gets created and when it gets removed.
+This is explained in detail in section <a href="extensions.php#metadata_processor">13.2.4&nbsp;The ObjectProcessor Interface</a>.</p>
+
+<p class="paragraph">Do not use such a processor to register and unregister message receivers. It would work in many cases,
+but would not be as robust as using a factory for a message receiver 
+as demonstrated in <a href="extensions.php#definitions_custom_messaging">13.4.5&nbsp;Custom Message Receivers</a>.</p>
+
+
+
+
+<h3><a name="definitions_register"></a>13.4.8 Registering Definitions</h3>
+
+<p class="paragraph">Finally after all configuration options have been specified like shown in preceding sections,
+the object has to be registered. Registering a definition has the same effect as adding
+an <code>&lt;Object&gt;</code> tag to an MXML configuration class: the object represented by the definition becomes
+available for dependency injection or may be fetched from the Context directly, e.g. with <code>Context.getObject()</code>.</p>
+
+<p class="paragraph">There are two types of objects you can register: Singletons, which will be created on container startup and will
+remain managed until the Context gets destroyed. In this case only one instance will be created from the definition.
+The second option is a DynamicObject. This can be created and removed from the Context at any point in time.
+And more than just one instance can be created from such a definition. Depending on what type of definition
+you create there are some final options for the registration available:</p>
+
+<p class="subheadline"> Singletons </p>
+
+<pre><code>builder
+    .asSingleton()
+        .id("someId")
+        .lazy(true)
+        .order(1)
+        .register();
+</code></pre>
+
+<p class="paragraph">All the options above are optional, to simply apply the defaults (non-lazy singleton with no particular order)
+you can reduce the above to:</p>
+
+<pre><code>builder
+    .asSingleton()
+        .register();
+</code></pre>
+
+<p class="subheadline"> Dynamic Objects </p>
+
+<pre><code>builder
+    .asDynamicObject()
+        .id("someId")
+        .register();
+</code></pre>
+
+<p class="paragraph">Again the id is optional and may be omitted. Lazy or order options do not apply to DynamicObjects.</p>
+    
+
+
+
+<h3><a name="definitions_dependent"></a>13.4.9 Defining Dependent Objects</h3>
+
+<p class="paragraph">Sometimes you want to create an object that is not registered and available as a root definition, but only gets
+used within another definition as a kind of private dependency. Something equivalent to the following MXML configuration:</p>
+
+<pre><code>&lt;Object type="{SomeService}"&gt;
+    &lt;ConstructorArgs&gt;
+        &lt;NestedObject type="{SomeCollaborator}"/&gt;
+    &lt;/ConstructorArgss&gt;
+&lt;/Object&gt;
+</code></pre>
+
+<p class="paragraph">In this case the instance of <code>SomeCollaborator</code> is not available for injection or for being fetched directly
+from the Context instance. Instead it only gets injected as a dependency into the constructor of the host object,
+with the lifecycle of the dependency being tied to that of the host.</p>
+
+<p class="paragraph">If you want to do the same in code, this is how it works:</p>
+
+<pre><code>var registry: ObjectDefinitionRegistry = ...;
+
+var dependency:DynamicObjectDefinition = registry.builders
+    .forClass(SomeCollaborator)
+        .asDynamicObject()
+            .build();
+            
+var builder:ObjectDefinitionBuilder = registry.builders
+    .forClass(SomeService);
+
+builder
+    .constructorArgs(<span style="color:#FF0000;">Inject.fromDefinition(dependency)</span>);
+            
+builder
+    .asSingleton()
+        .register();
+</code></pre>
+
+<p class="paragraph">As you see, we do not call <code>register</code> for the first definition we create. We just call <code>build</code> instead, 
+which gives us a definition the container does not know about. We then pass it to <code>Inject.fromDefinition</code> for the 
+constructor arguments of the other definition and only register the latter with the container.</p>
+
+
+
+
+<h3><a name="definitions_reflect"></a>13.4.10 Reflection</h3>
+
+<p class="paragraph">When reflecting on a class where there is already an existing builder for, you can simply use the <code>ClassInfo</code>
+instance avaibale through that builder:</p>
+
+<pre><code>var p:Property = builder.typeInfo.getProperty("service");
+</code></pre>
+
+<p class="paragraph">If for some reason you have to create a ClassInfo instance yourself, remember to always pass the ApplicationDomain
+that the Context your tag lives in belongs to:</p>
+
+<pre><code>var registry: ObjectDefinitionRegistry = ...;
+var ci:ClassInfo = ClassInfo.forClass(SomeClass, <span style="color:#FF0000;">registry.domain</span>);
+</code></pre>
+
+<p class="paragraph">Without passing the domain the tag may not work properly in modules loaded into child ApplicationDomains.</p>
+<h2><a name="scopes"></a>13.5 Working with Scopes</h2>
+
+<p class="paragraph">In some cases you may want to create custom configuration tags that interact with some kind
+of central manager in a similar way like the builtin message receiver tags interact with the <code>MessageReceiverRegistry</code>
+for example. And often it would be beneficial if there would be a way to avoid just having one global manager instance.
+If you want to allow the users of your custom extension tags to specify scopes the same way like for messaging,
+so that the feature can be applied globally or just locally for one Context only or for a any custom scope, 
+this can be accomplished by registering a scope extension.</p>
+
+<p class="paragraph">A core framework feature that is built on top of a ScopeExtension is the support for Decoupled Bindings with
+the <code>[Publish]</code> and <code>[Subscribe]</code> tags. If you want to browse the code for inspiration on building
+scope-wide services, you find the implementation in the <code>parsley-extensions</code> source folder in the package
+<code>org.spicefactory.parsley.binding</code>.</p>
+
+<p class="paragraph">Through the use of scopes a publisher may publish an object to a local scope only, which allows for multiple
+windows, popups or modules to have their own local publishing space without creating ambuigities through multiple
+publisher declarations.</p>
+
+<p class="paragraph">For a custom scope-wide service it is recommended to use a service interface and program the tags against
+that interface. You can then register the implementation for the manager like this:</p>
+
+<pre><code>BootstrapDefaults.config.scopeExtensions
+    .forType(NavigationManager)
+    .setImplementation(DefaultNavigationManager);
+</code></pre>
+
+<p class="paragraph">This way a new instance of your scope-wide manager will be created for each scope,
+the global scope, each local scope of each Context and each custom scope. Someone else would then
+be able to specify alernative implementations without the need to change any of the configuration tags
+that might talk to the service.</p>
+
+<p class="paragraph">A tag implementation may then fetch the manager instance that belongs to the specified target scope:</p>
+
+<pre><code>public class EnterScreenDecorator implements ObjectDefinitionDecorator {
+
+    public var scope:String = ScopeName.GLOBAL;
+    
+    [...]
+    
+    public function decorate (builder:ObjectDefinitionBuilder) : void {
+    
+        var scope:Scope = builder.registry.context.scopeManager.getScope(scope);
+        
+        var navigationManager:NavigationManager 
+                = scope.extensions.byType(NavigationManager) as NavigationManager;
+       
+        navigationManager.doSomethingWithDefinition(definition);
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">In the example above the default global scope could be overwritten by the user through the scope attribute.
+Of course your manager does not necessarily have to deal with definitions directly. You can also use
+the scope-wide manager in an <code>ObjectProcessor</code> and work with the actual target instance instead of just
+the definition.</p>
+<h2><a name="config_processors"></a>13.6 Custom Configuration Mechanisms</h2>
+
+<p class="paragraph">Although Parsley is already quite flexible in how you configure objects with support for configuration
+with Metadata, MXML, XML or ActionScript, you may require even more freedom in how you create object
+definitions. You may want to process configuration loaded through Sockets or WebServices or simply programmatically
+create some object definitions. For this purpose you can implement the <code>ConfigurationProcessor</code> interface.
+The interface contains a single method:</p>
+
+<pre><code>public interface ConfigurationProcessor {
+    
+    function processConfiguration (registry:ObjectDefinitionRegistry) : void;
+    
+}
+</code></pre>
+
+<p class="paragraph">Your implementation of this interface may create any number of <code>ObjectDefinition</code> instances and
+add them to the registry provided by the framework. If you still want to process the metadata tags of the classes
+you add to the registry (in addition to your own logic of constructing definitions) you should use the 
+mechanism provided by the framework:</p>
+
+<pre><code>var type:Class = AddToCartAction;
+var id:String = "addToCartAction";
+
+registry
+    .builders
+        .forClass(type)
+            .asSingleton()
+                .id(id)
+                .register();
+</code></pre>
+
+<p class="paragraph">The configuration DSL of the framework always processes metadata on the configured classes and combines
+the metadata configuration with the options specified programmatically through the DSL.</p>
+
+<p class="paragraph">Your custom processor can then be combined with any existing builder:</p>
+
+<p class="paragraph">MXML:</p>
+
+<pre><code>&lt;parsley:ContextBuilder&gt;
+    &lt;parsley:FlexConfig type="{BookStoreConfig}"/&gt;
+    &lt;parsley:XmlConfig file="logging.xml"/&gt;
+    <span style="color:#FF0000;">&lt;parsley:CustomConfig&gt;
+        &lt;mynamespace:MyCustomConfigurationProcessor/&gt;
+    &lt;/parsley:CustomConfig&gt;</span>
+&lt;/parsley:ContextBuilder&gt;
+</code></pre>
+
+<p class="paragraph">ActionScript DSL:</p>
+
+<pre><code>var viewRoot:DisplayObject = ...;
+
+ContextBuilder.newSetup()
+    .viewRoot(viewRoot)
+    .newBuilder()
+        .config(FlexConfig.forClass(BookStoreConfig))
+        .config(XmlConfig.forFile("logging.xml"))
+<span style="color:#FF0000;">        .config(new MyCustomConfigurationProcessor())</span>
+        .build();
+</code></pre>
+
+<p class="paragraph">After the code above executed the objects defined with MXML and XML happily coexist with objects added
+through your custom builder in the same <code>Context</code>.</p>
+
+
+<p class="subheadline"> Asynchronous Processors </p>
+
+<p class="paragraph">If your processor operates asynchronously you have to implement the <code>AsyncConfigurationProcessor</code>
+interface instead (which extends the <code>ConfigurationProcessor</code> interface). This might be necessary
+if you obtain the configuration with some remote service call for example. The interface looks like this:</p>
+
+<pre><code>[Event(name="complete", type="flash.events.Event")]
+
+[Event(name="error", type="flash.events.ErrorEvent")]
+
+public interface AsyncConfigurationProcessor 
+                                      extends ConfigurationProcessor, IEventDispatcher {
+    
+    function cancel () : void;
+    
+}
+</code></pre>
+
+<p class="paragraph">First you must be prepared that your asynchronous processor may get cancelled (for example if the application
+destroys the associated <code>Context</code> before it was fully configured). Finally you have to throw either
+<code>Event.COMPLETE</code> or <code>ErrorEvent.ERROR</code>, depending on whether configuration succeeded or failed.</p>
+<h2><a name="kernel"></a>13.7 Replacing IOC Kernel Services</h2>
+
+<p class="paragraph">(Note: Prior to version 2.4 kernel services required a dedicated factory. This is no longer needed, you can now
+simply specify the implementation class like shown in the following examples.)</p>
+
+<p class="paragraph">All central services of the IOC kernel live behind interfaces which can be replaced by custom implementations. 
+The replacement can be done globally or just for a single Context, in case you build a modular application with
+a hierarchy of multiple Contexts.</p>
+
+<p class="paragraph">In the following example the central <code>ViewManager</code> will be replaced globally by specifying
+a custom implementation:</p>
+
+<pre><code>BootstrapDefaults.config.services.viewManager.setImplementation(MyCustomViewManager);
+</code></pre>
+
+<p class="paragraph">A new instance of your custom ViewManager will then be created for each new Context. 
+If you want to replace the <code>ViewManager</code> for a single Context (and its children) only,
+you can specify the factory with the <code>ContextBuilder</code> DSL:</p>
+
+<pre><code>var viewRoot:DisplayObject = ...;
+
+ContextBuilder.newSetup()
+    .viewRoot(viewRoot)
+<span style="color:#FF0000;">    .services().viewManager().setImplementation(MyCustomViewManager)</span>
+    .newBuilder()
+        .config(FlexConfig.forClass(BookStoreConfig))
+        .build();
+</code></pre>
+
+<p class="paragraph">For reusable replacements to be used in Flex applications it is recommended to create a simple
+custom tag like shown in <a href="extensions.php#init">13.8&nbsp;Initializing Extension Modules</a> that can then be used as a child tag in a <code>ContextBuilder</code>
+tag.</p>
+
+
+<p class="subheadline"> Decorating IOC Kernel Services </p>
+
+<p class="paragraph">For most scenarios it is recommended not to create a replacement from scratch but instead decorate an existing service.
+There are two reasons why you should prefer a decorator. First, in most cases you want to add or modify a certain aspect
+of a core service and not implement it with a totally different behavior. Second, there might be 3rd party frameworks or 
+extensions that in turn want to replace or decorate a core service, which would fail if those were full replacements,
+as one replacement would overwrite the other. With a decorated service there is no limitation on the number of decorators
+you wrap around the original service.</p>
+
+<p class="paragraph">This is how you would write a very simple decorator that simply logs whenever a view root is added or removed
+from the Context. (This is a contrived example as Parsley does that anyway, it's just to demonstrate the principle.)</p> 
+
+<pre><code>package {
+
+// [imports...]
+
+public class LoggingViewManager implements ViewManager {
+    
+    private static const log:ILogger = Log.getLogger("com.foo.LoggingViewManager");
+    
+    private var delegate:ViewManager;
+    
+    function LoggingViewManager (delegate:ViewManager) {
+        this.delegate = delegate;
+    }
+
+    public function addViewRoot (view:DisplayObject) : void {
+        log.info("Adding view root " + view.name);
+        delegate.addViewRoot(view);
+    }
+
+    public function removeViewRoot (view:DisplayObject) : void {
+        log.info("Removing view root " + view.name);
+        delegate.removeViewRoot(view);
+    }
+    
+}
+}
+</code></pre>
+
+<p class="paragraph">As you can see all you need to do is implement the kernel interface (<code>ViewManager</code> in this example)
+like when replacing kernel services and then adding a constructor that accepts the real <code>ViewManager</code> as
+a delegate. You can then apply this decorator globally like this:</p>
+
+<pre><code>BootstrapDefaults.config.services.viewManager.addDecorator(LoggingViewManager);
+</code></pre>
+
+
+<p class="subheadline"> Knowing your Environment </p>
+
+<p class="paragraph">In many cases you may need access to the configuration settings or collaborating services or just the <code>Context</code>
+instance itself. This can be accomplished for service replacements and decorators through implementing the <code>InitializingService</code>
+interface:</p>
+
+<pre><code>class SomeService implements ViewManager, <span style="color:#FF0000;">InitializingService</span> {
+
+    <span style="color:#FF0000;">public function init (info:BootstrapInfo) : void {</span>
+    }
+
+    public function addViewRoot (view:DisplayObject) : void {
+    }
+	
+    public function removeViewRoot (view:DisplayObject) : void {
+    }
+	
+}
+</code></pre>
+
+<p class="paragraph">The <code>BootstrapInfo</code> class gives you access to all the other kernel services and the configuration settings for
+the Context your service instance belongs to. The <code>init</code> method will be invoked once after your service has been
+instantiated.</p>
+
+<p class="paragraph">The next section gives you an overview over all services that can be replaced or decorated.</p>
+
+
+<p class="subheadline"> List of IOC Kernel Services </p>
+
+<table>
+<tr><td> <code>BootstrapManager</code> </td><td> Responsible for processing the configuration
+and then building and initializing the <code>Context</code>. 
+May be fed with different types of <code>ConfigurationProcessor</code>s, like the builtin
+ones for ActionScript, MXML or XML configuration. </td></tr>
+
+<tr><td> <code>Context</code> </td><td> This is the core interface of the framework, putting all the other
+pieces together and delegating most of the work to the other parts of the kernel listed below. 
+It allows you to pull objects out of the container or examine its contents. </td></tr>
+
+<tr><td> <code>ObjectDefinitionRegistry</code> </td><td> The registry for all ObjectDefinitions the <code>Context</code>
+will manage. </td></tr>
+
+<tr><td> <code>ObjectLifecycleManager</code> </td><td> Responsible for processing <code>ObjectDefinitions</code>, instantiating,
+configuring and disposing the actual instances described by those definitions. </td></tr>
+
+<tr><td> <code>ScopeManager</code> </td><td> Responsible for managing all scopes that are associated with a single Context. </td></tr>
+
+<tr><td> <code>MessageRouter</code> </td><td> The core interface of the Messaging Framework. </td></tr>
+
+<tr><td> <code>ViewManager</code> </td><td> Responsible for dynamically wiring views to the <code>Context</code>. </td></tr>
+</table>
+
+<p class="paragraph">All the services listed above can be replaced through the <code>BootstrapDefaults</code>.</p>
+<h2><a name="init"></a>13.8 Initializing Extension Modules</h2>
+
+<p class="paragraph">When you create a set of configuration tags and possibly some scope-wide managers that integrate with them,
+you may want to offer your users a convenient way to activate that extension:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="{MyConfig}"&gt;
+    &lt;app:NavigationSupport/&gt;
+&lt;/parsley:ContextBuilder&gt;
+</code></pre>
+
+<p class="paragraph">Here a custom MXML tag as a child of the <code>&lt;ContextBuilder&gt;</code> tag takes the role of doing all the necessary
+setup to make the extension available for that Context.</p>
+
+<p class="paragraph">Child tags of <code>&lt;ContextBuilder</code> have to implement the <code>ContextBuilderProcessor</code> interface:</p>
+
+<pre><code>public class NavigationSupportTag implements BootstrapConfigProcessor {
+
+    private static var initialized:Boolean = false;
+
+    public static function initialize () : void {
+        if (initialized) return;
+        
+        Metadata.registerMetadataClass(EnterScreenDecorator);
+        Metadata.registerMetadataClass(ExitScreenDecorator);
+
+        BootstrapDefaults.config.scopeExtensions
+            .forType(NavigationManager)
+            .setImplementation(DefaultNavigationManager);
+    
+        [...]
+        
+        initialized = true;
+    }
+
+    public function processConfig (config:BootstrapConfig) : void {
+        initialize();
+    }
+    
+}
+</code></pre>  
+
+<p class="paragraph">The <code>processBuilder</code> method of the implemented interface will simply delegate to a public static method.
+This has the advantage that you can use the same class programmatically, in cases where you don't use the MXML tags
+to declare the Context:</p>
+
+<pre><code>NavigationSupport.initialize();
+</code></pre>
+
+<p class="paragraph">Like shown in our example, most common tasks in such an initializer are registering custom metadata tags
+or scope-wide managers.</p>
+
+<p class="paragraph">If you also offer your tags in an XML variant built on top of the custom configuration namespace
+support in Parsley you may want to prefer to offer them with a separate initializer class. This
+way you would make sure that users who do not use XML configuration do not end up with the entire
+Spicelib XML-Object-Mapper framework compiled into their SWF.</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="{MyConfig}"&gt;
+    &lt;app:NavigationSupport/&gt;
+    &lt;app:NavigationXmlSupport/&gt;
+&lt;/parsley:ContextBuilder&gt;
+</code></pre>
+
+<p class="paragraph">In the example above XML support is activated explicitly in addition to the core extension module. 
+The XML initializer is responsible for configuring the custom XML configuration namespace. For details see
+<a href="extensions.php#mxml_xml_namespace_xml">13.3.6&nbsp;Creating Custom XML Namespaces</a>.</p>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

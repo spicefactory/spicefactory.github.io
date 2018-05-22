@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>15 Logging Configuration</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>15 Logging Configuration</h1>
+
+<p class="paragraph">Since logging configuration changes very often (depending on deployment scenario and depending on personal
+settings of developers) it is often best to keep them in external XML configuration files. For that reason
+Parsley offers an optional extension with a set of XML tags for logging configuration.</p>
+
+<p class="paragraph">For Flex Application you can use XML tags to build standard Flex LogTargets. For Flash Applications Parsley
+includes a separate set of tags that build Loggers for the Spicelib Logging Framework instead. In the final
+section we'll demonstrate how you can configure the internal log output of Parsley Framework classes.</p>
+
+<p class="paragraph">This functionality is not part of Parsley Core. The extensions are available on the Parsley download page.
+Simply add the SWCs from the download to your classpath.</p>
+<h2><a name="flex"></a>15.1 Logging Configuration for Flex</h2>
+
+<p class="paragraph">If you want to use the Flex Logging API you have two options: You can configure LogTargets in MXML
+with the builtin MXML tags - in this case no Parsley integration is required. For details on using
+the Flex Loggin API see the <a href="http://livedocs.adobe.com/flex/3/html/help.html?content=logging_09.html#178687" target="_blank">Flex LiveDocs</a>.</p>
+
+<p class="paragraph">If you prefer using external XML files for your logging configuration you can use an XML tag extension
+of Parsley that creates LogTargets:</p>
+
+<pre><code>&lt;objects 
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:log="http://www.spicefactory.org/parsley/flex/logging"
+    
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spicefactory.org/parsley 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-core.xsd 
+    http://www.spicefactory.org/parsley/flex/logging 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-logging-flex.xsd"
+    &gt;
+    
+    &lt;log:target level="error"&gt;
+        &lt;log:filter&gt;org.spicefactory.*&lt;/log:filter&gt;        
+    &lt;/log:target&gt;
+    &lt;log:target level="debug"&gt;
+        &lt;log:filter&gt;com.bookstore.*&lt;/log:filter&gt;    
+        &lt;log:filter&gt;com.mycompany.util.*&lt;/log:filter&gt;    
+    &lt;/log:target&gt;
+    
+    &lt;!-- other object definitions --&gt;
+    
+&lt;/objects&gt;
+</code></pre>
+
+<p class="paragraph">With the example configuration above you will see only error from internal logs of Spicefactory framework classes
+while seeing all debug logs from your own application classes.</p>
+
+<p class="paragraph">The default target type created by this tag is a <code>TraceTarget</code>. You can explicitly declare other
+target types:</p>
+
+<pre><code>&lt;log:target level="debug" <span style="color:#FF0000;">type="com.bookstore.util.CustomLogTarget"</span>&gt;
+    &lt;log:filter&gt;com.bookstore.*&lt;/log:filter&gt;        
+&lt;/log:target&gt;
+</code></pre>
+
+<p class="paragraph">Since this is an extension it has to be initialized explicitly before using the <code>XmlContextBuilder</code>:</p>
+
+<pre><code>FlexLoggingXmlSupport.initialize();
+</code></pre>
+<h2><a name="flash"></a>15.2 Logging Configuration for Flash</h2>
+
+<p class="paragraph">For Flash Applications Spicelib offers its own Logging Framework. For details on how to use it see
+<a href="spicelib-logging.php#intro">22&nbsp;Logging for Flash Applications</a> in the Spicelib Manual. Parsley includes an XML tag extension that
+you can use to configure loggers for that framework:</p>
+
+<pre><code>&lt;objects 
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:log="http://www.spicefactory.org/parsley/flash/logging"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spicefactory.org/parsley 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-core.xsd 
+    http://www.spicefactory.org/parsley/flash/logging 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-logging-flash.xsd"
+    &gt;
+    
+    &lt;log:factory id="logFactory"&gt;
+        &lt;log:appender ref="appender" threshold="trace"/&gt;
+        &lt;log:logger name="org.spicefactory" level="warn"/&gt;
+        &lt;log:logger name="com.bookstore" level="debug"/&gt;
+    &lt;/log:factory&gt;
+    
+    &lt;object id="appender" type="org.spicefactory.lib.flash.logging.impl.TraceAppender"/&gt;
+    
+&lt;/objects&gt;
+</code></pre>
+
+<p class="paragraph">The Appenders that the Logging Framework should use can be defined with regular Parsley <code>object</code> tags.
+You can then refer to these definitions in the <code>log:appender</code> tag. You can add any number of loggers
+to the configuration and set their level individually. Note that the names always lead to a hierarchical logger
+structure, you don't have to specify an <code>'*'</code> at the end of logger names like with the Flex Logging API.</p>
+
+<p class="paragraph">You always have to add at least one <code>Appender</code>, because a <code>Logger</code> only dispatches
+<code>LogEvents</code>, which all <code>Appenders</code> listen to. Those <code>Appenders</code> then route the 
+messages to a final destination (console, socket, file, etc.). In the example above we just use the builtin
+<code>TraceAppender</code> which uses the Flash Players <code>trace</code> function for log output.</p>
+
+<p class="paragraph">There is also a second <code>Appender</code> released with the Spicelib: <code>SOSAppender</code>. This 
+<code>Appender</code> routes messages to <code>SOS</code> 
+(<a href="http://sos.powerflasher.com/" target="_blank">http://sos.powerflasher.com/</a>),
+a free logging tool from Powerflasher, that allows to colorize and filter log messages.</p>
+
+<p class="paragraph">In the example above we set the threshold for the <code>TraceAppender</code> to <code>TRACE</code>. This 
+threshold is a second level of filtering. All messages that were not filtered by the log level of
+the individual logger will again be checked against the threshold of the <code>Appender</code>.
+In this case we chose the <code>TRACE</code> level which is the lowest rank of all levels so all messages
+will pass.</p>
+
+<p class="paragraph">Since this is an extension it has to be initialized explicitly before using the <code>XmlContextBuilder</code>:</p>
+
+<pre><code>FlashLoggingXmlSupport.initialize();
+</code></pre>
+<h2><a name="spicefactory"></a>15.3 Configuration for Parsley Framework Logs</h2>
+
+<p class="paragraph">Finally you may want to see the output by Parsleys (and Spicelibs) internal loggers which might help with
+debugging. For the internal logs we had to tackle the problem that Parsley and Spicelib can be used in Flex and
+Flash Applications, and thus with the Flex Logging API or the Spicelib Logging Framework. So we created a log wrapper,
+similar to Commons Logging in the Java world, that would delegate the actual log output to any log delegate we feed it with.</p>
+
+<p class="paragraph">You can obtain such a delegating logger through the <code>LogContext</code> class:</p>
+
+<pre><code>LogContext.getLogger(MyClass);
+</code></pre>
+
+<p class="paragraph">You may even use those delegating loggers in your own code. It's not very useful for building applications, since
+they are either Flex or Flash Applications so you can simply decide which Logging API to use. But if you create reusable
+libraries that you might want to use with or without Flex, this delegate might come in handy.</p>
+
+<p class="paragraph">Finally the actual delegate must be initialized, depending on the environment.</p>
+
+
+<p class="subheadline"> Setting the delegate for the Flex Logging API </p>
+
+<p class="paragraph">In most cases the delegates will be initialized automatically. That happens if you either use one of the
+static entry point methods of the <code>FlexContextBuilder</code> class or if you use the XML configuration extension tags
+as shown in <a href="logging.php#flex">15.1&nbsp;Logging Configuration for Flex</a>.</p>
+
+<p class="paragraph">If you are using neither of those you have to initialize the delegate manually:</p>
+
+<pre><code>LogContext.factory = new FlexLogFactory();
+</code></pre>
+
+<p class="subheadline"> Setting the delegate for the Spicelib Logging Framework </p>
+
+<p class="paragraph">For Spicelib Logging the delegate will be set automatically when you use the custom XML configuration tags
+as shown in <a href="logging.php#flash">15.2&nbsp;Logging Configuration for Flash</a>.</p>
+
+<p class="paragraph">If you are not using XML configuration you can read <a href="spicelib-logging.php#config_programmatic">22.3.2&nbsp;Programmatic Configuration</a>.
+There is an code example where the last line sets the delegate:</p>
+
+<pre><code>LogContext.factory = factory;
+</code></pre>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

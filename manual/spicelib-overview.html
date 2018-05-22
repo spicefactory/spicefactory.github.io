@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>18 Spicelib Overview</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>18 Spicelib Overview</h1>
+
+<p class="paragraph">Spicelib is a suite of AS3 libraries that can be used in Flex or pure AS3 projects.
+This chapter will give a quick overview over the available projects.</p>
+<h2><a name="purpose"></a>18.1 Purpose of the library</h2>
+
+<p class="paragraph">The focus for Spicelib is on general utility modules for AS3
+development. Furthermore Spicelib serves as a support library for the other Spicefactory projects.
+So if you are using Parsley, Pimento or Cinnamon there are always Spicelib modules working
+under the hood. But they are completely independent and can be used without these other higher
+level frameworks (and also do not depend on each other, with a few exceptions).</p>
+<h2><a name="projects"></a>18.2 Spicelib Projects</h2>
+
+<p class="paragraph">Spicelib consists of the following projects:</p>
+
+<p class="subheadline"> Reflection </p>
+
+<p class="paragraph">The reflection library contains convenient classes to reflect on AS3 classes,
+methods and properties without the need for cumbersome parsing of XML output from 
+<code>describeType</code>. It includes convenient mechanism of mapping metadata 
+tags to concrete classes, to overcome the lack of type-safety of
+AS3 metadata. All in all it is a library that should have been part of the core APIs
+of the Flash Player.
+For more information see <a href="reflection.php#intro">19&nbsp;Reflection</a>.</p>
+
+<p class="subheadline"> XML to Object Mapper </p>
+
+<p class="paragraph">A small but powerful and flexibel XML-to-Object Mapper which allows you to map from XML 
+to AS3 classes - in both directions. It comes with builtin mappers
+which cover the most common use cases like mapping properties of AS3 classes to XML attributes
+or child elements, but can be easily extended. For more information see <a href="xmlmapper.php#intro">20&nbsp;XML to Object Mapper</a>.</p>
+
+<p class="subheadline"> Command Framework </p>
+
+<p class="paragraph">A general abstraction for asynchronous operations. Allows grouping of
+commands for sequential or parallel execution and passing data from command
+results to subsequent commands in a decoupled fashion. For more information see <a href="commands.php#intro">21&nbsp;The Command Framework</a>.</p>
+
+<p class="subheadline"> Logging </p>
+
+<p class="paragraph">The logging framework allows to log custom messages from application code and use 
+the configuration options to filter log output based on logger names (often corresponding
+to the name of the class containing the log statement) and log levels as a way to indicate
+the severity or importance of the log message. 
+For more information see <a href="spicelib-logging.php#intro">22&nbsp;Logging for Flash Applications</a>.</p> 
+<h2><a name="dependencies"></a>18.3 Project Dependencies</h2>
+
+<p class="paragraph">This table lists the dependencies required for each of the projects.
+The dependencies are always included in the downloads of library releases.</p>
+
+<table>
+<tr><td> Reflection </td><td> spicelib-util </td></tr>
+<tr><td> XML to Object Mapper </td><td> spicelib-reflect, spicelib-util </td></tr>
+<tr><td> Command Framework </td><td> spicelib-reflect, spicelib-util </td></tr>
+<tr><td> Logging </td><td> spicelib-util </td></tr>
+</table>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

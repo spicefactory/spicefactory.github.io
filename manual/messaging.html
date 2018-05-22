@@ -1,0 +1,605 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>6 Messaging</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>6 Messaging</h1>
+
+<p class="paragraph">Parsley comes with a generic Messaging Framework that allows you to exchange messages between objects
+in a fully decoupled manner. Decoupled not only means that the sender and the receiver do not have to know each other.
+It is equally important that the sending and receiving objects are also fully decoupled from the framework itself.
+This is an advantage ignored by most other Flex Frameworks (including version 1 of Parsley) where you have to use
+objects or static methods from the Framework API for dispatching application events or messages. Why is that important?
+If your objects are decoupled from the framework you can reuse them in a different context where you might want to use
+a different framework or no framework at all. For example you might want to wire dispatching and receiving instances
+programmatically for Unit Tests without the extra burden to initialize an application framework.</p>
+
+<p class="paragraph">The Parsley Messaging Framework is generic in a sense that it does not impose a particular usage style.
+This is also a difference to some of the existing Flex MVC Frameworks which often advocate a certain structure
+and usage pattern or even offer concrete base classes for the controller, model and view parts. With Parsley
+you are completely free to design your application architecture. In case you do use the Messaging Framework to 
+build a classic MVC architecture you may want to read <a href="mvc.php#intro">11&nbsp;Building MVC Architectures</a> in addition to this chapter.</p>
+
+
+
+<p class="paragraph">This chapter describes how you can configure objects for sending and receiving messages. 
+For every configuration option examples for AS3 Metadata, MXML and XML configuration are included.</p>
+<h2><a name="dispatching"></a>6.1 Dispatching Messages</h2>
+
+<p class="paragraph">For an object that wants to dispatch messages managed by Parsley you have the following setup options:</p>
+
+<ul>
+<li> <a href="messaging.php#managed_events">6.3&nbsp;Managed Events</a> if the dispatching object is a regular <code>EventDispatcher</code>. </li>
+<li> <a href="messaging.php#injected_dispatchers">6.4&nbsp;Injected MessageDispatchers</a> if your messages are not subclasses of <code>Event</code>. </li>
+<li> <a href="messaging.php#api">6.11&nbsp;Using the Messaging API</a> in rare cases where you need to use the Framework API directly </li>
+</ul>
+<h2><a name="receiving"></a>6.2 Receiving Messages</h2>
+
+<p class="paragraph">For an object that wants to receive and process messages managed by Parsley you have the following setup options:</p>
+
+<ul>
+<li> <a href="messaging.php#handlers">6.5&nbsp;MessageHandlers</a> for methods that should be invoked when a particular message is dispatched. </li>
+<li> <a href="messaging.php#bindings">6.6&nbsp;MessageBindings</a> for properties that should be set when a particular message is dispatched. </li>
+<li> <a href="messaging.php#interceptors">6.7&nbsp;Intercepting Messages</a> for intercepting, and optionally cancelling or deferring then redispatching a message 
+before it is processed by handlers or bindings. </li>
+<li> <a href="messaging.php#errorhandlers">6.8&nbsp;Error Handlers</a> for handling errors thrown by other handlers, bindings or interceptors. </li>
+<li> <a href="managedcommands.php#mapping">7.2&nbsp;Mapping Commands to Messages</a> for mapping Commands to messages, receiving the message in the execute method and 
+having the command's lifecycle tied to its execution time. </li>
+<li> <a href="messaging.php#api">6.11&nbsp;Using the Messaging API</a> in rare cases where you need to use the Framework API to register any of the
+features listed above. </li>
+</ul>
+<h2><a name="managed_events"></a>6.3 Managed Events</h2>
+
+<p class="paragraph">If the class that you want to dispatch messages managed by Parsley is a regular <code>EventDispatcher</code> this
+is the most convenient option. It would work for any existing <code>EventDispatcher</code> implementation even if it wasn't
+designed with Parsley in mind. It requires two steps:</p>
+
+<ul>
+<li> Declare the events that your class dispatches with regular [Event] tags. This is good practice anyway, whether you are
+using Parlsey or not, as it improves the readability of your classes and the ASDoc output where all events declared with
+this tag are included. </li>
+<li> Tell Parsley which of those declared events should be "managed" so that they are available for message receivers
+configured for the framework. Like for all messaging features you can use AS3 Metadata, MXML or XML tags for this step. </li>
+</ul>
+
+<p class="subheadline"> Metadata Example </p>
+
+<pre><code>[Event(name="loginSuccess",type="com.bookstore.events.LoginEvent")]
+[Event(name="loginFailed",type="com.bookstore.events.LoginEvent")]
+[Event(name="stateChange",type="flash.events.Event")]
+[ManagedEvents("loginSuccess,loginFailure")]
+public class LoginServiceImpl extends EventDispatcher implements LoginService {
+
+    [...]
+    
+    private function handleLoginResult (user:User) : void {
+        dispatchEvent(new LoginEvent("loginSuccess", user));
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">In the example above the service declares three events. Two of them (<code>loginSuccess</code> and <code>loginFailure</code>) 
+are application events and should be managed by Parsley and dispatched to all objects in the Context interested in that event. 
+The third one is a low-level event only of interest for objects interacting directly with that service. Those objects may
+still register a regular event listener for that event.</p>
+
+<p class="paragraph">The example method above shows how a result handler (that probably was registered as a handler for a remote service
+invocation) translates the result into an event and simply dispatches it. No <code>FrontController.getInstance().dispatch...</code>
+or anything like that. Since <code>loginSuccess</code> was declared as a managed event it will be passed to all <code>MessageHandlers</code>
+configured in Parlsey.</p>
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Object type="{LoginServiceImpl}"&gt;
+    &lt;ManagedEvents names="['loginSuccess','loginFailure']"/&gt;
+&lt;/Object&gt;
+</code></pre>
+
+<p class="paragraph">If you declare the managed events in MXML you can omit the <code>[ManagedEvents]</code> metadata tag from the previous example.
+Note that you still have to include the <code>[Event]</code> metadata tags, since those are not a configuration artifact of Parsley
+but a regular Flash API feature.</p>
+ 
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;object type="com.bookstore.services.LoginServiceImpl"&gt;
+    &lt;managed-events names="loginSuccess,loginFailure"/&gt;
+&lt;/object&gt;
+</code></pre>
+
+<p class="paragraph">As always very simliar to MXML configuration apart from several notation differences.</p>
+<h2><a name="injected_dispatchers"></a>6.4 Injected MessageDispatchers</h2>
+
+<p class="paragraph">Sometimes you don't want to work with events for your application messages. Somehow several event semantics may not
+make much sense in a particular scenario. Application events managed by Parsley cannot "bubble", <code>stopPropagation</code>
+would not have any effect in the Parsley message processing sequence and for fully decoupled messaging you may even want
+to avoid that the message receiver can get hold of the message dispatcher through <code>event.target</code>.</p>
+
+<p class="paragraph">In those cases Parsley offers the option to use any class as an application message, whether it extends <code>flash.events.Event</code>
+or not. You can then request the framework to inject a message dispatcher function that you can use for your custom application messages.
+Assuming you created the following simple message class:</p>
+
+<pre><code>class LoginMessage {
+
+    public var user:User;
+    
+    public var role:String;
+    
+    function LoginMessage (user:User, role:String) {
+        this.user = user;
+        this.role = role;
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">You can then use it in a service like this:</p>
+
+<pre><code>public class LoginServiceImpl implements LoginService {
+
+    [MessageDispatcher]
+    public var dispatcher:Function;
+
+    [...]
+    
+    private function handleLoginResult (user:User) : void {
+        dispatcher(new LoginMessage(user));
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">Now your service does not extend <code>EventDispatcher</code>. Instead it declares a variable of type <code>Function</code>
+annotated with the <code>[MessageDispatcher]</code> tag which instructs Parsley to inject a message dispatcher function 
+on object creation. You can then simply pass any kind of object to this dispatcher function.</p>
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Object type="{LoginServiceImpl}"&gt;
+    &lt;MessageDispatcher property="dispatcher"/&gt;
+&lt;/Object&gt;
+</code></pre>
+ 
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;object type="com.bookstore.services.LoginServiceImpl"&gt;
+    &lt;message-dispatcher property="dispatcher"/&gt;
+&lt;/object&gt;
+</code></pre>
+
+<p class="paragraph">If you don't want to use Metadata tags you can also request the dispatcher injection with MXML or XML configuration.</p>
+<h2><a name="handlers"></a>6.5 MessageHandlers</h2>
+
+<p class="paragraph">Message Handlers are the most common approach for the receiving side. You can declare methods to be invoked when
+a particular application message gets dispatched. In the most simple case the method will simply be selected by
+parameter type:</p>
+
+<p class="subheadline"> Metadata Example </p>
+
+<pre><code>[MessageHandler]
+public function handleLogin (message:LoginMessage) : void {
+</code></pre>
+
+<p class="paragraph">In this case the method will be invoked whenever a message of a matching type (or subtype) gets dispatched.</p>
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Object type="{LoginAction}"&gt;
+    &lt;MessageHandler method="handleLogin"/&gt; 
+&lt;/Object&gt;
+</code></pre>
+ 
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;object type="com.bookstore.actions.LoginAction"&gt;
+    &lt;message-handler method="handleLogin"/&gt; 
+&lt;/object&gt;
+</code></pre>
+
+<p class="paragraph">There is also a variant where you split properties of the message class to arguments of the message handler method:</p>
+
+<pre><code>[MessageHandler(type="com.bookstore.events.LoginMessage",messageProperties="user,role"]
+public function handleLogin (user:User, role:String) : void {
+</code></pre>
+
+<p class="paragraph">Note that in this case you also have to declare the message type since it cannot be detected from the
+parameter type.</p>
+
+<p class="paragraph">Finally you may encounter a situation where selection by message type is not sufficient. If you dispatch
+the same message type in different scenarios and application states you may want to further refine the message
+selection process. See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a> for details.</p>
+<h2><a name="bindings"></a>6.6 MessageBindings</h2>
+
+<p class="paragraph">Message Bindings are simply a shortcut, where you want to bind a property of a class to a property of a message,
+that should be updated whenever a message of a matching type is dispatched. 
+In the following example the user property of the example will be set to the value of the user property of
+the <code>LoginMessage</code> instance whenever such a message is dispatched.</p>
+
+<p class="subheadline"> Metadata Example </p>
+
+<pre><code>[MessageBinding(messageProperty="user",type="com.bookstore.events.LoginMessage")]
+public var user:User;
+</code></pre>
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Object type="{LoginServiceImpl}"&gt;
+    &lt;MessageBinding 
+        targetProperty="user" 
+        messageProperty="user"
+        type="{LoginMessage}"
+    /&gt;
+&lt;/Object&gt;
+</code></pre>
+ 
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;object type="com.bookstore.services.LoginServiceImpl"&gt;
+    &lt;message-binding 
+        target-property="user" 
+        message-property="user"
+        type="com.bookstore.events.LoginMessage"
+    /&gt;
+&lt;/object&gt;
+</code></pre>
+
+<p class="paragraph">As with <code>MessageHandlers</code> you may want to use Selectors with <code>MessageBindings</code>. 
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a> for details.</p>
+<h2><a name="interceptors"></a>6.7 Intercepting Messages</h2>
+
+<p class="paragraph">This is an optional feature for the receiving side. Interceptors may come in handy when you want to
+decide whether or not the message should be passed to the remaining handlers based on application state or user decisions. 
+Interceptors have the following characteristics:</p>  
+
+<ul>
+<li> All registered interceptors execute before any handlers or bindings are executed (unless you set the <code>order</code>
+attribute explicitly). </li>
+<li> Interceptors can optionally suspend the message processing and resume it at a later time. </li>
+</ul>
+
+<p class="paragraph">Since version 2.4 any kind of message receiver function can be used as an interceptor.
+For a <code>MessageHandler</code> for example the only difference is that you include the optional
+<code>MessageProcessor</code> parameter in the handler method signature:</p>
+
+<pre><code>[MessageHandler]
+public function intercept (msg:LoginMessage, processor:MessageProcessor) : void {
+</code></pre>
+
+<p class="paragraph">The same can be applied to a <code>[CommandResult]</code> or other types
+of message receivers. The first parameter serves for matching the types of messages you are interested
+in like with a normal message handler.</p>
+
+<p class="paragraph">A simple example where you might want to use such an interceptor, is any kind of interaction
+where the user has to confirm the action in a dialog first. In that case an interceptor could suspend
+the message processing, present the dialog and resume the message processing in case the user
+clicks OK.</p>
+
+<p class="paragraph">This is how a sample implementation for a simple Alert could look like:</p>
+
+<pre><code>public class DeleteItemInterceptor {
+ 
+    [MessageHandler]
+    public function deleteItem (msg:DeleteItemMessage, processor:MessageProcessor) : void {
+        processor.suspend();
+        var listener:Function = function (event:CloseEvent) : void {
+            if (event.detail == Alert.OK) {
+                processor.resume();
+            }  
+            else {
+                processor.cancel();
+            }
+        };      
+        Alert.show("Do you really want to delete this item?", "Warning", 
+            Alert.OK | Alert.CANCEL, null, listener);
+    }
+ 
+}
+</code></pre> 
+
+<p class="paragraph">When the user hits cancel, the <code>MessageProcessor</code> never resumes and no subsequent handler will
+be executed.</p>
+
+<p class="paragraph">It is recommended to use interceptors sparingly as it is the only feature of the Messaging Framework that ties
+you to the Parsley API, as we have to pass a <code>MessageProcessor</code> instance to you so that you are able to
+<code>cancel</code> or <code>suspend</code> the message processing.</p>
+
+<p class="paragraph">The old <code>[MessageInterceptor]</code> tag which was available for versions 2.0 through 2.3 has been deprecated. 
+For backwards-compatibility it will continue to work in version 2.4. It was replaced by the new mechanism explained 
+in this section as it is more flexible (any kind of receiver can now act as an interceptor) and more type-safe (the old
+interceptors often declared the message they are interested in as a String in the metadata tag).</p>
+
+
+<h2><a name="errorhandlers"></a>6.8 Error Handlers</h2>
+
+<p class="paragraph">Parsley allows to configure a method to be invoked whenever a handler for a 
+matching message threw an Error:</p> 
+
+<pre><code>[MessageError]
+public function handleError (error:IOError, message:LoginMessage) : void;
+</code></pre> 
+
+<p class="paragraph">In the example above the error handler would be invoked whenever any handler for a message of type LoginMessage 
+throws an IOError. So you can chose the matching message type and the matching Error type and of course, like with
+all tags, specify an additional selector attribute.</p>
+
+<p class="paragraph">But you can also create a global handler, for every type of error and any type of message:</p>
+
+<pre><code>[MessageError]
+public function handleError (error:Error) : void; 
+</code></pre>
+
+<p class="paragraph">As with all message handlers an error handler can also accept an argument of type <code>MessageProcessor</code>
+in case you want to cancel or suspend processing or send a message to the sender Context:</p>
+
+<pre><code>[MessageError]
+public function handleError (error:Error, processor:MessageProcessor) : void; 
+</code></pre>
+
+<p class="paragraph">Only the first parameter for the error is required. The ones for the message and the processor are both
+optional.</p>
+
+<p class="paragraph">Finally, since an error handler configured with the tag shown above always listens to a single
+scope, you may want to add an error handler that will be automatically attached to every scope created
+for an application. You can do that programmatically through the <code>BootstrapDefaults</code>:</p>
+
+<pre><code>var handler:DefaultMessageErrorHandler = new DefaultMessageErrorHandler();
+var method:Method = ClassInfo.forInstance(this).getMethod("handleError");
+handler.init(Provider.forInstance(this), method);
+
+BootstrapDefaults.config.messageSettings.addErrorHandler(handler);
+</code></pre>
+<h2><a name="selectors"></a>6.9 Using Selectors</h2>
+
+<p class="paragraph">In the examples for the sections about MessageHandlers, MessageBindings and MessageInterceptors the matching methods or 
+properties were always determined solely by the type (class) of the message. Sometimes that may not be sufficient if you dispatch the
+same message type in different scenarios or application states. In such a case you can refine the selection process with
+custom selectors.</p>
+
+<p class="paragraph">If you are using events the type property of the Event class can serve as a selector:</p>
+
+<pre><code>[MessageHandler(selector="loginSuccess")]
+public function handleLogin (message:LoginEvent) : void {
+    [...]
+}
+
+[MessageHandler(selector="loginFailure")]
+public function handleError (message:LoginEvent) : void {
+    [...]
+}
+</code></pre>
+
+<p class="paragraph">In the example above the <code>handleLogin</code> method will only be invoked when the <code>type</code> property of the
+<code>LoginEvent</code> instance has the value <code>loginSuccess</code>.</p>
+
+<p class="paragraph">For custom message types that do not extend <code>flash.events.Event</code> there is no default selector property,
+but it can be easily declared with the <code>[Selector]</code> metadata tag on a property of the message class:</p>
+
+<pre><code>class LoginMessage {
+
+    public var user:User;
+    
+    [Selector]
+    public var role:String;
+    
+    [...]
+}
+</code></pre>
+
+<p class="paragraph">Now you can select message handlers based on the role of the user that logged in:</p>
+
+<p class="subheadline"> Metadata Example </p>
+
+<pre><code>[MessageHandler(selector="admin")]
+public function handleAdminLogin (message:LoginMessage) : void {
+</code></pre>
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Object type="{AdminLoginAction}"&gt;
+    &lt;MessageHandler method="handleAdminLogin" selector="admin"/&gt; 
+&lt;/Object&gt;
+</code></pre>
+ 
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;object type="com.bookstore.actions.AdminLoginAction"&gt;
+    &lt;message-handler method="handleAdminLogin" selector="admin"/&gt; 
+&lt;/object&gt;
+</code></pre>
+<h2><a name="scopes"></a>6.10 Using Scopes</h2>
+
+<p class="paragraph">The scope feature adds flexibility for defining custom communication spaces, 
+allowing to dispatch messages inside a particular area of the application
+(e.g. a window, popup or tab) instead of just globally.</p>
+
+
+
+<p class="subheadline"> Global and Local Scopes </p>
+
+<p class="paragraph">In the default scope setup for Parsley there is a global scope that is created for each Context that does
+not have a parent (usually only the one root Context created at application startup) and then shared will all
+children of that Context (including grandchildren of course). Additionally each Context will create its own
+local scope which will not be shared with its children. The following diagram shows this default setup:</p>
+
+<img class="doc_img" src="scopes-default.jpg" />
+
+<p class="paragraph">The global scope will always be the default scope for all configuration tags where no scope is 
+explicitly specified.</p>
+
+<pre><code>[MessageHandler(selector="save")]
+public function save (event:ProductEvent) : void {
+</code></pre>
+
+<p class="paragraph">The handler above listens to ProductEvents dispatched from any Context in the hierarchy. It listens to the global
+scope.</p>
+
+<pre><code>[MessageHandler(selector="save", scope="local")]
+public function save (event:ProductEvent) : void {
+</code></pre>
+
+<p class="paragraph">Now the handler only listens to events dispatched from the same Context. Of course all tags
+for the various message receiver types accept a scope attribute, including <code>MessageBinding</code>
+and <code>MessageErrorHandler</code>.</p>
+
+
+
+<p class="subheadline"> Recommended Scope Defaults in Multi-Context Applications </p>
+
+<p class="paragraph">The global scope is the recommended default for a single-Context application and for the root
+Context in a multi-Context application. In a multi-Context application objects in the root Context often
+represent global services that need to react to messages dispatched by objects from child Contexts. Therefore
+the global scope is a convenient default. For child Contexts (those created specifically for a particular
+area of the application like a popup, tab or module) it is recommended to switch to local as a default,
+so that objects in these children use a local, private communication space per default.</p>
+
+<p class="paragraph">This is how you can switch the default scope for an entire Context:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="..."&gt;
+    &lt;parsley:MessageSettings defaultReceiverScope="local"/&gt;
+&lt;/parsley:ContextBuilder&gt;
+</code></pre>
+
+<p class="paragraph">Now the local scope is the default whenever no scope is specified explicitly in a configuration tag.
+The default is in effect for the Context and all its children unless overwritten again for a child Context.</p>
+
+
+
+<p class="subheadline"> Default Scopes for Dispatchers </p>
+
+<p class="paragraph">For the sending side the default behaviour is different. For any <code>[MessageDispatcher]</code> or 
+<code>[ManagedEvents]</code> tag
+where no scope is explicitly specified the message will be dispatched through all scopes available
+for that particular Context. This way the receiving side can decide which scope it wants to listen to,
+allowing global and local receivers for the same message instance.
+For cases where you even want to restrict the sending side to a single scope there will also be a new scope attribute
+for the <code>[ManagedEvents]</code> tag:</p>
+
+<pre><code>[ManagedEvents("save,delete", scope="local")]
+</code></pre>
+
+
+
+<p class="subheadline"> Custom Scopes </p>
+  
+<p class="paragraph">Finally you can also create your own custom scope when neither global nor local messaging is the right choice.
+This may be the case when you create a large AIR window for example. The root window component may create a Context
+with the root application Context as a parent but then also a few child Contexts for parts within that window.
+If you then want to setup a messaging scope for that window only you need a scope that spans multiple Contexts but
+still is not global. Since version 2.1 you can create a scope setup like in the following example diagram:</p>
+
+<img class="doc_img" src="scopes-custom.jpg" />
+
+<p class="paragraph">The window scope is a custom scope that exists side-by-side with the two default scopes. Now how do you 
+instruct the framework to create that scope? This has to be done for the root Context of the scope, 
+in this case the two root Contexts for the two window scopes. In MXML you can specify the scope like this:</p>
+
+<pre><code>&lt;parsley:ContextBuilder&gt;
+    &lt;parsley:FlexConfig type="{ServiceConfig}"/&gt;
+    &lt;parsley:FlexConfig type="{ControllerConfig}"/&gt;
+    &lt;parsley:XmlConfig file="logging.xml"/&gt;
+    <span style="color:#FF0000;">&lt;parsley:Scope name="window" inherited="true"/&gt;</span>
+&lt;/parsley:ContextBuilder&gt;
+</code></pre>
+
+<p class="paragraph">Or programmatically add the scope with the <code>ContextBuilder</code> DSL:</p>
+
+<pre><code>var viewRoot:DisplayObject = ...;
+
+ContextBuilder.newSetup()
+    .viewRoot(viewRoot)
+    .scope("window")
+    .newBuilder()
+        .config(FlexConfig.forClass(ServiceConfig))
+        .config(FlexConfig.forClass(ControllerConfig))
+        .config(XmlConfig.forFile("logging.xml"))
+        .build();
+</code></pre>
+
+<p class="paragraph">The name of the scope does not have to 
+be unique as long as you make sure that two scopes with the same name do never overlap. This is convenient
+as it allows to define a message handler for the window scope without having to think about which
+window instance it belongs to:</p>
+
+<pre><code>[MessageHandler(selector="save", scope="window")]
+public function save (event:ProductEvent) : void {
+</code></pre>
+
+<p class="paragraph">The second boolean parameter specifies whether the scope should be shared with child Contexts.
+So you can also create custom local scopes, although this is probably a rather unsual use case.</p>
+<h2><a name="api"></a>6.11 Using the Messaging API</h2>
+
+<p class="paragraph">In normal application code you should try to avoid to directly interact with the Parsley API to keep your classes
+decoupled from the framework. But in some edge cases or if you want to extend the framework or build another framework 
+on top of it, you may want to register message handlers or bindings programmatically. The <code>MessageReceiverRegistry</code> 
+interface contains the following methods for regristration:</p>
+
+<pre><code>function addTarget (target:MessageTarget) : void;
+
+function addErrorHandler (handler:MessageErrorHandler) : void;
+
+function addCommandObserver (observer:CommandObserver) : void;
+</code></pre>
+
+<p class="paragraph">There are three categories of message receivers: a <code>MessageTarget</code> is a regular receiver, implementing
+classes include <code>MessageHandler</code> and <code>MessageBinding</code>. <code>&lt;MapCommand&gt;</code> also acts as a regular
+target. <code>MessageErrorHandler</code> corresponds to the <code>[MessageError]</code> tag and finally 
+a <code>CommandObserver</code> listens to the result or
+error outcome of a command. The interface contains three for methods for removing these three receiver types.</p>
+
+<p class="paragraph">To get hold of a <code>MessageReceiverRegistry</code> instance you can inject a <code>Context</code> instance into your class. 
+You then have to pick the registry for the scope you want your receivers to be applied to. In the following example
+we register a message handler for the global scope:</p>
+
+<pre><code>class SomeExoticClass {
+
+    [Inject]
+    public var context:Context;
+    
+    [Init]
+    public function init () : void {
+        var registry:MessageReceiverRegistry 
+                = context.scopeManager.getScope(ScopeName.GLOBAL).messageReceivers;
+        var target:MessageTarget 
+                = new MessageHandler(Provider.forInstance(this), "onLogin");
+        registry.addMessageTarget(target);    
+    }
+}
+</code></pre>
+
+<p class="paragraph">When you place an <code>[Inject]</code> metadata tag on a property of type <code>Context</code> Parsley will always
+inject the <code>Context</code> instance this class is managed in.</p>
+
+<p class="paragraph">Finally you can also use the <code>ScopeManager</code> to dispatch messages:</p>
+
+<pre><code>context.scopeManager.dispatchMessage(new LoginMessage(user, "admin"));
+</code></pre>
+
+<p class="paragraph">When dispatching through the <code>ScopeManager</code> directly, the message will be dispatched through all
+scopes managed by this Context (by default only global and local scopes, but you can create your own).
+This way the receiving side can decide which scope to listen to. In rare cases you might want to limit
+the choice right on the sending side. In this case you have to dispatch through an individual scope:</p>
+
+<pre><code>var scope:Scope = context.scopeManager.getScope(ScopeName.LOCAL);
+scope.dispatchMessage(new LoginMessage(user, "admin"));
+</code></pre>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

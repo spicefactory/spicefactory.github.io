@@ -1,0 +1,592 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>1 Overview</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>1 Overview</h1>
+
+<p class="paragraph">Parsley is an Application Framework for Flex and Flash Applications built upon an IOC Container and
+Messaging Framework that can be used to create highly decoupled architectures. 
+It allows you to configure objects to be managed by the container with Metadata, MXML, XML or ActionScript
+and is easily extensible.</p>
+
+<p class="paragraph">While many other Application Frameworks for the Flash Platform are either a pure Flex Framework that cannot
+be used without the Flex SDK or are a classic Flash Framework without any deeper integration with Flex, Parsley
+is both. The core of the framework (the IOC Container and the Messaging Subsystem) does not depend on the
+Flex SDK at all, but there are several additional modules that are specifically designed for Flex, providing
+support for MXML Configuration, View Wiring and Flex Modules.</p>
+ 
+<h2><a name="features"></a>1.1 Features List</h2>
+
+<p class="paragraph">This section gives a quick overview over the available features linking to the other chapters of the manual
+where appropriate. There is also a <a href="tutorial.php#intro">2&nbsp;Getting Started</a> chapter containing a few sample use cases for the impatient.</p>
+
+
+<p class="subheadline"> IOC Container </p>
+
+<p class="paragraph">Parsley is a classic IOC Container. It provides support for Dependency Injection, Object Lifecycle Management
+and Messaging. The key differentiator is the scope of the framework: While still being as easy to use  
+as many smaller IOC frameworks for simple applications, it also provides many features which are essential for building
+large, complex and modular applications and numerous extension points.</p>
+
+
+<p class="subheadline"> Dependency Injection </p>
+
+<p class="paragraph">The core feature of any IOC Container. Dependencies can be conveniently declared using AS3 Metadata
+Tags (<code>[Inject]</code>) on properties, methods or constructors or alternatively with MXML or XML. 
+See <a href="injection.php#intro">4&nbsp;Dependency Injection</a> for details.</p>
+
+
+<p class="subheadline"> Decoupled Bindings </p>
+
+<p class="paragraph">A feature similar to the concept of Flex Bindings, with the difference that the target does not have to know
+the source of the binding. The source publishes an object on a property marked with <code>[Publish]</code> and any
+other object may receive all updates of that value in a property marked with <code>[Subscribe]</code>.
+See <a href="bindings.php#intro">5&nbsp;Decoupled Bindings</a> for details.</p>
+
+
+<p class="subheadline"> Messaging </p>
+
+<p class="paragraph">Parsley contains a Messaging Framework that allows for objects to send and receive messages in a fully decoupled way.
+You can mark a function property with the <code>[MessageDispatcher]</code> tag, and invoke it whenever you want to pass
+a message instance to the system to be routed to registered receivers. The receiving objects can declare interest 
+in particular message types with several metadata tags like <code>[MessageHandler]</code> in a type-safe way. 
+This is because message selection happens based on the type (class) of the message, instead of being purely String based 
+like with regular AS3 event handlers. Furthermore messaging can happen in different scopes, globally or just in a particular region 
+(like an AIR window for example).
+See <a href="messaging.php#intro">6&nbsp;Messaging</a> for details.</p>
+
+
+<p class="subheadline"> Managed Commands </p>
+
+<p class="paragraph">Parsley supports commands based on the standalone Spicelib Commands framework. It allows to execute commands in
+a way that the container automatically adds them to the Context just for the time they execute. It comes with MXML
+and XML tags to declare commands or sequences of commands. It allows to map commands to messages so that each matching
+message causes a new command to be instantiated and executed. Alternatively command factories can get injected into
+managed objects for manual execution. 
+See <a href="managedcommands.php#intro">7&nbsp;Managed Commands</a> for details.</p>
+
+
+<p class="subheadline"> Object Lifecycle </p>
+
+<p class="paragraph"><a href="lifecycle.php#methods">8.5&nbsp;Object Lifecycle Methods</a>: Objects can have methods marked with <code>[Init]</code> 
+(which will be invoked after the object has been instantiated and configured) or <code>[Destroy]</code> which will be 
+invoked when the container gets destroyed.</p>
+ 
+<p class="paragraph"><a href="lifecycle.php#async">8.3&nbsp;Asynchronous Object Initialization</a>: Configuration option for asynchronously initializing objects (e.g. objects
+that need to load data before they can operate). In this case the container will defer the initialization
+of other objects until those configured to be asynchronous are ready.</p>
+
+
+<p class="subheadline"> Dynamic View Wiring </p>
+
+<p class="paragraph">This module is particularly useful for Flex and solves the problem that you usually wouldn't want to declare
+Flex Components in IOC Container configuration files, but instead inside your MXML view hierarchy like always.
+Parsley allows to connect these components to the IOC Container on-the-fly when they are added to the stage.
+Also solves the more complicated issues with wiring components in Flex Popups or Native AIR Windows.
+See <a href="view.php#intro">9&nbsp;Dynamic View Wiring</a> for details.</p>
+
+
+<p class="subheadline"> Support for Modular Applications </p>
+
+<p class="paragraph">For modular applications it's essential that you can create configuration sub-contexts and dynamically load
+and undload them as needed. Seamlessly integrates with Flex Modules, but can also be used without. The framework
+allows for a very fine-grained hierarchy of Contexts, making it convenient to create separate communication spaces
+for individual windows, popups or tabs in your application. 
+See <a href="modules.php#intro">10&nbsp;Building Modular Applications</a> for details.</p>
+
+
+<p class="subheadline"> Localization </p>
+
+<p class="paragraph">Allows to bind properties to resources with the <code>[ResourceBinding]</code> tag. Integrates with the
+Flex ResourceManager for Flex Applications and contains its own Localization Module for Flash Applications.
+See <a href="resources.php#intro">12&nbsp;Localization</a> for details.</p>
+
+
+<p class="subheadline"> Extensibility </p>
+
+<p class="paragraph">Parsley can serve as the base for building higher-level frameworks on top of. Or you may just want to create
+some additional configuration tags for use cases which are frequent for a particular application.
+Parsley is easy to extend. A single implementation of an extension interface can be used to create
+a custom configuration tag that can be used as a Metadata, MXML or XML tag.
+Furthermore basically all central services of the IOC kernel can be swapped out easily.
+See <a href="extensions.php#intro">13&nbsp;Extending the Framework</a> for details.</p>
+ 
+<h2><a name="whatsnew_30"></a>1.2 What's New in Parsley 3.0</h2>
+
+<p class="paragraph">This section only lists the parts of the manual which are new or have been signifantly modified. 
+For general migration steps see the next section.</p>
+
+
+<p class="paragraph"><a href="overview.php#intro">1&nbsp;Overview</a></p>
+
+<ul>
+<li> <a href="overview.php#building">1.4&nbsp;Building the Framework from Source</a> (rewritten for the new project structure) </li>
+<li> <a href="overview.php#dependencies">1.5&nbsp;Dependencies</a> (new section describing the new, more fine-grained set of artifacts) </li>
+</ul>
+
+<p class="paragraph"><a href="messaging.php#intro">6&nbsp;Messaging</a></p>
+
+<ul>
+<li> <strong>Command Methods</strong> (removed, replaced by the new command support in a new separate chapter) </li>
+<li> <strong>DynamicCommand</strong> (removed, replaced by the new command support in a new separate chapter) </li>
+</ul>
+
+<p class="paragraph"><a href="managedcommands.php#intro">7&nbsp;Managed Commands</a></p>
+
+<ul>
+<li> The entire chapter is new, describing the redesigned command support in Parsley and all new features like command sequences. </li>
+</ul>
+
+<p class="paragraph"><a href="extensions.php#intro">13&nbsp;Extending the Framework</a></p>
+ 
+<ul>
+<li> <strong>Command Factories</strong> (removed, no longer needed with new command support) </li>
+</ul> 
+
+<p class="paragraph"><a href="commands.php#intro">21&nbsp;The Command Framework</a></p>
+
+<ul>
+<li> The entire chapter is new, describing the new command support in Spicelib and all new features like command sequences. </li>
+</ul>
+
+<p class="paragraph"><strong>Task Framework</strong></p>
+
+<ul>
+<li> The entire chapter has been removed as the Task Framework has been superceded by the new Commands Framework. </li>
+</ul>
+<h2><a name="migrate_30"></a>1.3 Migrating from Parsley 2 to Parsley 3</h2>
+
+<p class="paragraph">Migration steps are primarily necessary in 2 areas: Command Support and Extension APIs.
+Apart from that some APIs have been moved to new packages to improve the internal decoupling
+of the framework, but these changes only require a simple Organize Imports. Many other
+areas remained unchanged, like all configuration tags (MXML, XML and metadata) apart from
+those for Commands.</p>
+
+<p class="paragraph">The API of Parsley 3 is intended to be a long-term stable API. If you followed the
+Parsley 2 releases you may have noticed that even second digit changes in version numbers
+often meant breaking API changes. This was because Parsley significantly evolved in its
+version 2 lifetime based on the growing adoption in large-scale enterprise projects.
+This fast evolution will come to an end with Parsley 3, where even a future releases
+of versions 3.1 or 3.2 are intended to be drop-in replacements for existing applications
+without any migration steps. Therefore it is strongly recommended to move to Parsley 3
+at some point, as it will allow you to benefit from future enhancements and fixes
+without further changes on your side. On the other hand Parsley 2 will not see any
+further enhancement or bugfix releases, so staying with that version would mean that
+you'd have to find workarounds yourself.</p>
+
+<p class="paragraph">Parsley 3 is also the cleanest release to date. With all deprecations being removed
+and other areas of the code base being streamlined, it is the best version so far for anyone
+with the intention to learn, enhance or modify the code base.</p>
+
+
+
+<h3><a name="migrate_older"></a>1.3.1 Migrating from Versions older than 2.4</h3>
+
+<p class="paragraph">If your application still uses an older version of Parsley 2, it is recommended
+to first try to replace the SWCs in your classpath with the ones for the last Parsley 2
+release (2.4.1). That release contained a lot of deprecation warnings already. Trying
+to compile against that version might give you a list of deprecation warnings with
+concrete instructions on what to change. In Parsley 3 all deprecations have been removed,
+so you won't get any warnings when compiling against that version. 
+Once you have adjusted your code to remove the warnings and errors you get,
+you can more easily move to version 3.0.</p>
+
+
+
+<h3><a name="migrate_24"></a>1.3.2 Migrating from Version 2.4</h3>
+
+<p class="paragraph">This section tries to give a detailed overview over the most important
+changes. If you think that something essential is not covered here, please post on our
+forum.</p>
+
+
+<h3><a name="migrate_repackaging"></a>1.3.3 Repackaged APIs</h3>
+
+<p class="paragraph">Some of the core APIs have been repackaged, primarily the various configuration DSLs have
+been moved. The most likely candidates for frequent use in applications are the <code>ContextBuilder</code>,
+<code>Configure</code> and <code>FastInject</code> APIs. The corresponding MXML tags are not affected, only
+the APIs. Only an Organize Import is required to migrate here, with the only exception being some
+of the lower level options of the ContextBuilder API as covered in the next section.</p>
+
+
+<h3><a name="migrate_defbuilder"></a>1.3.4 Reduced ObjectDefinitionBuilder API</h3>
+
+<p class="paragraph">If you used the <code>ObjectDefinitionBuilder</code> API, either to implement a custom tag or
+in setup code via <code>ContextBuilder.objectDefinition().forClass(MyClass)</code> then you'll notice
+that the options have been reduced. They are not gone, they are just no longer hard-coded into the
+ObjectDefinitionBuilder API to make it easier to build custom Parsley distributions with a reduced or different
+set of pre-installed configuration tags. You do not have to restructure anything, everything can be
+adjusted via in-place changes. An example for configuring a message handler via API is shown below:</p>
+
+<p class="paragraph">Before:</p>
+
+<pre><code>var builder: ObjectDefinitionBuilder = ...;
+
+builder
+    .method("handleMessage")
+        .messageHandler()
+            .scope(ScopeName.GLOBAL)
+            .type(MyMessage)
+            .order(10);
+</code></pre>
+
+<p class="paragraph">After:</p>
+
+<pre><code>var builder: ObjectDefinitionBuilder = ...;
+
+<span style="color:#FF0000;">MessageHandler
+    .forMethod("handleMessage")</span>
+        .scope(ScopeName.GLOBAL)
+        .type(MyMessage)
+        .order(10)
+            <span style="color:#FF0000;">.apply(builder);</span>
+</code></pre>
+
+<p class="paragraph">As you see the message handler is just no longer available through the builder API, 
+but instead comes with a static, standalone entry point. The class name for the API is 
+always the same as the name of the corresponding metadata or MXML tag.</p>
+
+
+
+<h3><a name="migrate_commands"></a>1.3.5 Redesigned Command Support</h3>
+
+<p class="paragraph">The biggest area of change in Parsley 3 is the completely rewritten Command Support.
+The new implementation is not backwards-compatible, although in most cases migration
+is trivial and possible without touching the command implementation itself (only changes
+in configuration files and classes are required).</p>
+
+<p class="paragraph">If you have an existing application based on Parsley 2 that uses commands a lot,
+you basically have 2 options:</p>
+
+<ul>
+<li> <strong>Use the Parsley Legacy Commands Extension</strong>: This extension project has
+been created for providing backwards-compatibility for large Parsley 2 applications
+where full migration to the new command style is not feasible. This extension should
+provide 80% to 90% compatibility for existing DynamicCommands, only requiring migration
+steps if some of the less common options of DynamicCommands have been used. </li>
+
+<li> <strong>Migrate to the New Command Style</strong>: If your commands are pretty standard
+implementations only using the basic feature set (like returning an AsyncToken in the 
+execute method for example) or if you only have a handful of commands in your application
+anyway, it is recommended to prefer full migration over using the legacy commands extension.
+Full migration requires configuration changes for all commands (often merely a name change
+from <code>&lt;DynamicCommand&gt;</code> to <code>&lt;MapCommand&gt;</code>, but usually no changes in the
+command implementation. </li>
+</ul>
+
+<p class="paragraph">Once you've decided on the route you want to take, you can find detailed instructions
+for both approaches below.</p>
+
+
+
+<h3><a name="migrate_legacycommands"></a>1.3.6 The Legacy Commands Extension</h3>
+
+<p class="paragraph">You can download this extension from the Parsley download page. Depending on what
+features you have used in your Parsley 2 application, an additional tag in your first
+ContextBuilder might be necessary:</p>
+
+<ul>
+<li> <code>&lt;DynamicCommand&gt;</code> MXML tag: Comes for free as soon as the extension is in your classpath. </li>
+<li> <code>&lt;dynamic-command&gt;</code> XML tag: Needs the <code>&lt;LegacyDynamicCommandXmlSupport/&gt;</code> tag inside the first 
+ContextBuilder tag. </li>   
+<li> <code>[Command]</code> metadata tag: Needs the <code>&lt;LegacyCommandMetadataSupport/&gt;</code> tag inside the first 
+ContextBuilder tag. </li>   
+</ul>
+
+<p class="paragraph">The full support for all features listed above would be restored with the following builder:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="{MyConfigClass}"&gt;
+    &lt;parsley:LegacyCommandMetadataSupport/&gt;
+    &lt;parsley:LegacyDynamicCommandXmlSupport/&gt;
+&lt;/parsley:ContextBuilder&gt;
+</code></pre>
+
+<p class="paragraph">Once the legacy command support is initialized most of your existing commands should run
+out of the box. The few exceptions where usage of some of the more exotic features would need
+some adjustments are listed below:</p>
+
+<ul>
+<li> The <code>stateful</code> attribute on the <code>&lt;DynamicCommand&gt;</code> tag is no longer supported.
+Commands in Parsley 3 are always short-lived. If you have set this attribute to true on one of your
+commands, you can change it into a regular <code>&lt;Object&gt;</code> tag and then add the old <code>[Command]</code>
+metadata tag on the execute method. This should retain the old behavior, as the Object tag creates
+a singleton which has the same effect as marking the command as stateful. </li>
+
+<li> The result or error handlers for a command can no longer accept instances of type <code>ResultEvent</code>
+or <code>FaultEvent</code>. They need to switch to the actual result or fault instances carried by these events. </li>
+
+<li> Parsley 2 allowed to pass an instance of <code>MessageProcessor</code> to the execute method of the command.
+This is no longer supported in Parsley 3, a command can no longer suspend or cancel the message that triggered 
+the command. This functionality would have been impractical in Parsley 3, as the new version also allows
+to conveniently declare sequences or flows of commands and then map them to messages. All individual commands
+in the sequence can then accept the trigger message as a parameter, but any influence on the actual message
+processor is not possible, as the message processing might have long been finished when the command is executed
+after other asynchronous commands in the sequence. </li>
+
+<li> When you added a method parameter of type <code>CommandObserverProcessor</code> to a result handler in your
+dynamic command to change the result, you have to adjust the call from <code>processor.command.setResult(...)</code>
+to <code>processor.changeResult(...)</code>. </li>
+</ul>
+
+
+
+<h3><a name="migrate_full"></a>1.3.7 Full Command Migration</h3>
+
+<p class="paragraph">If you want to fully migrate your commands you do not have to include the SWC for the legacy command support.
+Instead you have to apply all the changes listed above (which are even necessary when using the
+legacy command support) plus several additional adjustments listed below.</p>
+
+
+<p class="subheadline"> Configuration Changes </p>
+
+<p class="paragraph">The <code>&lt;DynamicCommand&gt;</code> tag does no longer exist in Parsley 3. The new version supports many ways
+to execute a command. Mapping it to a message that triggers command execution is just one of them. Therefore
+this feature comes with a new tag that explicitly states this intent, it's called <code>&lt;MapCommand&gt;</code>.
+In many cases this is just a name change:</p>
+
+<p class="paragraph">Before:</p>
+
+<pre><code>&lt;parsley:DynamicCommand type="{LoginCommand}"/&gt;
+</code></pre>
+
+<p class="paragraph">After:</p>
+
+<pre><code>&lt;parsley:MapCommand type="{LoginCommand}"/&gt;
+</code></pre>
+
+<p class="paragraph">But if you also added further configuration for the command with child tags, the syntax needs to change
+as they can no longer be immediate children of the <code>MapCommand</code> tag. This is because Parsley 3 also
+allows the definition of sequences or flows inside <code>MapCommand</code>, so that different child tags can
+be nested. If you want to configure a single command to be mapped to a message, the following change is
+necessary:</p>
+
+<p class="paragraph">Before:</p>
+
+<pre><code>&lt;parsley:DynamicCommand type="{LoginCommand}"&gt;
+    &lt;parsley:Property name="mode" value="auto"/&gt;
+&lt;/parsley:DynamicCommand&gt;
+</code></pre>
+
+<p class="paragraph">After:</p>
+
+<pre><code>&lt;parsley:MapCommand /&gt;
+    &lt;parsley:Command type="{LoginCommand}"&gt;
+        &lt;parsley:Property name="mode" value="auto"/&gt;
+    &lt;/parsley:Command&gt;
+&lt;/parsley:MapCommand&gt;
+</code></pre>
+
+<p class="paragraph">Finally the names of the execute, result and error method can no longer be changed. It is always the convention
+to name them <code>execute</code>, <code>result</code> and <code>error</code> respectively.</p>
+
+
+<p class="subheadline"> Implementation Changes </p>
+
+<p class="paragraph">Like already mentioned the command implementations can stay the same in probably more than 90% of the cases.
+One option that had been changed is how you can overwrite a result in a result handler inside the command:</p>
+
+<p class="paragraph">Before:</p>
+
+<pre><code>public function result (result: XML, processor: CommandObserverProcessor): void {
+    var user: User = parse(result);
+    processor.command.setResult(user);
+}
+</code></pre>
+
+<p class="paragraph">After:</p> 
+
+<pre><code>public function result (result: XML): User {
+    var user: User = parse(result);
+    return user;
+}
+</code></pre>
+
+
+
+<h3><a name="migrate_contextbuilder"></a>1.3.8 Building the first Context with the ContextBuilder API</h3>
+
+<p class="paragraph">If you are using the <code>&lt;ContextBuilder&gt;</code> MXML tag to create the first
+Context of the application, all Flex support provided by Parsley is initialized 
+automatically, as the MXML tag is Flex-specific. On the other hand the 
+ContextBuilder API is now part of Parsley Core which does not
+depend on Flex. If you create the first Context of a Flex application with this
+API, you need to call the following initialization method once first:</p>
+
+<pre><code><span style="color:#FF0000;">FlexSupport.initialize();</span>
+
+ContextBuilder.newBuilder() [...]
+</code></pre>
+
+<p class="paragraph">Again, this is not required when you use the <code>&lt;ContextBuilder&gt;</code> MXML
+tag or use this API for creating subsequent Context instances.</p>
+
+
+
+<h3><a name="migrate_messageerror"></a>1.3.9 Signature Change for MessageError handlers</h3>
+
+<p class="paragraph">If you declared a message error handler in Parsley 2, then you need to adjust the order
+of parameters:</p>
+
+<p class="paragraph">Before:</p>
+
+<pre><code>[MessageError]
+public function handleError (processor: MessageProcessor, error: Error): void
+</code></pre>
+
+<p class="paragraph">After:</p>
+
+<pre><code>[MessageError]
+public function handleError (error: Error, processor: MessageProcessor): void
+</code></pre>
+
+<p class="paragraph">This change has been made to align this tag with all other types of message handlers where the 
+(optional) processor parameter always comes last. You can also now additionally map the error handler
+by message type like with all other types of message receivers:</p>
+
+<pre><code>[MessageError]
+public function handleError (error: Error, message: LoginMessage, processor: MessageProcessor): void
+</code></pre> 
+
+
+<h3><a name="migrate_extension"></a>1.3.10 Changes in Extension APIs</h3>
+
+<p class="paragraph">If you wrote custom configuration tags or other types of extensions, you may need to adjust
+them one final time. In particular the <code>ObjectProcessor</code> interface has been adjusted one
+more time. It took some time to get the balance between robustness, flexiblity and simplicity right.
+In Parsley 3 the interim <code>ObjectProcessorFactory</code> has gone, you can now directly add
+an <code>ObjectProcessor</code> to an <code>ObjectDefinitionBuilder</code>. This removes the need for
+cumbersome plumbing, in particular if the processor is stateless. For a stateful processor you
+now have to implement the optional <code>StatefulProcessor</code> interface, which adds a simple
+<code>clone</code> method in case the same processor needs to get applied for another target object.</p>
+
+<p class="paragraph">ObjectProcessor interface - before:</p>
+
+<pre><code>function preInit (): void;
+
+function postDestroy (): void;
+</code></pre>
+
+<p class="paragraph">ObjectProcessor interface - after (allowing for stateless implementations):</p>
+
+<pre><code>function init (target: ManagedObject): void;
+
+function destroy (target: ManagedObject): void;
+</code></pre>
+
+<p class="paragraph">New optional interface <code>StatefulProcessor</code>, extending <code>ObjectProcessor</code>:</p>
+
+<pre><code>function clone (): StatefulProcessor;
+</code></pre>
+
+<p class="paragraph">This method should create a clone of the processor without any state that you kept for a particular
+managed object</p>
+
+<p class="paragraph">Applying a processor - before:</p>
+
+<pre><code>var builder: ObjectDefinitionBuilder = ...;
+
+builder
+    .lifecycle()
+        .processorFactory(MyProcessor.newFactory(someParam));
+</code></pre>
+
+<p class="paragraph">Although not mandated it was a common pattern to add a static factory method to processors to create
+a factory for new instances. With the new optional clone method, a factory is now obsolete.</p>
+
+<p class="paragraph">Applying a processor - after:</p>
+
+<pre><code>var builder: ObjectDefinitionBuilder = ...;
+
+builder
+    .process(new MyProcessor(someParam));
+</code></pre>
+
+<p class="paragraph">There are also some new options, like using a dedicated <code>PropertyProcessor</code> or <code>MethodProcessor</code>
+subinterface when implementing processors that just deal with one member of the target instance (which is the case
+for the majority of processors), and convenient target property and method validation as well as the option to specify
+the exact phase the processor is applied to a target instance in case the order matters. The new options are explained
+in <a href="extensions.php#metadata_processor">13.2.4&nbsp;The ObjectProcessor Interface</a>.</p> 
+
+<h2><a name="building"></a>1.4 Building the Framework from Source</h2>
+
+<p class="paragraph">There are two common use cases where you might want to build the framework's SWC files yourself: either you want to apply a fix
+or enhancement to a local copy or you want to build snapshots from master to take advantage of fixes or enhancements before they
+make it into the next official release. In both cases it's recommended to check out the project from GitHub. This way you can easily
+follow the ongoing development. Building from source should be pretty straightforward, so this section just gives you a brief summary
+of the necessary steps.</p>
+
+<p class="paragraph">The instructions below apply to all projects, Parsley Core, as well as all Spicelib libraries and Parsley extension projects.</p>
+
+
+<p class="subheadline"> Check out Parsley from GitHub </p>
+
+<p class="paragraph">Parsley 3 is <a href="http://www.github.com/spicefactory/" target="_blank">hosted on GitHub</a>. If you just want to add something to an official release,
+it's best to check out the corresponding tag. If you want to follow the ongoing development of the next version and build snapshots
+you should check out master.</p> 
+
+
+<p class="subheadline"> Edit the Properties File </p>
+
+<p class="paragraph">Next you have to adapt the properties for your environment, all projects have a template file called <code>build.properties.tmpl</code> 
+in the <code>build</code> directory. Create a copy of that file under the name <code>build.properties</code> and edit it as instructed in the
+comments inside this file.</p> 
+
+
+<p class="subheadline"> Run the Ant Targets for building the SWCs </p>
+
+<p class="paragraph">Finally you just have to pick the corresponding Ant target. Projects that just produce one SWC have a single <code>compile</code>
+target, whereas some projects have multiple targets for compilation.</p>
+
+<p class="paragraph">The SWCs are built into the directory <code>release/&lt;version&gt;/release</code>.</p>
+<h2><a name="dependencies"></a>1.5 Dependencies</h2>
+
+<p class="paragraph">Parsley and Spicelib get released in a number of separate SWCs. 
+You only have to add the SWCs to your classpath if you need the corresponding
+functionality. Spicelib is a set of libraries that do not depend on Parsley
+and also mostly not on each other. Parsley builds functionality on top of them.</p>
+
+<p class="paragraph">The diagram below shows the dependencies between these artifacts.
+For Parsley only the SWCs provided by the Parsley Core project are included,
+for the sake of clarity. The dependencies of the various Parsley extension 
+projects are listed in the table below the diagram.</p>
+
+
+<p class="subheadline"> Dependencies of Parsley Core and Spicelib Artifacts </p>
+
+<img class="doc_img" src="dependencies.png" />
+
+
+<p class="subheadline"> Dependencies of Parsley Extension Projects </p>
+
+<p class="paragraph">All extensions depend on <code>parsley-core</code> (including all transitive dependencies).
+Additional dependencies are listed below (omitting transitive dependencies which you can see in the diagram above).</p>
+
+<table>
+<tr><td> <code>XML Tags for Flex Logging</code> </td><td> parsley-flex, parsley-xml </td></tr> 
+<tr><td> <code>XML Tags for Spicelib Logging</code> </td><td> spicelib-logging, parsley-xml </td></tr> 
+<tr><td> <code>Flash Localization</code> </td><td> parsley-xml </td></tr> 
+<tr><td> <code>Parsley Popup</code> </td><td> parsley-flex, popup (from Cairngorm 3) </td></tr> 
+<tr><td> <code>Pimento Support</code> </td><td> pimento, cinnamon </td></tr> 
+</table>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

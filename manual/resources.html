@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>12 Localization</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>12 Localization</h1>
+
+<p class="paragraph">The recommended approach for localizing Parsley based applications is very different dependending
+on whether you are using Flex or not. For Flex Applications Parsley integrates with the Flex ResourceManager.
+For Flash Applications Parsley offers its own Localization Module. In fact that module is the only part
+that survived from version 1 of the framework, albeit with some major refactorings.</p>
+<h2><a name="bindings"></a>12.1 ResourceBindings</h2>
+
+<p class="paragraph">This is the only Parsley Localization feature that works the same way in Flex and Flash Applications,
+so we will explain it first.</p>
+
+<p class="paragraph">You can place <code>[ResourceBinding]</code> metadata tags on properties of objects managed by the IOC Container:</p>
+
+<pre><code>[ResourceBinding(bundle="errorMessages",key="fileNotFound")]
+public var message:String;
+</code></pre>
+
+<p class="paragraph">The tag has the following effects:</p>
+
+<ul> 
+<li> When the object is instantiated the container will fetch the message with the specified bundle name and key
+from the ResourceManager and inject it into the property. This step happens while other injections are processed
+and before the methods marked with <code>[Init]</code> get invoked. In case the bundle is not yet available at the
+time the object is initialized the resource may get injected at a later time. </li> 
+
+<li> When Flex ResourceManager is updated (Flex Applications) or the <code>currentLocale</code>
+property of the Parsley ResourceManager gets changed (Flash Applications) the value for that property will be updated automatically. </li>
+</ul>
+
+<p class="paragraph">For Flex Applications it is recommended to use this feature primarily for objects defined in Parsley configuration classes
+or files (MXML or XML). For View Components, even when they connect to the Parsley IOC Container like described in
+<a href="view.php#intro">9&nbsp;Dynamic View Wiring</a>, you could just stick to normal Flex Binding syntax like this:</p>
+
+<pre><code>&lt;s:Label text="{resourceManager.getString('RegistrationForm','city')}"/&gt;
+</code></pre>
+
+<p class="paragraph">This way your localized View Component does not depend on the Parsley Framework at all. The Parsley
+[ResourceBinding] tag still may come in handy for other localized objects.</p>
+
+<p class="paragraph">For Flash Applications the <code>[ResourceBinding]</code> tag is usually the recommended approach for localizing
+components.</p>
+
+<p class="paragraph">In most cases the Parsley Framework will automatically detect if it is used in a Flex or Flash Application depending
+on how Parsley is initialized. So the adapter that connects the class that processes the <code>[ResourceBinding]</code> tags
+to either the Flex or Parsley ResourceManager will be set automatically. There are a few exceptions described in the 
+following sections.</p>
+
+<p class="paragraph">Like for most other Parsley metadata tags there are corresponding MXML and XML tags that could be used alternatively:</p>
+
+<p class="subheadline"> MXML Example </p>
+
+<pre><code>&lt;Object type="{SlideShowController}"&gt;
+    &lt;ResourceBinding property="message" bundle="errorMessages" key="fileNotFound"/&gt; 
+&lt;/Object&gt;
+</code></pre>
+ 
+<p class="subheadline"> XML Example </p>
+
+<pre><code>&lt;object type="com.bookstore.catalog.SlideShowController"&gt;
+    &lt;resource-binding property="message" bundle="errorMessages" key="fileNotFound"/&gt;  
+&lt;/object&gt;
+</code></pre>
+<h2><a name="flex"></a>12.2 Localized Flex Applications</h2>
+
+<p class="paragraph">For Flex Applications the <code>[ResourceBinding]</code> tag described in the previous section 
+is currently the only integration feature that is available (and probably the only feature you'll need in a
+Flex environment). Otherwise you should use the Flex Localization features the same way
+like you would without using the framework. There is extensive documentation available in the
+<a href="http://livedocs.adobe.com/flex/3/html/help.html?content=l10n_1.html" target="_blank">Flex Livedocs</a>.</p>
+
+<p class="paragraph">We might think about expanding the Flex Module Support to include management of dynamically
+loaded Flex Resource Modules which are associated with a particular Flex Module. But we will wait
+for feedback on this and see how the Module Support gets used.</p>
+
+<p class="subheadline"> Initializing the ResourceBinding metadata tag support for Flex </p>
+
+<p class="paragraph">Whenever you are using the <code>FlexContextBuilder</code> to initialize your MXML-based
+Parsley Configuration the framework will automatically set the required adapter for you.
+In rare cases where you would build a Parsley Flex Application but not use MXML configuration at all (for example
+confining yourself to use XML configuration files) you'd need to set the adapter manually:</p>
+
+<pre><code>ResourceBindingDecorator.adapterClass = FlexResourceBindingAdapter;
+</code></pre> 
+<h2><a name="flash"></a>12.3 Localized Flash Applications</h2>
+
+<p class="paragraph">For Flash Applications Parsley offers its own Localization Module. This is the oldest part of
+the framework that already existed in early AS2 versions of the framework. But it's still a good solution
+if you are not using Flex. This section describes how you configure and use this module.</p>
+
+<p class="paragraph">This functionality is not part of Parsley Core. The extension is available on the Parsley download page.
+Simply add the SWCs from the download to your classpath.</p>
+
+
+<h3><a name="flash_config"></a>12.3.1 Configuration</h3>
+
+<p class="paragraph">Parsley includes a separate XML configuration namespace that you can use to declare the bundles
+that the framework should load when initializing the IOC Container:</p>
+
+<pre><code>&lt;objects xmlns="http://www.spicefactory.org/parsley" 
+    xmlns:res="http://www.spicefactory.org/parsley/flash/resources"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spicefactory.org/parsley 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-core.xsd
+    http://www.spicefactory.org/parsley/flash/resources 
+      http://www.spicefactory.org/parsley/schema/2.3/parsley-resources-flash.xsd"&gt;
+    
+    &lt;res:resource-manager id="resourceManager"&gt;
+        &lt;res:locale language="en" country="US"/&gt;
+        &lt;res:locale language="de" country="DE"/&gt;
+        &lt;res:locale language="fr" country="FR"/&gt;
+    &lt;/res:resource-manager&gt;
+	        
+    &lt;res:resource-bundle id="tooltips" basename="messages/tooltips" localized="true"/&gt;
+
+    &lt;res:resource-bundle id="alerts" basename="messages/alerts" localized="true"/&gt;
+
+    &lt;!-- other object definitions ... --&gt;
+    
+&lt;/objects&gt;
+</code></pre>
+
+<p class="paragraph">In the example above we declare a ResourceManager and the supported locales. In a modular application you should
+only declare a single ResourceManager instance (usually in the main application Context initialized on application start).
+You can then add any number of ResourceBundles in the main Context as well as child Context configurations. In the example
+above we add two bundles, one for tooltips and one for alerts.</p>
+
+<p class="paragraph">With the basename attribute you specify how Parsley concatenates the actual names of the files it attempts to load.
+For the basename <code>messages/tooltips</code> and the active locale en_US it would look for the following files:</p>
+
+<ul>
+<li> messages/tooltips.xml </li>
+<li> messages/tooltips_en.xml </li>
+<li> messages/tooltips_en_US.xml </li>
+</ul>
+
+<p class="paragraph">This way you could keep messages that differ for each country in <code>tooltips_en_US</code> while adding messages
+which are the same for each country with English messages to <code>tooltips_en.xml</code>. You can reduce the number of
+files Parsley attempts to load though: When you set the <code>ignore-country</code> attribute to true the third file from
+the list will be omitted, if you set the <code>localized</code> attribute to false the second one will be omitted, too.</p>
+
+<p class="paragraph">Since this is an extension it has to be initialized explicitly before using the <code>XmlContextBuilder</code>:</p>
+
+<pre><code>FlashResourceXmlSupport.initialize();
+</code></pre>
+
+<h3><a name="flash_bundles"></a>12.3.2 XML Resource Bundle Files</h3>
+
+<p class="paragraph">The structure for the bundle files themselves is quite trivial:</p>
+
+<pre><code>&lt;resource-bundle 
+    xmlns="http://www.spicefactory.org/parsley/flash/resource-bundle"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spicefactory.org/parsley/flash/resource-bundle 
+        http://www.spicefactory.org/parsley/schema/2.3/parsley-resources-flash-bundle.xsd"
+    &gt;
+    &lt;resource key="tooltip.save"&gt;Saves the file&lt;/resource&gt;
+    &lt;resource key="tooltip.open"&gt;Opens a new file&lt;/resource&gt;
+    &lt;resource key="tooltip.saveAs"&gt;Saves the file with a new name&lt;/resource&gt;
+    &lt;resource key="tooltip.delete"&gt;Deletes the file&lt;/resource&gt;
+&lt;/resource-bundle&gt;
+</code></pre>
+
+
+
+<h3><a name="flash_switching"></a>12.3.3 Switching the active Locale</h3>
+
+<p class="paragraph">If you want to switch the active locale at runtime (and thereby trigger updates for properties
+marked with <code>[ResourceBinding]</code>), you can inject the configured <code>ResourceManager</code> into any
+object and set its <code>currentLocale</code> property:</p>
+
+<pre><code>[Inject]
+public var resourceManager:ResourceManager;
+
+public function switchLocale (lang:String) : void {
+    resourceManager.currentLocale = new Locale(lang);
+} 
+</code></pre>
+
+<p class="paragraph">This will trigger the loading of the XML bundle files associated with that locale.
+The <code>ResourceManager</code> will dispatch a <code>LocaleSwitchEvent.COMPLETE</code> event when the 
+loading process has completed. But in many cases you don't even have to listen for that
+event as the ResourceBindings will update automatically. You only need this event
+if switching the locale involves more than just updating property values.</p>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

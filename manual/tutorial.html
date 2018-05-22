@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>2 Getting Started</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>2 Getting Started</h1>
+
+<p class="paragraph">This chapter gives a very quick introduction on how to build a simple application with Parsley,
+linking to other parts of the manual for more detailed descriptions. Most of the explanations
+apply in the same way to building Flex or Flash Applications. Examples that only apply
+for Flex development will be pointed out accordingly.</p>
+<h2><a name="sample"></a>2.1 Hello World Sample Application</h2>
+
+<p class="paragraph">If you prefer to examine a simple sample application before reading the manual,
+you can find a Hello World sample <a href="http://www.spicefactory.org/parsley/docs/2.3/samples/helloworld/HelloWorld.html" target="_blank">here</a>,
+"View Source" is enabled.</p>
+
+<p class="paragraph">This chapter does not reflect the sample application though.</p>
+<h2><a name="setup"></a>2.2 Adding the Framework SWCs</h2>
+
+<p class="paragraph">To start working with Parsley you need to add several of its SWCs to your classpath first.
+Which ones you'll need depends on the feature set you'll be using and whether you'll be building
+a Flex or Flash Application. See <a href="overview.php#dependencies">1.5&nbsp;Dependencies</a> for details.</p>
+
+<p class="paragraph">To get started take the Parsley Core download and add the required SWCs from the
+release and dependencies folders to your classpath.
+You'll find them in the <code>release</code> folder of the download Zip.</p>
+
+
+
+<p class="subheadline"> Minimum Set of Required SWCs </p>
+
+<p class="paragraph">You always need:</p>
+
+<ul>
+<li> <code>parsley-core-${version}.swc</code> </li>
+<li> <code>spicelib-commands-${version}.swc</code> </li>
+<li> <code>spicelib-reflect-${version}.swc</code> </li>
+<li> <code>spicelib-util-${version}.swc</code> </li>
+</ul>
+
+
+
+<p class="subheadline"> Additional SWC for Flex </p>
+
+<p class="paragraph">For Flex you'd also need:</p>
+
+<ul>
+<li> <code>parsley-flex-${version}.swc</code> </li>
+</ul>
+
+
+
+<p class="subheadline"> Additional SWCs for XML Configuration </p>
+
+<p class="paragraph">Only when using XML configuration you'd also need to add:</p>
+
+<ul>
+<li> <code>parsley-xml-${version}.swc</code> </li>
+<li> <code>spicelib-xml-mapper-${version}.swc</code> </li>
+</ul>
+
+<h2><a name="dependencies"></a>2.3 Defining Object Dependencies</h2>
+
+<p class="paragraph">This is probably the most frequently used feature of Parsley. Dependencies can be configured
+with Metadata, MXML, XML or programmatically.</p>
+
+<p class="subheadline"> Using the <code>[Inject]</code> metadata tag </p>
+
+<p class="paragraph">You can use the tag on properties:</p>
+
+<pre><code>[Inject]
+public var loginService:LoginService;
+</code></pre>
+
+<pre><code>[Inject]
+public function set loginService (service:LoginService) : void {
+</code></pre>
+
+<p class="paragraph">Or you can use it on methods to declare multiple dependencies at once:</p>
+
+<pre><code>[Inject]
+public function init (loginService:LoginService, cartService:CartService = null) : void {
+</code></pre>
+
+<p class="paragraph">The nice thing in the example above is that Parsley will also reflect on the parameter types
+and treat optional parameters as optional dependencies. So in this example the container will throw an 
+Error if the <code>LoginService</code> is missing, but silently skip the <code>CartService</code> if it is
+not present in the container.</p>
+
+<p class="paragraph">Finally you can also use a similar tag (<code>[InjectConstructor]</code>) on the class declaration
+for constructor injection (as the Flex compiler ignores metadata on constructors):</p>
+
+<pre><code>[InjectConstructor]
+public class LoginAction {
+
+    function LoginAction (loginService:LoginService, cartService:CartService = null) : void {
+</code></pre>
+
+<p class="paragraph">Again the second (optional) parameter will treated as an optional dependency accordingly</p>
+ 
+
+<p class="subheadline"> Best Practices </p>
+
+<p class="paragraph">In all the examples we showed in this section the dependencies will be selected by type,
+since Parsley will reflect on the property and method parameter types. To benefit from the decoupling
+that an IOC Container offers you should prefer to declare interface types at injection points.
+This way you can switch implementations in the configuration without touching the injection
+points of classes that need these services.</p>
+
+<p class="paragraph">Of course this only works when you add only a single object matching the type at the
+injection point to the container. If you have several implementation of the same interface
+you'd need to switch to injection by id instead which is only available for properties:</p>
+
+<pre><code>[Inject(id="mainLoginService")]
+public var loginService:LoginService;
+</code></pre>
+
+<p class="paragraph">The choice between property, method or constructor injection is up to you. Some prefer
+constructor injection as it enables better encapsulation, allowing you to create immutable classes.
+But constructor injection is only recommended if you target Flash Player 10.1 or newer as earlier
+players had reflection bugs on constructors.</p>
+
+<p class="paragraph">See <a href="injection.php#intro">4&nbsp;Dependency Injection</a> for more details on injection in general.</p>
+<h2><a name="messaging"></a>2.4 Sending and Receiving Messages</h2>
+
+<p class="paragraph">While Dependency Injection already allows some level of decoupling if you declare injection
+points with interface types, for some parts of the application you'll prefer even looser coupling,
+letting the parts of your application communicate through messages, without the sender and receiving
+objects having to know each other.</p>
+
+<p class="paragraph">For example you might transform low-level view events into calls to a presentation model which 
+dispatches application messages, so that any action/controller
+can register for all message types it is interested in.</p>
+
+<p class="paragraph">For more details on this topic see <a href="messaging.php#intro">6&nbsp;Messaging</a> and <a href="mvc.php#intro">11&nbsp;Building MVC Architectures</a>.</p>
+
+<p class="paragraph">With Parsley you can configure the sending as well as the receiving side with metadata tags.
+The sending part may simply contain a <code>[MessageDispatcher]</code> tag on a public function
+property:</p>
+
+<pre><code><span style="color:#FF0000;">[MessageDispatcher]</span>
+public var dispatcher: Function;
+
+public class LoginServiceImpl implements LoginService {
+
+    [...]
+    
+    private function handleLoginResult (user:User) : void {
+        <span style="color:#FF0000;">dispatcher(new LoginMessage(user));</span>
+    }
+    
+}
+</code></pre> 
+
+<p class="paragraph">Here we use the injected dispatcher function to send an instance of <code>LoginMessage</code>.
+With Parsley messages do not need to extend the Event class (although they could if they'd need to).</p>
+
+<p class="paragraph">For the receiving side you can use the <code>[MessageHandler]</code> tag to signal interest in a particular
+message type, determined by the parameter type of the method:</p>
+
+<pre><code>[MessageHandler]
+public function login (event:LoginEvent) : void {
+</code></pre>
+
+<p class="paragraph">Like with Dependency Injection selecting the message receivers by type improves the robustness of the system
+as you don't have to take care of unique event type String constants for the whole system.</p>
+
+<p class="paragraph">There are more tags for the receiving side like the <code>[MessageBinding]</code> tag.
+Those will be explained in <a href="messaging.php#intro">6&nbsp;Messaging</a>.</p> 
+<h2><a name="assembling"></a>2.5 Assembling the Objects</h2>
+
+<p class="paragraph">There are a lot more configuration options in addition to the tags for Dependency Injection and Messaging.
+But since those are the most common ones we'll now show you how you assemble these objects for the IOC Container. 
+After you added metadata tags to the classes you have to tell the container which objects it should manage.</p>
+
+
+<p class="subheadline"> Flex Applications </p>
+
+<p class="paragraph">In Flex you might want to prefer MXML configuration. You can create a simple MXML class (using <code>&lt;Objects&gt;</code>
+from the Parsley namespace as the root tag) and add all the classes you want to be managed by Parsley:</p>
+
+<pre><code>&lt;Objects
+    xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:services="com.bookstore.services.*"
+    xmlns:actions="com.bookstore.actions.*"&gt;
+    
+    &lt;fx:Declarations&gt;
+    
+        &lt;services:LoginServiceImpl timeout="3000"/&gt;
+
+        &lt;services:CartServiceImpl timeout="3000"/&gt;
+    
+        &lt;actions:LoginAction/&gt;
+
+        &lt;actions:AddToCartAction/&gt;
+
+        &lt;actions:DeleteCartAction/&gt;
+        
+    &lt;/fx:Declarations&gt;
+    
+&lt;/Objects&gt; 
+</code></pre>
+
+<p class="paragraph">Of course you can also use this configuration file for setting additional property values. They will be combined
+with the processing of the metadata tags for all classes added to the container.</p>
+
+<p class="paragraph">In this example we didn't specify any id attributes. If you just use injection by type you don't need them.
+In case you use ids at injection points like in the last example of the section on injection you have to specify them
+here:</p>
+
+<pre><code>&lt;services:AdminLoginServiceImpl id="adminLogin" timeout="3000"/&gt;
+&lt;services:UserLoginServiceImpl id="userService" timeout="3000"/&gt;
+</code></pre>
+
+<p class="paragraph">You can then use those ids at injection points:</p>
+
+<pre><code>[Inject(id="adminLogin")]
+public var adminLogin:LoginService;
+
+[Inject(id="userLogin")]
+public var userLogin:LoginService;
+</code></pre>
+
+<p class="paragraph">But in general you should try to avoid injection by id and only use it where you work with multiple instances
+of the same type.</p>
+
+
+<p class="subheadline"> Flash Applications </p>
+
+<p class="paragraph">In this case MXML is not available. So the preferred configuration mechanism is probably the use of XML files.
+Of course you can also use external XML files in Flex Applications if you don't want to compile the configuration
+into your application.</p>
+
+<p class="paragraph">An example XML configuration corresponding to the MXML example above would look like this:</p>
+
+<pre><code>&lt;objects 
+    xmlns="http://www.spicefactory.org/parsley"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.spicefactory.org/parsley 
+        http://www.spicefactory.org/parsley/schema/2.3/parsley-core.xsd"
+    &gt;
+    
+    &lt;object type="com.bookstore.services.LoginServiceImpl"&gt;
+        &lt;property name="timeout" value="3000"/&gt;
+    &lt;/object&gt;
+    
+    &lt;object type="com.bookstore.services.CartServiceImpl"&gt;
+        &lt;property name="timeout" value="3000"/&gt;
+    &lt;/object&gt;
+    
+    &lt;object type="com.bookstore.actions.LoginAction"/&gt;
+
+    &lt;object type="com.bookstore.actions.AddToCartAction"/&gt;
+
+    &lt;object type="com.bookstore.actions.DeleteCartAction"/&gt;
+&lt;/objects&gt;
+</code></pre>
+
+<p class="paragraph">Like with the MXML example we don't specify an id for the object definitions. You can add it if required
+for injection by id.</p>
+
+<p class="paragraph">These are the most common options for assembling the objects. You'll find many more examples in <a href="config.php#intro">3&nbsp;Configuration and Initialization</a>.</p>
+<h2><a name="initialize"></a>2.6 Initializing the Framework</h2>
+
+<p class="paragraph">Now that you configured your classes with metadata tags and assembled them in MXML or XML, it's finally
+time to intialize the whole thing. Fortunately in most cases this is a one liner or a simple tag.</p>
+
+<p class="paragraph">For the MXML configuration file we created, assuming that we called it <code>BookStoreConfig.mxml</code>,
+the tag would look like this:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="{BookStoreConfig}"/&gt;
+</code></pre>
+
+<p class="paragraph">That's all there is to it.</p>
+
+<p class="paragraph">For the XML example we have to initialize the Context programmatically in a Flash application:</p>
+
+<pre><code>XmlContextBuilder.build("config.xml");
+</code></pre>
+
+<p class="paragraph">We covered the most common use cases here. There are a lot more options like splitting
+the configuration into multiple files or even using different configuration mechanisms like MXML and XML
+in the same application and merging them to a single context. This will be demonstrated in <a href="config.php#combine">3.7&nbsp;Combining multiple Configuration mechanisms</a>.</p>
+
+<p class="paragraph">For modular applications you wouldn't want to lump everything together into a single monolithic context and
+load all this stuff on application start. For building modular applications and loading and unloading configurations
+on demand see <a href="modules.php#intro">10&nbsp;Building Modular Applications</a>.</p>
+<h2><a name="more"></a>2.7 Adding more Services</h2>
+
+<p class="paragraph">Since this is the Getting Started section we only covered the most common use cases.
+But hopefully for simple applications it is sufficient to get you going.
+As you may have noticed already the manual is quite extensive and if you think you need
+a lot more options than covered in this chapter you should browse the remaining chapters.</p> 
+
+<p class="paragraph">If you just want to get an idea of the feature set Parsley offers you may want to start with
+<a href="overview.php#features">1.1&nbsp;Features List</a>.</p> 
+
+<p class="paragraph">The most interesting options not covered in this chapter are probably:</p>
+
+<ul>
+<li> <a href="config.php#dsl">3.5&nbsp;Configuration DSL</a> and <a href="config.php#as3">3.6&nbsp;ActionScript Configuration</a>: You are not limited to configuration with Metadata, MXML or XML, there
+are two more options, which give you additional flexibility. </li>
+
+<li> <a href="messaging.php#interceptors">6.7&nbsp;Intercepting Messages</a>: A <code>MessageHandlers</code> as covered
+in this chapter even allows you to interfere with the message dispatching process (e.g. suspending
+and resuming or cancelling the message processing). </li>
+
+<li> <a href="managedcommands.php#intro">7&nbsp;Managed Commands</a>: You can execute Commands in a way that they are managed
+by the container for the time they execute. </li>
+
+<li> <a href="lifecycle.php#factories">8.2&nbsp;Using Factories</a>: Instead of assembling the target objects itself you can also add
+factories to the IOC Container which create objects, which gives you additional flexibility on how
+objects are instantiated. </li>
+
+<li> <a href="lifecycle.php#async">8.3&nbsp;Asynchronous Object Initialization</a>: Configuration option for asynchronously initializing objects (e.g. objects
+that need to load data before they can operate). In this case the container will defer the initialization
+of other objects until those configured to be asynchronous are ready. </li>
+
+<li> <a href="view.php#intro">9&nbsp;Dynamic View Wiring</a>: We already mentioned this one briefly. Allows you to wire Flex Components defined
+in MXML to objects declared in the IOC Container. </li>
+
+<li> <a href="modules.php#intro">10&nbsp;Building Modular Applications</a>: Associate configured services, actions, presentation models and so on with a configuration Context
+that can be loaded and unloaded on demand. </li>
+
+<li> <a href="resources.php#bindings">12.1&nbsp;ResourceBindings</a>: For binding properties of managed objects to localized resources, updating them automatically
+when the localeChain changes. </li>
+
+<li> <a href="extensions.php#intro">13&nbsp;Extending the Framework</a>: If you want to add your own Metadata, MXML or XML configuration tags or use
+some of the other available extension points.
+Useful for simplifying recurring configuration tasks or for creating frameworks on top of Parsley. </li>
+</ul>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

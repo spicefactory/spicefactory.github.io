@@ -1,0 +1,922 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>7 Managed Commands</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>7 Managed Commands</h1>
+
+
+<p class="paragraph">The Command support in Parsley 3 is a complete rewrite of the DynamicCommand facility in Parsley 2.
+The way you implement a simple command is still mostly the same and you can still map commands to messages
+like in previous versions. But the implementation has changed completely and also added a lot of new functionality.</p>
+
+<p class="paragraph">Command Support in Parsley 3 builds on top of the standalone Spicelib Commands library. That library already 
+allows for convenient ways to implement a command, to group them for sequential or parallel execution, or to create
+dynamic flows with decision points based on results of individual commands. It also allows to pass results from one
+command to subsequent commands in a sequence. Therefore it is recommended to start reading the documentation on
+<a href="commands.php#intro">21&nbsp;The Command Framework</a> first. This chapter will only provide brief summaries of the content covered in the Spicelib
+manual and instead focus on the features that Parsley adds to that library.</p>
+
+<p class="paragraph">The features that Parsley offers on top of Spicelib Commands are:</p>
+
+<ul>
+<li> Dynamically add a command to a Context only for the time it executes. This way a command can get injections,
+send and receive messages while it executes and take advantage of any built-in or custom container feature, while
+getting automatically disposed and removed from the Context when it finishes executing.
+See <a href="managedcommands.php#lifecycle">7.7&nbsp;Command Lifecycle</a> for details. </li>
+
+<li> In addition to the fluent API offered by Spicelib to build, chain and execute commands, Parsley offers a declarative
+way to configure Commands (or sequences or flows) in MXML or XML. 
+See <a href="managedcommands.php#groups">7.3&nbsp;Command Groups</a> and <a href="managedcommands.php#flows">7.4&nbsp;Command Flows</a> for details. </li>
+
+<li> Like with DynamicCommands in Parsley 2 it allows you to map a Command (or sequence or flow) to a message, so that
+the container automatically instantiates and executes a new command whenever a matching message is heard. 
+See <a href="managedcommands.php#mapping">7.2&nbsp;Mapping Commands to Messages</a> for details. </li>
+</ul>
+
+<p class="paragraph">If you do not need any of the features mentioned above, you can as well use Spicelib Commands in their standalone
+mode. Running commands or a sequence of commands in unmanaged mode is a perfectly valid use case if the commands do not
+need injections, messaging or other container features. This is quite a common use case when a set of commands deal
+with a separate, isolated task. Remember that the standalone Commands project already offers a lot of container-like
+convenience features like the ability to transparently pass data from commands to subsequent commands. You should always 
+start with the most lightweight option, if you discover later that you do need Parsley features in your commands you
+can usually easily "upgrade" them through adding a few lines of code while leaving everything else untouched.</p>
+
+<h2><a name="implementation"></a>7.1 Implementing a Command</h2>
+
+
+<p class="paragraph">A slightly more detailed documentation on how to implement a Command can be found in <a href="commands.php#implementation">21.1&nbsp;Implementing a Command</a>
+in the Spicelib section of the manual. This chapter will provide a quick overview with a few examples
+and describe the additional options you have when the command is managed by Parsley.</p>
+
+
+<h3><a name="sync"></a>7.1.1 Synchronous Commands</h3>
+
+<pre><code>public class SimpleCommand {
+
+    public function execute (): void {
+    
+        trace("I execute, Therefore I am");
+        
+    }
+    
+}
+</code></pre>    
+
+<p class="paragraph">The method to execute is determined by naming convention, there is no interface to implement or base class to extend.
+This allows some flexibility in the signature of the execute method, which may receive result callback functions, results
+from previous commands or the message that triggered the command.</p>
+
+
+
+<h3><a name="sync_result"></a>7.1.2 Synchronous Commands with Result</h3>
+
+<pre><code>public class SimpleCommand {
+
+    public function execute (): String {
+    
+        return "This is the result";
+        
+    }
+    
+}
+</code></pre>    
+
+<p class="paragraph">A synchronous execute method may declare a different return type than void. In this case the returned
+value is interpreted as the result of the command. The result may get passed to execute methods of subsequent
+command (in a sequence or flow) or to decoupled result handlers. For details see <a href="managedcommands.php#results">7.6&nbsp;Handling Results and Observing Commands</a>.</p>
+
+
+
+<h3><a name="async"></a>7.1.3 Asynchronous Commands with Result</h3>
+
+<pre><code>public class GetUserListCommand {
+
+    [Inject("myService")]
+    public var service: RemoteObject;
+
+    public var callback: Function;
+
+    public function execute (): void {
+    
+        service.getUserList().addResponder(new Responder(result, error));
+        
+    }
+    
+    private function result (result: ResultEvent): void {
+        callback(result.result);
+    }
+    
+    private function error (event: FaultEvent): void {
+        callback(event.fault);
+    }
+    
+}
+</code></pre>    
+
+<p class="paragraph">A command is seen as asnchronous by the framework as soon as it either has a public var of type Function named callback or
+a method parameter of type Function in the execute method. In these cases the framework will inject a function that can be
+used to signal command completion or an error condition. For both regular results and errors the result is simply passed
+to the callback function, the framework can distinguish between results and errors based on the type of the object.</p>
+
+
+
+<h3><a name="async_token"></a>7.1.4 Asynchronous Commands with AsyncToken</h3>
+
+<pre><code>public class GetUserListCommand {
+
+    [Inject("myService")]
+    public var service: RemoteObject;
+
+    public function execute (): AsyncToken {
+    
+        return service.getUserList();
+        
+    }
+    
+}
+</code></pre>  
+
+<p class="paragraph">When all you do is invoking a RemoteObject and passing the results or faults back to the framework for further
+processing, there is a shortcut like shown above. Instead of doing all the plumbing around the Responder yourself,
+you leave this task to the framework. Technically, the command above produces a synchronous command, but of a type
+(in this case AsyncToken) that is known by the framework as not immediately available. The framework will then wait
+for either result or fault and treat that as the outcome of the command. The support for AsyncToken is built into 
+Parsley, but you can create custom <a href="commands.php#resultprocessors">21.5.2&nbsp;Implementing a Result Processor</a> for other types if required.</p>  
+
+
+
+<h3><a name="result_handler"></a>7.1.5 Result Handlers in Commands</h3>
+
+
+<pre><code>public class GetUserListCommand {
+
+    [Inject("myService")]
+    public var service: RemoteObject;
+
+    public function execute (): AsyncToken {
+    
+        return service.getUserList();
+        
+    }
+    
+    public function result (users: Array): void {
+        
+        // process users
+    
+    }
+    
+}
+</code></pre> 
+
+<p class="paragraph">If you use the shortcut for AsyncTokens you may still want to process the result inside the command before
+it gets passed to other parts of the application. The method name must be result for the result handler and
+error for the error handler. It must accept one parameter, the type can be the result type you expect from
+the remote call.</p> 
+
+
+
+<h3><a name="changing_result"></a>7.1.6 Changing the Result</h3>
+
+
+<pre><code>public class GetUserProfileCommand {
+
+
+    [Inject("myService")]
+    public var service: RemoteObject;
+
+    public function execute (msg: GetUserProfileMessage): AsyncToken {
+    
+        return service.getUserProfile(msg.userId);
+        
+    }
+    
+    public function result (profile: XML): UserProfile {
+        
+        return parse(profile);
+    
+    }
+    
+}
+</code></pre> 
+
+<p class="paragraph">You can also overwrite the result in case you want to modify or transform it before it
+gets passed to other parts of the application. In the example you receive XML from the server,
+but return the resulting UserProfile instance after parsing the XML. The UserProfile will then
+be treated as the command result.</p> 
+
+
+
+<h3><a name="other"></a>7.1.7 Other Options</h3>
+
+
+<p class="paragraph">Since Managed Commands are built on top of Spicelib Commands, all the features of that library
+are also available when using Command in Parsley. More example can be found in the Spicelib Manual:</p>
+
+<ul>
+<li> An example for a command that either executes synchronously or asynchronously depending on whether
+a matching result is already available in a client-side cache is shown in <a href="commands.php#async">21.1.2&nbsp;Asynchronous Commands</a>. </li>
+
+<li> A command can get cancelled, both from the outside and from within the command as shown in 
+<a href="commands.php#cancellation">21.1.4&nbsp;Command Cancellation</a>. </li>
+
+<li> For more options on how to produce an error outcome see <a href="commands.php#errors">21.1.3&nbsp;Error Handling</a>. </li>
+</ul> 
+
+<h2><a name="mapping"></a>7.2 Mapping Commands to Messages</h2>
+
+<p class="paragraph">If you used DynamicCommands in Parsley 2, you are already familiar with the concept of mapping commands to messages.
+In Parsley 3 this feature has been generalized, allowing to map any command, including sequences and flows, to a Parsley
+message, as long as it is implemented in a way that could also be executed by the new Spicelib Commands library (with
+a few feature additions only available in Parsley).</p>
+
+
+
+<h3><a name="mapping_mxml"></a>7.2.1 Mapping Commands in MXML</h3>
+
+
+<p class="paragraph">A mapping declaration can be as simple as this:</p>
+
+<pre><code>&lt;parsley:MapCommand type="{LoadUserCommand}"/&gt;
+</code></pre>
+
+<p class="paragraph">Here the only thing that gets specified is the type of command to execute for matching messages.
+The type of the message the command should map to is determined from the method signature of the 
+execute method, which can receive the trigger message as a method parameter:</p>
+
+<pre><code>public class GetUserProfileCommand {
+
+    [Inject("myService")]
+    public var service: RemoteObject;
+
+    public function execute (<span style="color:#FF0000;">msg: GetUserProfileMessage</span>): AsyncToken {
+    
+        return service.getUserProfile(msg.userId);
+        
+    }
+    
+}
+</code></pre> 
+
+<p class="paragraph">Like always when something gets configured per-type in Parsley, this is interpreted polymorphically,
+therefore the command will also execute for subclasses of <code>GetUserProfileMessage</code>.</p>
+
+<p class="paragraph">For every matching message the container will create a new instance of the command, add it to the Context,
+so that it can act as a fully managed object, e.g. get injections, send messages, etc., process the result
+of the command, e.g. passing it to matching methods in other objects that are configured as result handlers,
+and finally remove it from the Context after execution.</p>
+
+
+<p class="subheadline"> Explicit Message Type Configuration </p>
+
+<p class="paragraph">If you do not want to pass the message to the execute method (for example to avoid unecessary dependencies),
+you can also specify the message type explicitly in MXML:</p>
+
+<pre><code>&lt;parsley: MapCommand type="{LoadUserCommand}" messageType="{LoadUserMessage}"/&gt;
+</code></pre>
+
+
+<p class="subheadline"> Full Command Configuration </p>
+
+<p class="paragraph">If you want to specify more than just the type of the command, like setting property values
+or constructor arguments like for regular object configuration in MXML, you can use a nested Command
+tag:</p>
+
+<pre><code>&lt;parsley:MapCommand&gt;
+    &lt;parsley:Command type="{LoadUserProfileCommand}"&gt;
+        &lt;parsley:Property name="type" value="{UserProfile.EXTENDED}"/&gt;
+        &lt;parsley:Property name="cache" value="true"/&gt;
+    &lt;/parsley:Command&gt;
+&lt;/parsley:MapCommand&gt;
+</code></pre>
+
+
+<p class="subheadline"> Other Options </p>
+
+
+<p class="paragraph">The tag also supports most of the attributes you know from the regular <code>[MessageHandler]</code>
+tags:</p>
+
+<pre><code>&lt;parsley:MapCommand 
+    type="{ShoppingCartCommand}" 
+    <span style="color:#FF0000;">selector="save"
+    scope="local"
+    order="1"</span>
+/&gt;
+</code></pre>
+
+  
+
+<h3><a name="mapping_xml"></a>7.2.2 Mapping Commands in XML</h3>
+  
+<p class="paragraph">The syntax for mapping a command in XML is the same as for MXML, only using dash-notation instead of camel case:</p>
+
+<pre><code>&lt;map-command 
+    type="com.company.shop.ShoppingCartCommand" 
+    selector="save"
+    scope="local"
+    order="1"
+/&gt;
+</code></pre>
+  
+  
+  
+<h3><a name="mapping_programmatic"></a>7.2.3 Mapping Commands Programmatically</h3>
+
+<p class="paragraph">Finally you can also map a command programmatically:</p>
+
+<pre><code>var context: Context = ...
+
+MappedCommands
+    .create(GetUserProfileCommand)
+    .scope(ScopeName.LOCAL)
+    .register(context);
+</code></pre>
+
+<p class="paragraph">In the example above the Context will create a new instance of <code>GetUserProfileCommand</code> whenever a matching message
+(deduced from the signature of the execute method) is heard in local scope.</p>
+
+<p class="paragraph">If you need more setup than just specifying the class, you need to pass a factory function. You cannot pass existing
+command instances, as the container must create new instances for each message:</p>
+
+<pre><code>private function createCommand (): Object {
+    var com:GetUserProfileCommand = new GetUserProfileCommand(someParam);
+    com.profileType = ProfileType.EXTENDED;
+    return com;
+}
+
+[...]
+
+var context: Context = ...
+
+MappedCommands
+    .factoryFunction(createCommand, GetUserProfileCommand)
+    .scope(ScopeName.LOCAL)
+    .register(context);       
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+<h2><a name="groups"></a>7.3 Command Groups</h2>
+
+
+<p class="paragraph">The Spicelib Commands library offers the option to configure a group of commands for 
+sequential or parallel execution. If you want to configure such a group programmatically
+and execute it in unmanaged mode, you can read <a href="commands.php#groups">21.2&nbsp;Command Groups</a> in the Spicelib
+Manual. This chapter discusses the options that Parsley adds on top.</p>
+
+
+<h3><a name="groups_mxml"></a>7.3.1 Declaring Groups in MXML</h3>
+
+<p class="paragraph">To map a sequence of commands to a message, you can use the following syntax:</p>
+
+<pre><code>&lt;parsley:MapCommand messageType="{LoginMessage}"&gt;
+    &lt;parsley:CommandSequence&gt;
+        &lt;parsley:Command type="{LoginCommand}"/&gt;
+        &lt;parsley:Command type="{LoadUserProfileCommand}"/&gt;
+    &lt;/parsley:CommandSequence&gt;
+&lt;/parsley:MapCommand&gt;
+</code></pre>
+
+<p class="paragraph">Most examples in this chapter show how to map a command group to a message.
+Alternatively you can also declare command groups as factories (wrapped inside a <code>&lt;CommandFactory&gt;</code> tag) and then execute
+them programmatically. But you cannot add a <code>&lt;CommandSequence&gt;</code> tag to the top level of an MXML configuration class.</p>
+
+
+<p class="paragraph">For parallel execution you'd just use the <code>&lt;ParallelCommands&gt;</code> tag instead of <code>&lt;CommandSequence&gt;</code>:</p>
+
+<pre><code>&lt;parsley:MapCommand messageType="{LoadDashboardMessage}"&gt;
+    &lt;parsley:ParallelCommands&gt;
+        &lt;parsley:Command type="{LoadUserProfileCommand}"/&gt;
+        &lt;parsley:Command type="{LoadPrivateMailboxCommand}"/&gt;
+    &lt;/parsley:ParallelCommands&gt;
+&lt;/parsley:MapCommand&gt;
+</code></pre>
+
+
+
+<h3><a name="groups_xml"></a>7.3.2 Declaring Groups in XML</h3>
+
+<p class="paragraph">Like always the syntax is the same, you only have to switch to dash notation:</p>
+
+<pre><code>&lt;map-command message-type="com.bluebeard.auth.LoginMessage"&gt;
+    &lt;command-sequence&gt;
+        &lt;command type="com.bluebeard.auth.LoginCommand"/&gt;
+        &lt;command type="com.bluebeard.user.LoadUserProfileCommand"/&gt;
+    &lt;/command-sequence&gt;
+&lt;/map-command&gt;
+</code></pre>
+
+
+
+<h3><a name="groups_results"></a>7.3.3 Using Results from Preceding Commands</h3>
+
+<p class="paragraph">Results can get passed to subsequent commands in a sequence in a decoupled way.
+If your <code>LoginCommand</code> produces an instance of <code>User</code>, the next command
+can accept it as a parameter in the execute method, together with other parameters like
+the callback function or the message that triggered the sequence:</p>
+
+<pre><code>public class GetUserProfileCommand {
+
+    public function execute (<span style="color:#FF0000;">user: User</span>, callback: Function): void {
+    
+    	[...]
+        
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">The order of parameters does not matter. In case of multiple preceding commands
+that all produced a result, the result will simply be matched by type. If more than
+one command produced the same type, the last of them will be injected.</p> 
+<h2><a name="flows"></a>7.4 Command Flows</h2>
+
+
+<p class="paragraph">Command Flows add the concept of decision points to define a dynamic sequence of commands where
+the next command to execute is determined by a link that inspect the result of the preceding command.</p>
+
+<p class="paragraph">Parsley offers MXML and XML tags for defining a flow, including all
+default link types offered by the Spicelib Commands library:</p>
+
+
+<pre><code>&lt;parsley:MapCommand messageType="{LoginMessage}"&gt;
+    &lt;parsley:CommandFlow&gt;
+        &lt;parsley:Command type="{LoginCommand}"&gt;
+            &lt;parsley:LinkResultType type="{AdminUser}" to="{loadAdminConsole}"/&gt;
+            &lt;parsley:LinkResultType type="{User}" to="{loadProfile}"/&gt;
+        &lt;/parsley:Command&gt;
+        &lt;parsley:Command id="loadAdminConsole" type="{LoadAdminConsoleCommand}"&gt;
+            &lt;parsley:LinkAllResults to="{loadProfile}"/&gt;
+        &lt;/parsley:Command&gt;
+        &lt;parsley:Command id="loadProfile" type="{LoadProfileCommand}"/&gt;
+    &lt;/parsley:CommandFlow&gt;
+&lt;/parsley:MapCommand&gt;
+</code></pre>   
+
+<p class="paragraph">In the example above the <code>LoadAdminConsoleCommand</code> is only executed when the <code>LoginCommand</code>
+produced a result of type <code>AdminUser</code>.</p>
+
+<p class="paragraph">For mapping the flow to a message
+the same options like for sequences are available, so we won't repeat them all here.</p>
+
+<p class="paragraph">Parsley offers MXML and XML tags for all built-in link types Spicelib Commands offer:</p>
+
+
+<p class="subheadline"> Linking by Result Type </p>
+
+<pre><code>&lt;parsley:Command type="{LoginCommand}"&gt;
+    &lt;parsley:LinkResultType type="{AdminUser}" to="{loadAdminConsole}"/&gt;
+    &lt;parsley:LinkResultType type="{User}" to="{loadProfile}"/&gt;
+&lt;/parsley:Command&gt;
+</code></pre>
+
+
+<p class="subheadline"> Linking by Result Value </p>
+
+<pre><code>&lt;parsley:Command type="{LoginCommand}"&gt;
+    &lt;parsley:LinkResultValue value="{Login.ADMIN}" to="{loadAdminConsole}"/&gt;
+    &lt;parsley:LinkResultValue value="{Login.USER}" to="{loadProfile}"/&gt;
+&lt;/parsley:Command&gt; 
+</code></pre>
+
+
+<p class="subheadline"> Linking by Property Value </p>
+
+<pre><code>&lt;parsley:Command type="{LoginCommand}"&gt;
+    &lt;parsley:LinkResultProperty name="isAdmin" value="{true}" to="{loadAdminConsole}"/&gt;
+    &lt;parsley:LinkResultProperty name="isAdmin" value="{false}" to="{loadProfile}"/&gt;
+&lt;/parsley:Command&gt; 
+</code></pre>
+
+
+<p class="subheadline"> Linking all Results of a Command </p>
+
+<pre><code>&lt;parsley:Command type="{LoginCommand}"&gt;
+    &lt;parsley:LinkAllResults to="{loadAdminConsole}"/&gt;
+&lt;/parsley:Command&gt; 
+</code></pre>
+
+
+<p class="subheadline"> Custom Links </p>
+
+<p class="paragraph">A custom link class encapsulating more complex logic can be added, too. Anything that implements
+the <code>LinkTag</code> interface can be inserted as a child tag inside the <code>&lt;Command&gt;</code> tag:</p>
+
+<pre><code>&lt;Command type="{LoginCommand}"&gt;
+    &lt;links:MyCustomLinkType/&gt;
+&lt;/Command&gt;
+</code></pre>  
+
+  
+<h2><a name="programmatic"></a>7.5 Starting a Command Programmatically</h2>
+
+
+<p class="paragraph">When you don't map a Command to a message you can still trigger the Command execution programmatically.
+To do this you basically have two options:</p>
+
+<ul>
+<li> Configure the Command(s) in MXML or XML and inject a <code>CommandFactory</code> into any managed object and then
+use the factory to create command instances and execute them. </li>
+<li> Create the Command programmatically (using the regular Spicelib APIs) and then pass the Command to Parsley
+for managed execution. </li>
+</ul>
+
+<p class="paragraph">This section gives examples for both variants.</p>
+
+
+<h3><a name="inject_factory"></a>7.5.1 Injecting a Command Factory</h3> 
+
+<p class="paragraph">First you need to declare a command factory in MXML or XML. The factory
+can produce a single command, a sequence or a flow:</p>
+
+<pre><code>&lt;parsley:CommandFactory id="loginCommand"&gt;
+    &lt;parsley:CommandSequence&gt;
+        &lt;parsley:Command type="{LoginCommand}"/&gt;
+        &lt;parsley:Command type="{LoadUserProfileCommand}"/&gt;
+    &lt;/parsley:CommandSequence&gt;
+&lt;/parsley:CommandFactory&gt;
+</code></pre>
+
+<p class="paragraph">You can then inject this factory into any managed object in the same Context or
+a child Context:</p>
+
+<pre><code>[Inject("loginCommand")]
+public var loginCommand: ManagedCommandFactory;
+</code></pre>
+
+<p class="paragraph">The type always needs to be <code>ManagedCommandFactory</code>. The id is optional if you only
+declare a single factory per Context.</p>
+
+<p class="paragraph">You can then create any number of new command instances from this factory and execute them:</p>
+
+<pre><code>loginCommand.newInstance().execute();
+</code></pre>
+
+<p class="paragraph">This command will get added to the Context for the time it executes like any other command
+variant offered by Parsley.</p>
+
+
+
+<h3><a name="manual"></a>7.5.2 Initiating Managed Execution Manually</h3>
+
+<p class="paragraph">This option allows you to configure a command with the plain Spicelib API and
+then pass it to Parsley for managed execution:</p>
+
+<pre><code>var loginSequence: Command = Commands
+    .asSequence()
+    .add(new LoginCommand())
+    .add(new LoadUserProfileCommand())
+    .complete(completeHandler)
+    .error(errorHandler)
+    .build();
+    
+var context: Context = ...;    
+    
+ManagedCommands
+    .wrap(loginSequence)
+    .execute(context);
+</code></pre>
+
+<p class="paragraph">The setup for the sequence is performed using the Spicelib API, but instead of calling <code>execute</code>
+direclty like you would when using just Spicelib Commands, you call <code>build</code> and then pass the fully
+configured command to Parsley for managed execution.</p>
+
+<p class="paragraph">When you only need to specify the command type of a single command without further configuration, you
+can alternatively skip the Spicelib setup step:</p>
+
+<pre><code>var context:Context = ...;
+
+ManagedCommands
+    .create(MyCommand)
+    .execute(context);
+</code></pre>
+
+<h2><a name="results"></a>7.6 Handling Results and Observing Commands</h2>
+
+<p class="paragraph">Parsley offers multiple ways of dealing with results or observing command
+execution in general. They will be described in the following sections.</p>
+
+
+
+<h3><a name="result_handler_internal"></a>7.6.1 Result Handlers in Commands</h3>
+  
+<p class="paragraph">When you base a command on an AsyncToken returned by the execute method, you can
+have result handlers inside the command itself as described in <a href="managedcommands.php#result_handler">7.1.5&nbsp;Result Handlers in Commands</a>.
+These internal result handlers will always get invoked before any decoupled result handlers in other
+objects. They can also potentially alter the result before the external result handlers get invoked.</p>
+  
+  
+  
+<h3><a name="result_handler_internal"></a>7.6.2 Decoupled Result Handlers and Command Observers</h3>
+  
+<p class="paragraph">Apart from handling results inside the command itself, other objects can get notified, too.
+There is a set of tags for declaring these on any managed object (like most tags available as metadata, MXML and XML tags).</p>  
+  
+  
+  
+<p class="subheadline"> CommandResult </p>
+
+<p class="paragraph">This tag can be used to obtained the result produced by a command in a different object.
+(It is not needed and should not be used to define a result handler inside the command itself).</p>
+
+<pre><code>[CommandResult]
+public function handleResult (user:User, message:LoginMessage) : void {
+</code></pre>
+
+<p class="paragraph">In this case the User instance returned by the remote call will be passed to the result handler
+alongside the original message that triggered the action. Like with normal message handlers the parameter
+type for the message is used to determine which handlers to invoke. It is always
+a combination of message type (polymorphically) and an optional selector value which serves as
+a secondary selection key. The type of the result also has to match for this method to get invoked.</p>
+
+<p class="paragraph">If the command that produced the User instance is part of a sequence that was triggered by the 
+specified message type, then by default the result handler will only get invoked after the entire 
+sequence has been completed. This way you do not need to bother processing the result in case
+a subsequent command causes the sequence to abort with an error for example.</p>
+
+<p class="paragraph">In case you do need to process the result as early as possible, you can use the immediate attribute:</p>
+
+<pre><code>[CommandResult(immediate="true")]
+public function handleResult (user:User, message:LoginMessage) : void {
+</code></pre> 
+
+<p class="paragraph">This attribute does not have any effect if the command is not part of a sequence or flow.</p>
+
+
+
+<p class="subheadline"> CommandComplete </p>
+
+<p class="paragraph">If you are not interested in the actual result, but instead only want to execute some logic
+triggered by the completion of the command, you can use another tag:</p>
+
+<pre><code>[CommandComplete]
+public function userSaved (message:SaveUserMessage) : void {
+</code></pre>
+
+<p class="paragraph">This means that this method would get invoked whenever any command triggered by an <code>SaveUserMessage</code> has completed. 
+In case of sequences this means the method gets invoked after all commands in that sequence completed successfully.</p>
+
+
+
+<p class="subheadline"> CommandError </p>
+
+<p class="paragraph">This tag can be used for receiving the eventual fault events or other errors.</p>
+
+<pre><code>[CommandError]
+public function handleResult (fault:FaultEvent, trigger:SaveUserMessage) : void {
+</code></pre>
+
+<p class="paragraph">The parameters are again both optional and the rules for matching are the same as
+for <code>[CommandResult]</code>.</p>
+
+
+
+<p class="subheadline"> Overriding the Result </p>
+
+<p class="paragraph">Like with a result handler inside a command, a decoupled result handler can also overwrite
+the original result. To be able to do this the method needs an additional parameter of type
+<code>CommandObserverProcessor</code>, so the exact mechanics are a bit different than for an
+internal result handler:</p>
+
+<pre><code>[CommandResult]
+public function handleResult 
+        (result:XML, msg:LoginMessage, processor:CommandObserverProcessor) : void {
+    var parsedResult:Object = parseResultSomehow(result);
+    processor.changeResult(parsedResult);
+}
+</code></pre>
+
+<p class="paragraph">The <code>CommandObserverProcessor</code> interface is a sub-interface of the <code>MessageProcessor</code>
+interface that provides access to the <code>Command</code> that was executed on top of the common <code>MessageProcessor</code>
+functionality.</p>
+
+
+
+<p class="subheadline"> Local Result Handlers </p>
+
+<p class="paragraph">Parsley allows for local result handlers for a command
+that was executed in global scope. This solves a common problem in modular applications where a single
+tab or window dispatches a message that is supposed to trigger a command in a shared service in the root
+application. The Command in the shared service has to listen to the global scope, as it does not
+belong to the same Context as the sending object in the module loaded into that tab or window. But for the result handling
+it is very often only this particular tab or window which wants to handle it. For this reason command results and errors
+are always re-routed to the Context where the message that triggered the command originated from.</p>
+
+<p class="paragraph">This allows to use a local handler like this:</p>
+
+<pre><code>[CommandResult(scope="local")]
+public function handleResult (result:Object, msg:LoginMessage) : void {
+    [...]
+}
+</code></pre>
+
+<p class="paragraph">This even works when the command executed in a parent Context, as long as the <strong>trigger message</strong> originated
+from the same Context as this result handler.</p>
+
+<p class="paragraph">Apart from that option any part of the application can still handle the result when listening in the global
+scope.</p>
+
+
+
+<h3><a name="result_handler_internal"></a>7.6.3 Command Status Flags</h3>
+
+<p class="paragraph">Finally you can also observe the status of executing commands:</p>
+
+<pre><code>[CommandStatus(type="com.foo.messages.SaveUserMessage")]
+public var isSaving:Boolean;
+</code></pre>
+
+<p class="paragraph">This boolean flag will always be true if one or more asynchronous commands matching the specified
+type and selector are currently executing. It will be false otherwise. This is very convenient
+for tasks like disabling buttons during command execution for example.</p>
+
+<p class="paragraph">Unfortunately, when using this tag as metadata the trigger message has to be specified as a
+String. For this reason you may sometime prefer to use MXML configuration in such a case:</p>
+
+<pre><code>&lt;Object type="{SomeType}"&gt;
+    &lt;CommandStatus property="isSaving" type="{SaveUserMessage}"/&gt;
+&lt;/Object&gt;
+</code></pre>
+
+<p class="paragraph">For this configuration style there is no risk that refactoring leads to runtime errors
+due to stale fully qualified class names in buried somewhere in metadata tags. 
+But of course, now the property name is only a String, albeit a shorter one.</p>        
+
+
+
+   
+<h2><a name="lifecycle"></a>7.7 Command Lifecycle</h2>
+
+<p class="paragraph">Like already mentioned multiple times in preceding sections, a managed command is added
+to the Context for the time it executes. This section provides a bit more detail so that you
+can avoid common errors like trying to access Parsley features from your command after it
+already finished executing.</p>
+
+<p class="paragraph">A command is not kept in the Context longer than necessary as it is intended to be
+short-lived. As long as it is part of the Context, it cannot get garbage-collected for
+example as a Context holds references to all managed objects. Therefore commands are
+removed from the Context as soon as the container sees them as completed. This section
+explains what that exactly means.</p>
+
+
+
+<h3><a name="lifecycle_sync"></a>7.7.1 Synchronous Commands</h3>
+
+<p class="paragraph">Take the following simple (albeit very contrived) example of a synchronous
+command with one injected collaborator:</p>
+
+<pre><code>class MultiplyCommand {
+
+    [Inject]
+    public var multiplier: Multiplier;
+
+    public function execute (msg: MultiplyMessage): int {
+        
+        return multiplier.multiply(msg.valueA, msg.valueB);
+        
+    }
+
+}
+</code></pre>
+
+<p class="paragraph">The command performs a simple multiplication of two integers passed in through the message that
+triggered the command. Unfortunately it is not the smartest command, so it needs a collaborator
+to do the actual calculation.</p>
+
+<p class="paragraph">Since the container adds the command to the Context before it executes it, any kind of injection
+or other setup has been performed before the execute method is invoked.</p>
+
+<p class="paragraph">Likewise, since this is a synchronous command, we also know that the command is very short-lived.
+Right after the execute method returns its result, the command will be removed from the Context.
+Since a command supports the full
+set of container services you could also add a second method marked with <code>[Destroy]</code>. 
+You would then see that it would be invoked right after the execute method.</p>
+
+
+
+<h3><a name="lifecycle_async"></a>7.7.2 Asynchronous Commands</h3>
+
+<p class="paragraph">Let's now imagine that the injected multiplier is not the smartest either and it needs
+some time to perform the calculation. This means we have to turn the command into an asynchronous
+command and ask for a callback function to get injected, too:</p>
+
+<pre><code>class MultiplyCommand {
+
+    [Inject]
+    public var multiplier: Multiplier;
+    
+    public var callback: Function;
+
+    public function execute (msg: MultiplyMessage): int {
+        
+        return multiplier
+            .multiply(msg.valueA, msg.valueB)
+            .addResultHandler(resultHandler);
+        
+    }
+    
+    private function resultHandler (result: int): void {
+        
+        trace("before invoking callback");
+               
+        callback(result);
+        
+        trace("after invoking callback");
+        
+    }
+    
+    [Destroy]
+    public function destroy (): void {
+    
+        trace("destroy method called");
+        
+    }
+
+}
+</code></pre>
+
+<p class="paragraph">If you execute the command above the traces would be:</p>
+
+<pre><code>before invoking callback
+destroy method called
+after invoking callback
+</code></pre>
+
+<p class="paragraph">Passing the result to the callback also marks the completion of the command
+so that it is immediately removed from the Context. If you need to perform any
+kind of task that requires container features (like sending a message) 
+you must do that before passing out the result.</p>
+
+
+<p class="subheadline"> Asynchronous Command based on AsyncTokens and Result Handlers </p>
+
+<p class="paragraph">In the other variant of an asynchronous command as described in
+the mechanism is slightly different:</p>
+
+<pre><code>public class GetUserListCommand {
+
+    [Inject("myService")]
+    public var service: RemoteObject;
+
+    public function execute (): AsyncToken {
+    
+        return service.getUserList();
+        
+    }
+    
+    public function result (users: Array): void {
+        
+        // command still managed here
+    
+    }
+    
+}
+</code></pre> 
+
+<p class="paragraph">Here the framework waits until the AsyncToken produced either a result
+or a fault and then invokes the result handler. Only after invocation of the result
+handler the command will be removed from the Context.</p>
+
+
+
+
+
+
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

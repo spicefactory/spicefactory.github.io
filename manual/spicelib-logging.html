@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>22 Logging for Flash Applications</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>22 Logging for Flash Applications</h1>
+
+<p class="paragraph">The logging framework allows to log custom messages from application code and use 
+the configuration options to filter log output based on logger names and log levels.
+It was first developed in AS2 and used in inhouse projects for more than three years until
+we ported it to AS3 and included it in the public Spicelib release.</p>
+
+<p class="paragraph">It is currently maintained primarily for use in Flash Applications. 
+The Flex SDK has its own Logging API which you can use when building Flex Applications.</p>
+<h2><a name="application"></a>22.1 Adding log statements to application code</h2>
+
+<p class="paragraph">Usually you would just create a constant that holds the logger for your particular class:</p>
+
+<pre><code>private static const log : Logger = LogContext.getLogger(MyClass);
+</code></pre>  
+
+<p class="paragraph"> You can just pass a <code>Class</code> instance to the <code>getLogger</code> method. In this case
+the fully qualified class name would be used as the name for the logger.
+Of course you could use any name you want (specified as a String) or create more that one logger for a class, 
+but using
+the class name is the most common usage. The static <code>getLogger</code> method of the <code>LogContext</code>
+class uses the default <code>LogFactory</code> under the hood. This is not required but it makes sure that
+your application logs use the same configuration and appenders than the internal logs of all Spicefactory
+projects. Alternatively you could also instantiate and use a custom <code>LogFactory</code> and configure 
+it separately.</p> 
+
+<p class="paragraph">You could then use that <code>Logger</code> instance anywhere in the class:</p>
+
+<pre><code>public function loadProject (id:String) : void {
+    log.info("Start loading project with id {0}", id);
+    // do something
+}
+</code></pre>
+<h2><a name="levels"></a>22.2 Log levels</h2>
+
+<p class="paragraph">Log levels offer a way to organize log statements into a hierarchy of different severities.
+The logging configuration (explained in the next section) allows to filter the log output
+based on Logger names and levels.
+The framework supports the following log levels (semantics borrowed from log4j and other existing frameworks):</p>
+
+<table>
+<tr><td> FATAL </td><td> Very severe error events that will presumably lead the application to abort. </td></tr> 
+<tr><td> ERROR </td><td> Error events that might still allow the application to continue running. </td></tr> 
+<tr><td> WARN </td><td> Potentially harmful situations. </td></tr> 
+<tr><td> INFO </td><td> Informational messages that highlight the progress of the application at coarse-grained level. </td></tr> 
+<tr><td> DEBUG </td><td> Fine-grained informational events that are most useful to debug an application. </td></tr> 
+<tr><td> TRACE </td><td> Very fine-grained information (represents the lowest rank of all levels). </td></tr> 
+</table>
+<h2><a name="config"></a>22.3 Configuration</h2>
+
+<p class="paragraph">There are two ways to configure the logging framework: Parsley XML and programmatic configuration.</p>
+
+
+<h3><a name="config_parsley"></a>22.3.1 Using Parsley XML Tags</h3>
+
+<p class="paragraph">If you are using Parsley anyway, using its XML configuration is probably the most convenient way.
+You can maintain different configuration files for each developer of the project and change it frequently 
+without recompiling. See <a href="logging.php#flash">15.2&nbsp;Logging Configuration for Flash</a> for details.</p>
+
+
+<h3><a name="config_programmatic"></a>22.3.2 Programmatic Configuration</h3>
+
+<p class="paragraph">If you don't use Parsley for application configuration it is recommended to configure
+logging programmatically since you would pull in the whole Parsley library otherwise.
+An example setup could look like this:</p> 
+
+<pre><code>var factory:FlashLogFactory = new DefaultLogFactory();
+
+factory.setRootLogLevel(LogLevel.WARN);
+factory.addLogLevel("com.mycompany.mypackage.controller", LogLevel.DEBUG);
+factory.addLogLevel("com.mycompany.mypackage.services", LogLevel.DEBUG);
+
+var traceApp:Appender = new TraceAppender();
+traceApp.threshold = LogLevel.TRACE;
+factory.addAppender(traceApp);
+
+LogContext.factory = factory;
+</code></pre>
+
+<p class="paragraph">This block should execute once on application startup.</p>
+<h2><a name="customize"></a>22.4 Customizing the Logging Framework</h2>
+
+<p class="paragraph">The most common use case for customizing the logging framework would be to implement your own
+<code>Appender</code>. This might be necessary if you have some special requirements like the need
+to send log statements over a socket connection for example. Implementing the <code>Appender</code>
+interface is quite straightforward. You can look at the source of Spicelibs existing two implementations.</p>
+
+<p class="paragraph">If you need even more flexibility you could also develop your own implementations of the 
+<code>Logger</code> and <code>LogFactory</code> interfaces, but that might be a rather rare scenario.</p>  
+
+<p class="paragraph">In the future we might add more <code>Appender</code> implementations to Spicelib like a 
+<code>FileAppender</code> for AIR applications or even might look into integrating with the Flex Logging
+Framework.</p>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

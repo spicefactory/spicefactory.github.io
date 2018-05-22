@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>5 Decoupled Bindings</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>5 Decoupled Bindings</h1>
+
+<p class="paragraph">Introduced with version 2.3 this feature adds a major new option to the existing ways of decoupling the parts of your 
+application, injection and messaging. It's not a new idea though. Similar concepts existed in Seam in the Java world (based
+on its <code>@In</code> and <code>@Out</code> annotations) and have already been picked up by other Flex frameworks, too, like 
+in GraniteDS that also offers <code>[In]</code> and <code>[Out]</code> metadata configuration.</p> 
+<h2><a name="difference"></a>5.1 Comparing Dependency Injection and Decoupled Bindings</h2>
+
+<p class="paragraph">This section aims to give an overview over the differences between two framework features that share a few similarities
+and a few suggestions for how to determine which mechanism to use in a particular use case.</p>
+
+<p class="paragraph">Note that there are other frameworks who even mix these two mechanisms into a single feature. However I think that it is
+better to have a clear distinction as there are significant differences in the pros and cons for both.
+It also makes the code easier to read when there are distinct tags for these capabilities.</p>
+
+
+
+<p class="subheadline"> Dependency Injection </p>
+
+<p class="paragraph">For details see <a href="injection.php#intro">4&nbsp;Dependency Injection</a></p>
+
+<p class="paragraph">Classic Dependency Injection (using Parsley's <code>[Inject]</code> tag) offers the following advantages 
+over Decoupled Bindings:</p>
+
+<ul>
+<li> This feature is designed for robustness. An object declares a dependency on some collaborator and it can rely
+on the container injecting a matching instance when the object gets initialized. Likewise it will also
+make sure that the injected object has a lifecycle at least as long as the target it is injected into. This way
+the dependent object has a guarantee that the collaborator does not suddenly "go away". This is the reason that
+you cannot inject from a child Context into a parent (vice versa is fine of course) and also cannot inject 
+dynamic objects (unless they are defined with the <code>&lt;DynamicObject&gt;</code> tag in the Context) as they could 
+be removed anytime. </li>
+
+<li> Similarly useful for increased robustness is the fact that the container gives you the guarantee that
+all injections have already been performed when the method marked with <code>[Init]</code> gets invoked.
+This often simplifies internal initialization code. </li>
+
+<li> Any errors caused by misconfiguration (e.g. ambuigities or missing dependencies) are already detected at Context 
+initialization time. </li>
+</ul>
+
+
+
+
+
+<p class="subheadline"> Decoupled Bindings </p>
+
+<p class="paragraph">Decoupled Binding (using Parsley's <code>[Publish]</code> and <code>[Subscribe]</code> tags) offers the following 
+advantages over Dependency Injection:</p>
+
+<ul>
+<li> This feature is much more dynamic than Dependency Injection. It is perfectly legal for any subscriber to have no value
+at all or to receive multiple updates of the same property during its lifecycle. It is really more the decoupled equivalent
+of the typical usage of Flex Bindings. </li>
+
+<li> The published object does not even have to be a container managed object. So this feature can be used in a more 
+lightweight way. Publishing an object also does not cause reflection on the object (unless you specify that it should
+be managed), so it has benefits for performance. </li>
+</ul>
+
+<p class="paragraph">Of course there is also a price to pay compared to injection:</p>
+
+<ul>
+<li> There is no guarantee that the subscribers have any values when the method marked with <code>[Init]</code> gets invoked 
+on the object as the value can be published and updated at any point in time. </li>
+
+<li> Errors caused by misconfiguration (in particular ambuigities) are sometimes not detected at Context initialization
+time. They can happen anytime a new publisher enters the Context (dynamic objects can act as publishers, too). </li>
+</ul>
+<h2><a name="basics"></a>5.2 Basic Usage</h2>
+
+<p class="paragraph">To set up a publisher on a managed object you can use the <code>Publish</code> metadata tag:</p>
+
+<pre><code>[Publish][Bindable]
+public var selectedContact:Contact;
+</code></pre>
+
+<p class="paragraph">In Flex applications you also need to use the <code>[Bindable]</code> tag on the publishing side, as the implementation for 
+Flex is based on the standard Flex Binding architecture. For Flash applications see the last section in this chapter.</p>
+
+<p class="paragraph">As soon as you update such a publisher property, 
+the value will be pushed to all matching subscribers in any other object in any Context:</p>
+
+<pre><code>[Subscribe]
+public var selectedContact:Contact;
+</code></pre>
+
+<p class="paragraph">If you do not specify an object id, the matching subscribers will be determined by the type of the property, in this
+case <code>Contact</code>. Like with injection and messaging this works polymorphically. You can publish a <code>Dog</code> and
+a subscriber for <code>Animal</code> would also get updated.</p>
+
+<p class="paragraph">Like with all other features it is best to stick with matching by type and avoid the use of string identifiers if possible.
+If you need to publish multiple objects of the same type, you can specify an id:</p>
+
+<pre><code>[Publish(objectId="selectedContact")][Bindable]
+public var selectedContact:Contact;
+</code></pre>
+
+<p class="paragraph">Of course the subscribers must specify the corresponding id then, too. In some case you may also be able to use scopes
+to confine the area of the application an object is published to and avoid the use of an id this way.</p>
+
+<p class="paragraph">You can also let a property act as a publisher and subscriber at the same time:</p>
+
+<pre><code>[PublishSubscribe][Bindable]
+public var selectedContact:Contact;
+</code></pre>
+
+<p class="paragraph">Now the value will be updated when any other publisher updates, but still act as a publisher itself.</p>
+
+<p class="paragraph">Finally, like most other tags these tags can be used in MXML and XML, too:</p>
+
+<pre><code>&lt;Object type="{MyPublisher}"&gt;
+    &lt;Publish property="selectedContact"/&gt;
+    &lt;!-- other tags --&gt;
+&lt;/Object&gt;
+</code></pre>
+<h2><a name="conflicts"></a>5.3 Avoiding Conflicts</h2>
+
+<p class="paragraph">For the Decoupled Binding facility to work in a reliable and robust way, you have to make sure that your setup does not
+lead to ambuigities. The framework must know which publisher is "in charge" for a particular subscriber at any point in time.
+In general publishing to different scopes cannot lead to conflicts as the scopes are completely shielded from each other.
+But for any publishing within a single scope for the same type or id (depending on whether you use an id), the rules
+are as follows:</p>
+
+<ul>
+<li> You can have exactly one <code>[Publish]</code> tag and any number of matching <code>[Subscribe]</code> tags. </li>
+<li> You can have any number of <code>[PublishSubscribe]</code> tags and any number of matching <code>[Subscribe]</code> tags. </li>
+<li> It's also legal to have a <code>[Publish]</code> tag without any matching <code>[Subscribe]</code> tag and vice versa. If a 
+<code>[Subscribe]</code> tag has no matching <code>[Publish]</code> tag its value will be set to null. </li>
+</ul>
+
+<p class="paragraph">As you see having more than one <code>[Publish]</code> tag for the same type or id within a single scope is illegal.
+The same goes for combining <code>[Publish]</code> and <code>[PublishSubscribe]</code> for the same type or id.
+In those cases the framework would not be able to determine "who is in charge". This problem does not occur with multiple
+<code>[PublishSubscribe]</code> tags. Since those are subscribers, too, changing one of them will also update all the others,
+so that they are always in sync.</p>
+<h2><a name="scopes"></a>5.4 Using Scopes</h2>
+
+<p class="paragraph">Like with Messaging the Decoupled Binding facility allows to use scopes. Sometimes you don't want to publish an object
+globally, but instead use different instances in different areas of the application. For a general introduction see
+<a href="messaging.php#scopes">6.10&nbsp;Using Scopes</a> in the messaging chapter.</p>
+
+<p class="paragraph">In contrast to messaging there is one major difference in the default behaviour. With messaging the default for the sending
+side is to dispatch through all scopes available for the Context so that the receiving side can decide which scope to listen for.
+This is different for publishing as the former would lead to conflicts too often (see preceding section). Instead the default is to 
+publish only to the global scope.</p>
+
+<p class="paragraph">For any other scope than the global scope you have to use the scope attribute explicitly:</p>
+
+<pre><code>[Publish(scope="window")][Bindable]
+public var selectedContact:Contact;
+</code></pre>
+
+<p class="paragraph">And of course on all subscribers, too:</p>
+
+<pre><code>[Subscribe(scope="window")]
+public var selectedContact:Contact;
+</code></pre>
+<h2><a name="managed"></a>5.5 Publishing Managed Objects</h2>
+
+<p class="paragraph">In all preceding examples the state of the published object did not change. You can use either container-managed objects
+or any other objects not known by the container and publish it to subscribers. If it is unmanaged it would remain so.
+In some cases you might want to explicitly add the object to the Context dynamically only for the time it is being published.
+This way it can also participate in messaging and other container features. This has the same effect as using the 
+Context API to create dynamic objects like demonstrated in <a href="lifecycle.php#dynamic">8.7&nbsp;Dynamic Objects</a>, just with the advantage
+that you do not have to talk to the framework API.</p>
+
+<p class="paragraph">This is how it works, you just add the <code>managed</code> attribute to the <code>Publish</code> tag:</p>
+
+<pre><code>[Publish(managed="true")][Bindable]
+public var selectedContact:Contact;
+</code></pre>
+
+<p class="paragraph">Now anytime you set this variable to a Contact instance, that instance gets added to the Context automatically.
+It remains managed until:</p>
+
+<ul>
+<li> The variable is set to a different Contact instance or it is set to null. </li>
+<li> The object holding the variable is removed from the Context. </li>
+<li> The Context the object belongs to gets destroyed. </li>
+</ul>
+
+<p class="paragraph">This also means that the lifecycle methods demarcated with <code>[Init]</code> and <code>[Destroy]</code> can be used
+on the published object to get notified when the object gets published and removed.</p>
+<h2><a name="persistence"></a>5.6 Persistent Properties</h2>
+
+<p class="paragraph">A published property can be marked as persistent. Immediately after the object gets instantiated it will 
+then receive the value from the last time the application ran:</p>
+
+<pre><code>[PublishSubscribe(persistent="true",objectId="selectedContact")]
+public var selectedContactId : String;
+</code></pre>
+
+<p class="paragraph">Under the hood Parsley uses Local SharedObjects for storing the values. But this is only the default implementation
+which can be swapped like almost everything in Parsley, like explained in the next section. But if you only use simple types
+like <code>String</code> or <code>Number</code> and only the global scope (which is the default) and are fine with using
+Local SharedObjects for persistence, then you can safely skip all remaining parts of this section. The <code>persistent</code>
+attribute as shown above is all you need to know in this case.</p>
+
+
+
+<p class="subheadline"> Custom Persistence without Local SharedObjects </p>
+
+<p class="paragraph">If you want to persist values in a user session on the server side for example, you can provide your own implementation and read
+and write values to and from a remote service. The interface looks like this:</p>
+
+<pre><code>[Event(name="change", type="flash.event.Event")]
+
+public interface PersistenceManager extends IEventDispatcher {
+	
+    function saveValue (scopeId:String, baseType:Class, id:String, value:Object) : void;
+	
+    function deleteValue (scopeId:String, baseType:Class, id:String) : void;
+	
+    function getValue (scopeId:String, baseType:Class, id:String) : Object;
+	
+}
+</code></pre>
+
+<p class="paragraph">The <code>scopeId</code>, <code>baseType</code> and <code>id</code> values can be used to uniquely identify a value.
+The <code>id</code> alone is not guaranteed to be unique. You can use these three values to build a unique key
+to send to the server. The <code>scopeId</code> will be explained later. 
+A <code>change</code> event has to be dispatched by the implementation whenever it receives
+new values from the server (or wherever it gets its data from). This includes the values loaded on application
+startup. The change event should be dispatched once all initial values are available. 
+</p>
+
+<p class="paragraph">Such a custom service can be registered like this:</p>
+
+<pre><code>BootstrapDefaults.config.scopeExtensions
+    .forType(PersistenceManager)
+    .setImplementation(MyCustomPersistenceManager);
+</code></pre>
+
+
+
+<p class="subheadline"> Persisting Complex Types </p>
+
+<p class="paragraph">The framework only detects changes of the actual reference stored in the persistent property.
+This is how the Publish/Subscribe mechanism works in general. When a published object changes internally,
+there is no need to notify the subscribers (and besides no sensible way to do that) as they already have
+a reference to the modified object. For persistent properties this has an impact though, as it means
+that it works best for simple properties like <code>String</code> or <code>Number</code> out of the box.
+Because for complex types it would indeed be desired that internal changes get persisted, too, as the
+server (or peristent store in general) does not have a permament reference to the object like a normal,
+local subscriber in your application.</p>
+
+<p class="paragraph">For detecting changes to complex types you'd have to code the knowledge about these types into
+a custom <code>PersistenceManager</code> implementation. The framework cannot easily know which changes
+to observe (and how), so it is best to leave that to the application developer. Future versions
+might add support for common types at least (like an <code>ArrayCollection</code> where it could 
+listen to the <code>CollectionEvents</code>).</p>
+ 
+
+
+<p class="subheadline"> Using Scopes </p>
+
+<p class="paragraph">Persisting values works without additional setup steps when using the global scope (which is the 
+default). But when you are using multiple Contexts and want to have persistent values for each of them
+(through using the local scope or a custom scope), then you need to take care of re-creating the same
+set of scopes and Contexts when the application restarts. This is usually done in some sort of application-specific
+navigation logic that handles the <code>scopeId</code> that is always passed to the <code>PersistenceManager</code>.
+To guarantee the correct delivery of local persistent values the Contexts need to be created with the same
+id's. Normally you do not care for the id's of the scopes and only specify the name. But if required
+the id can be specified explicitly:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="..."&gt; 
+    &lt;parsley:Scope name="someScopeName" uuid="{idFromLastSession}"/&gt;
+&lt;/parsley:ContextBuilder&gt;
+</code></pre>
+
+<p class="paragraph">While the name is not unqiue (you can have as many scopes with the same name as you want as long as they do not 
+overlap), the id is indeed a unique identifier for a scope. This is the same value that gets then passed as the <code>scopeId</code>
+parameter to all the methods of the
+<code>PersistenceManager</code>. On the persistent property itself you still only have to use the name, as it would get quite
+convoluted if you'd need to pass the uuid around:</p>
+
+<pre><code>[PublishSubscribe(persistent="true", objectId="selectedContact", scope="someScopeName")]
+public var selectedContactId : String;
+</code></pre>
+
+<p class="paragraph">The framework simply knows which id that particular instance of the <code>someScopeName</code> scope has.</p>
+
+<p class="paragraph">For a general overview regarding scopes see <a href="messaging.php#scopes">6.10&nbsp;Using Scopes</a>.</p>
+
+
+
+
+
+
+<h2><a name="flash"></a>5.7 Bindings in Flash</h2>
+
+<p class="paragraph">The implementation for Flash avoids the use of the Flex Binding facility. This feature is fully functional without Flex, too,
+but it requires some additional work. In Flash applications you would leave out the <code>[Bindable]</code> tag.
+Instead the publisher has to manually signal that the value of the publisher 
+property has changed:</p>
+
+<pre><code>private var _contact:Contact;
+
+[Publish]
+public function get selectedContact () : Contact {
+    return _contact;
+}
+
+public function set selectedContact (value:Contact) : void {
+    _contact = value;
+    <span style="color:#FF0000;">dispatchEvent(new Event(Event.CHANGE));</span>
+}
+</code></pre>
+
+<p class="paragraph">If a single class has multiple publisher properties you can alternatively optimize and specify different
+change event types for different properties:</p>
+
+<pre><code>private var _contact:Contact;
+
+[Publish(<span style="color:#FF0000;">changeEvent="contactChanged"</span>)]
+public function get selectedContact () : Contact {
+    return _contact;
+}
+
+public function set selectedContact (value:Contact) : void {
+    _contact = value;
+    <span style="color:#FF0000;">dispatchEvent(new Event("contactChanged"));</span>
+}
+</code></pre>
+
+<p class="paragraph">Apart from the necessity to dispatch a change event, everything else described in the preceding sections of this 
+chapter also applies to Flash applications.</p>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

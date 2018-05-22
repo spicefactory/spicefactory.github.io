@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>16 Troubleshooting Guide</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>16 Troubleshooting Guide</h1>
+
+<p class="paragraph">This chapter aims to summarize some of the more common error scenarios. It was compiled based
+on questions asked on the forum and will most likely grow over time. It would be nice if you'd follow the guidelines in this chapter
+and do some investigation yourself before you post on the forum in case you run into any kind of problem. 
+Please start with <a href="troubleshooting.php#logging">16.1&nbsp;Configure Logging</a>, as logging should be turned on in all debugging 
+scenarios, and then jump to the section which applies to your problem.</p>
+<h2><a name="logging"></a>16.1 Configure Logging</h2>
+
+<p class="paragraph">Some services in Parsley and also Flex Bindings in general do not rethrow errors. Thus you'd be completely tapping
+in the dark for some sorts of errors if logging is not turned on. For debugging Parsley applications it's usually sufficient
+to set a filter for <code>org.spicefactory.parsley.*</code> and avoid the logs from the underlying Spicelib, as the reflection cache
+emits some pretty verbose logs which would distract from the things you'd be interested in.</p>
+
+<p class="paragraph">Log output from Parsley covers things like Contexts getting created or destroyed, objects getting configured or removed from the Context,
+messages getting dispatched or views getting wired.</p>
+
+<p class="paragraph">The logging setup is usually done in the top level application class. It differs depending on the environment:</p>
+
+<p class="subheadline"> Flex 4 </p>
+
+<pre><code>&lt;fx:Declarations&gt;
+    &lt;s:TraceTarget 
+        includeCategory="true" 
+        includeLevel="true" 
+        includeTime="true"
+        level="{LogEventLevel.DEBUG}"
+        &gt;
+        &lt;s:filters&gt;
+            &lt;fx:String&gt;org.spicefactory.parsley.*&lt;/fx:String&gt;
+        &lt;/s:filters&gt;
+    &lt;/s:TraceTarget&gt;
+&lt;/fx:Declarations&gt;
+</code></pre>
+
+<p class="subheadline"> Flex 3 </p>
+
+<pre><code>&lt;mx:TraceTarget 
+    includeCategory="true" 
+    includeLevel="true" 
+    includeTime="true"
+    level="{LogEventLevel.DEBUG}"
+    &gt;
+    &lt;mx:filters&gt;
+        &lt;mx:String&gt;org.spicefactory.parsley.*&lt;/mx:String&gt;
+    &lt;/mx:filters&gt;
+&lt;/mx:TraceTarget&gt;
+</code></pre>
+
+<p class="subheadline"> Flash </p>
+
+<p class="paragraph">For Flash it is recommended to use XML configuration files as described in <a href="logging.php#flash">15.2&nbsp;Logging Configuration for Flash</a>.
+If you want to use other configuration mechanisms for the rest of the application, you can still combine
+the XML for the logging setup with the other configuration artifacts:</p>
+
+<pre><code>FlashLoggingXmlSupport.initialize();
+ContextBuilder
+    .newBuilder()
+    .config(XmlConfig.forFile("logging.xml"))
+    .config(ActionScriptConfig.forClass(MyApplicationConfig))
+    .build();
+</code></pre>
+<h2><a name="silent"></a>16.2 Silent Failure</h2>
+
+<p class="paragraph">Even after you have configured logging as described in the preceding section, you still might run into a situation
+where an expected action is not performed while the logging output remains completely silent about it. Since Parsley generally
+logs all errors this usually hints at a problem where the framework does not even attempt to perform the desired action.
+This is usually caused by some sort of configuration error. The following sections list the most common scenarios that
+lead to silent failure:</p>
+
+
+<p class="subheadline"> The object is not managed </p>
+
+<p class="paragraph">Some developers new to the concept of IOC containers simply add metadata like <code>[Inject]</code> to a class and then create
+an instance with <code>new</code> and are suprised that nothing happens. Such an instance is not known to the framework and thus
+will never get configured. Another common error is to add the class to a Parsley configuration file or class as required and then
+create an instance with <code>new</code>. This is a similar problem: Now you have two instances of the same class, but the one you
+created with <code>new</code> is not managed by the framework.</p>
+
+<p class="paragraph">If you are not familiar with the concept of managed objects, please read <a href="lifecycle.php#managed">8.1&nbsp;About Managed Objects</a> first.</p>
+
+<p class="paragraph">If you are not sure whether the object you are working with is managed, you can use the framework API to find out:</p>
+
+<pre><code>var obj:SomeClass = ...; // the object that does not work
+trace("managed? " + ContextUtil.isManaged(obj));
+</code></pre>
+
+<p class="paragraph">Apart from that you'll also find logs for all objects that are getting added or removed from a Context. They look like this:</p>
+
+<pre><code>21:09:07.967 [INFO] org.spicefactory.parsley.core.lifecycle.impl.DefaultManagedObjectHandler 
+    Configure managed object with [ObjectDefinition(type = com.foo::MyClass, id = someId)] 
+    and 2 processor(s)
+</code></pre>
+
+
+<p class="subheadline"> Metadata not compiled into the SWF or SWC </p>
+
+<p class="paragraph">Another very common error. The mxmlc compiler of the Flex SDK has a confusingly inconsistent behavior when it comes to compiling
+metadata into SWFs. The outcome is different whether you merge Parsley into the code or whether you specify it as an external library.
+As a consequence it usually works in the top level application without additional configuration steps, but then fails when used
+in a Flex Module for example.</p>
+
+<p class="paragraph">To find out whether metadata has actually been compiled into your application, you can trace the reflection output of the
+Flash Player for that class:</p>
+
+<pre><code>var obj:SomeClass = ...; // the object that does not work
+trace(describeType(obj));
+</code></pre>
+
+<p class="paragraph">Here you can see whether the metadata is present on the property or method where you expect it.
+For Flex Modules or RSLs the metadata usually has to be specified explicitly. For detailed instructions
+see <a href="config.php#metadata">3.1&nbsp;Configuration with AS3 Metadata</a>, specifically the section titled <strong>Compiling custom metadata into SWFs</strong>.</p>
+
+
+<p class="subheadline"> Metadata on private or protected members </p>
+
+<p class="paragraph">The Reflection facility in the Flash Player will only consider metadata on public members. This is not a limitation
+of the Parsley framework, it's the way the Flash Player works. Thus the following will simply be ignored, you won't get
+any error messages:</p>
+
+<pre><code>[Inject]
+private var service:RemoteObject;
+</code></pre>
+
+
+<p class="subheadline"> Typos in metadata </p>
+
+<p class="paragraph">Although this is pretty obvious it's worth mentioning it as this also leads to silent failure. When you misspell an
+attribute on a Parsley metadata tag the framework will throw an Error, but if you misspell the tag name itself it will
+simply get ignored.</p>
+
+
+<p class="subheadline"> Timing issues with object initialization </p>
+
+<p class="paragraph">Also a pretty common scenario. The dependency injection does get performed in this case, just not at the time the
+developer expects it. The most extreme example is trying to access the value of a variable marked with [Inject] in the
+constructor of an object. It should be pretty obvious that it is virtually impossible that the injection has already happened at
+this point.</p>
+
+<p class="paragraph">Somewhat less obvious but still very common is to use a Flex component event like <code>addedToStage</code> or 
+<code>creationComplete</code> and then access an expected injected value in the event handler. Please don't do this!
+There are lots of reasons not to use <code>addedToStage</code> for component initalization, some of them are not even related to 
+Parsley. For the full story, please read <a href="view.php#lifecycle">9.7&nbsp;Component Lifecycle</a> and specifically the section titled 
+<strong>Be careful with Component Initialization Logic</strong>.</p>
+
+<p class="paragraph">As a very short excerpt of that section, a safe place to put some initialization logic 
+is a method marked with <code>[Init]</code>. This will only be invoked after all injections have been performed:</p>
+
+<pre><code>[Inject]
+public var service1:SomeService;
+
+[Inject]
+public var service2:SomeOtherService;
+
+[Init]
+public function init () : void {
+    // here it is guaranteed that service1 and service2 have been set already
+}
+</code></pre>
+<h2><a name="views"></a>16.3 Problems with View Wiring</h2>
+
+<p class="paragraph">For wiring components it's important to understand the lifecycle of Flex components in relation to Parsley 
+object management. One problem with misplaced initialization logic (that does not only affect views) has already 
+been described in the preceding section under <strong>Timing issues with object initialization</strong>. 
+This section lists some of the most frequent issues purely related to wiring views.</p>
+
+
+<p class="subheadline"> Errors when re-adding a view to the stage </p>
+
+<p class="paragraph">The default behavior for a wired view (no matter whether you are using view autowiring or the <code>&lt;Configure&gt;</code> tag)
+is to remove the view from the Context once the view is removed from the stage. This is the most convenient option as this is
+what is required in many scenarios where views are not developed for reuse. But when you do reuse a view and are not aware 
+of this behavior you will encounter unexpected behavior. Dependencies like presentation models might get injected for a second
+time for example, causing the view to lose its internal state.</p>
+
+<p class="paragraph">Fortunately there are ways to prevent this, as this is just the default behavior. For more details see
+<a href="view.php#lifecycle">9.7&nbsp;Component Lifecycle</a>, preferrably including the section <strong>Beware of Memory Leaks</strong> as changing the
+default behavior might indeed solve your problem, but at the same time introduce leaks if not done correctly.</p>
+
+<p class="paragraph">If the <code>&lt;ContextBuilder&gt;</code> tag itself is placed into a view, you might even encounter the situation where
+the entire Context gets destroyed when you remove the view from the stage. Again this is only the default that can 
+be switched off like explained in <a href="view.php#lifecycle">9.7&nbsp;Component Lifecycle</a>.</p>
+
+
+<p class="subheadline"> Error: Object of type [SomeViewClass] is already managed </p>
+
+<p class="paragraph">Parsley 2.4 introduced checks to prevent the same object getting wired twice, potentially to two different Contexts 
+which could cause non-deterministic behavior. If you see this error it might have any of the following causes:</p>
+
+<ul>
+<li> You are not using the latest version. If you are using an explicit wiring mechanism like the <code>Configure</code> 
+tag and API you need at least version 2.4.0, if you are using View Autowiring you need at least version 2.4.1. Earlier
+versions had bugs in the way they performed the checks for duplicate wiring. </li>
+
+<li> You may indeed have duplicate configuration. This may happen when you combine an explicit mechanism like the 
+<code>Configure</code> tag with View Autowiring (setting the <code>autowireComponents</code> property to true in the
+<code>ViewSettings</code> tag). </li>
+
+<li> You may use a very old view wiring mechanism which is no longer supported and does not offer the full lifecycle
+features introduced in versions 2.2 to 2.4. This includes manually dispatching events of type <code>configureIOC</code>
+or <code>configureView</code>. </li>
+</ul>
+
+
+<p class="subheadline"> Problems with popups and AIR windows </p>
+
+<p class="paragraph">When wiring views in popups or AIR windows some additional steps need to be performed as these types of components
+are not placed into the normal view hierarchy below the root Application component. The basics are explained in
+<a href="view.php#popup">9.8&nbsp;Flex Popups and Native AIR Windows</a>. If you follow these instructions and still run into problems, they might be caused by one
+of the following issues:</p>
+
+<ul>
+<li> <strong>You get errors claiming that dependencies could not be found.</strong> This might happen even if you connected the popup or window 
+to a Parsley Context, if it is not to the right one. In a multi-Context application
+it is important that you connect the window to the Context where dependencies should be fetched from. While each 
+Context shares dependencies with its parent, the opposite is not true. So if you connect your window to the root Context
+for example, any dependencies defined in any child Context will not be seen. </li>
+
+<li> <strong>You get reflection errors claiming that some class cannot be found in a particular ApplicationDomain.</strong>
+This is a very similar issue: when you work with modules and windows it is particularly important to connect the window
+to the right Context. If the window shell is defined in the application and the window content will then be a module
+loaded into that window, it is fully sufficient to connect the window to the root Context as long as the loaded module
+will then define its own Context internally. But if the window or popup
+is launched from within a module that was already loaded, you must make sure to connect the window to the Context defined
+in the module. See the next section for further common error scenarios around working with modules. </li>
+</ul>
+<h2><a name="modules"></a>16.4 Problems with Modules</h2>
+
+<p class="paragraph">Applications that load modules are usually also multi-Context applications, as each module normally creates at least
+one internal Context within the module. Errors when working with modules usually occur when the Contexts in the various layers
+do not "connect" correctly or when a view is wired to the wrong Context. This often comes as a surprise as there is a lot of
+magic happening under the hood when you load a module and/or create a child Context. Parsley usually connects them automatically,
+creating a Context hierarchy that matches the view hierarchy the Contexts were created in. This way any child Context does always
+automatically share all dependencies from a parent Context. In some scenarios this magic does not work, most often due to a configuration
+issues. In very rare cases it might even be necessary to specify the parent Context and/or ApplicationDomain manually, which can
+be done through attributes of the <code>&lt;ContextBuilder&gt;</code> tag for example.</p>
+
+
+<p class="subheadline"> Reflection Errors ("Specified ApplicationDomain does not contain the class MyClass") </p>  
+
+<p class="paragraph">This can only happen when you load modules into child ApplicationDomains. Reflection errors usually have one of
+the following two causes:</p>
+
+<ul>
+<li> <strong>The module does not declare its own Context internally.</strong> When you want to wire views from within a module that
+was loaded into a child ApplicationDomain, the module must create its own Context. This is because every Context uses
+exactly one ApplicationDomain for reflection internally. If you only want to wire views and otherwise do not want to 
+declare any models or services in the module Context, you can simply add an empty <code>&lt;ContextBuilder/&gt;</code> tag
+to the root module component. </li>
+
+<li> <strong>The view is wired to the wrong Context.</strong> This might happen even when the module does create its own Context
+and that Context has the right ApplicationDomain for reflection. The last possible cause is then that the view did not
+get wired to the module Context, but only to the root application Context. The views connect through bubbling events
+to the nearest Context and this normally works as expected. There are only a few scenarios that might cause problems
+(see <strong>Problems with popups and AIR windows</strong> for an example). You can use the log output as demonstrated in 
+the next section to verify whether the view gets wired to the right Context. </li>
+</ul>
+
+
+<p class="subheadline"> Missing Dependencies </p>
+
+<p class="paragraph">If you see errors that a specific dependency cannot be found, although you are sure that you declared it in a
+Context configuration file, then it is very likely that the view got wired to the wrong Context. See
+<strong>Problems with popups and AIR windows</strong> for a common error scenario.</p>
+
+<p class="paragraph">Examining the log output also helps in this case, as it allows you to easily find out which Context connected to which
+parent and which view got wired to which Context. For an example lets assume that you create the root application Context
+using <code>MyRootConfig</code> as the MXML configuration class and then <code>MyModuleConfig</code> as the configuration for the
+module. Inside the module you have a view of type <code>MyWindow</code> that needs to get wired. If all goes well you should
+find these three entries in the log output (intertwined with other logs):</p>
+
+<pre><code>22:18:54.953 [INFO] org.spicefactory.parsley.core.bootstrap.impl.DefaultBootstrapConfig
+Creating Context [Context(FlexConfig{MyRootConfig})] without parent
+
+[...]
+
+22:19:01.270 [INFO] org.spicefactory.parsley.core.bootstrap.impl.DefaultBootstrapConfig 
+Creating Context [Context(FlexConfig{MyModuleConfig})] 
+with parent [Context(FlexConfig{MyRootConfig})]
+
+[...]
+
+22:19:01.544 [DEBUG] org.spicefactory.parsley.core.view.impl.DefaultViewConfigurator 
+Add view 'My_Module.ApplicationSkin2._AppSkin_Group1.contentGroup.TestModule23.MyWindow25' 
+to [Context(FlexConfig{MyModuleConfig})]
+</code></pre>
+
+<p class="paragraph">Here you can examine that the module Context found its parent (the root ApplicationContext) and the
+view MyWindow got wired to the module Context and not to the root Context.</p>
+
+<p class="paragraph">You can also improve the readability of the logs when you set the <code>description</code> attribute
+explicitly in the ContextBuilder:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="{MyRootConfig}" description="root"/&gt;
+</code></pre>
+
+<p class="paragraph">This would turn the output <code>[Context(FlexConfig{MyRootConfig})]</code> into just 
+<code>[Context(root)]</code>. This does not make such a big difference if you use only one configuration class,
+but if you use multiple ones the default description would list them all.</p>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

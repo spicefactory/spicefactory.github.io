@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><!-- saved from url=(0014)about:internet --><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" href="../../../../../style.css" type="text/css" media="screen"><link rel="stylesheet" href="../../../../../print.css" type="text/css" media="print"><link rel="stylesheet" href="../../../../../override.css" type="text/css"><meta name="keywords" content="ViewAutowireFilter,org.spicefactory.parsley.core.view.ViewAutowireFilter,ALWAYS,CONFIGURED,NEVER,autodestroyContext,autoremove,autoremoveComponents,autoremoveViewRoots,autowireComponents,autowireFilter,configId,definition,eventType,key,lifecycle,processor,reuse,reuseComponents,target,view,viewProcessor,addViewLifecycle,addViewRoot,addViewRoot,addViewRootHandler,destroy,destroy,filter,getViewRootHandlers,init,init,newViewLifecycle,prefilter,removeViewRoot,removeViewRoot,start,stop"><title>org.spicefactory.parsley.core.view.ViewAutowireFilter</title></head><body><script language="javascript" type="text/javascript" src="../../../../../asdoc.js"></script><script language="javascript" type="text/javascript" src="../../../../../help.js"></script><script language="javascript" type="text/javascript" src="../../../../../cookies.js"></script><script language="javascript" type="text/javascript"><!--
+				asdocTitle = 'ViewAutowireFilter - Parsley + Spicelib API';
+				var baseRef = '../../../../../';
+				window.onload = configPage;
+			--></script>
+<script type="text/javascript">
+			scrollToNameAnchor();
+		</script><table class="titleTable" cellpadding="0" cellspacing="0" id="titleTable" style="display:none"><tr><td class="titleTableTitle" align="left">Parsley + Spicelib API</td><td class="titleTableTopNav" align="right"><a href="../../../../../package-summary.html" onclick="loadClassListFrame('../../../../../all-classes.html')">All Packages</a>&nbsp;|&nbsp;<a href="../../../../../class-summary.html" onclick="loadClassListFrame('../../../../../all-classes.html')">All Classes</a>&nbsp;|&nbsp;<a href="../../../../../all-index-A.html" onclick="loadClassListFrame('../../../../../index-list.html')">Index</a>&nbsp;|&nbsp;<a id="framesLink1" href="../../../../../index.html?org/spicefactory/parsley/core/view/ViewAutowireFilter.html&amp;org/spicefactory/parsley/core/view/class-list.html">Frames</a><a id="noFramesLink1" style="display:none" href="" onclick="parent.location=document.location"> No Frames </a></td><td class="titleTableLogo" align="right" rowspan="3"><img src="../../../../../images/logo.jpg" class="logoImage" alt=" Adobe Logo " title=" Adobe Logo "></td></tr><tr class="titleTableRow2"><td class="titleTableSubTitle" id="subTitle" align="left">ViewAutowireFilter</td><td class="titleTableSubNav" id="subNav" align="right"><a href="#propertySummary">Properties</a>&nbsp;| <a href="#methodSummary">Methods</a></td></tr><tr class="titleTableRow3"><td colspan="3">&nbsp;</td></tr></table><script language="javascript" type="text/javascript" xml:space="preserve">
+				<!--
+				
+					if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("ViewAutowireFilter"); titleBar_setSubNav(false,true,false,false,false,false,false,false,true,false,false	,false,false,false,false,false);}	
+				-->
+			</script><div xmlns:fn="http://www.w3.org/2005/xpath-functions" class="MainContent"><table class="classHeaderTable" cellpadding="0" cellspacing="0"><tr><td class="classHeaderTableLabel">Package</td><td><a href="package-detail.html" onclick="javascript:loadClassListFrame('class-list.html')">org.spicefactory.parsley.core.view</a></td></tr><tr><td class="classHeaderTableLabel">Interface</td><td class="classSignature">public  interface  ViewAutowireFilter</td></tr><tr><td class="classHeaderTableLabel">Implementors</td><td> <a href="../../../../../org/spicefactory/parsley/core/view/impl/AbstractViewAutowireFilter.html">AbstractViewAutowireFilter</a></td></tr></table><p></p><p></p><p></p>
+ Filter that can be used to select views that should be wired to the Context.
+ Autowiring views based on a filter is an alternative mechanism to explicitly
+ specifying views to be wired with the <code>&lt;Configure&gt;</code> tag.
+ 
+ <p></p><br/><hr></div><a name="propertySummary"></a><div class="summarySection"><div class="summaryTableTitle">Public Properties</div><table cellspacing="0" cellpadding="3" class="summaryTable " id="summaryTableProperty"><tr><th>&nbsp;</th><th colspan="2">Property</th><th class="summaryTableOwnerCol">Defined By</th></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a href="#eventType" class="signatureLink">eventType</a> : String<div class="summaryTableDescription">
+	 The event type to listen to in the view roots.</div></td><td class="summaryTableOwnerCol">ViewAutowireFilter</td></tr></table></div><a name="methodSummary"></a><div class="summarySection"><div class="summaryTableTitle">Public Methods </div><table cellspacing="0" cellpadding="3" class="summaryTable " id="summaryTableMethod"><tr><th>&nbsp;</th><th colspan="2">Method</th><th class="summaryTableOwnerCol">Defined By</th></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#filter()" class="signatureLink">filter</a>(object:DisplayObject):<a href="../../../../../org/spicefactory/parsley/core/view/ViewAutowireMode.html">ViewAutowireMode</a></div><div class="summaryTableDescription">
+	 Makes the final decision whether a view object should be wired to the Context.</div></td><td class="summaryTableOwnerCol">ViewAutowireFilter</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#prefilter()" class="signatureLink">prefilter</a>(object:DisplayObject):Boolean</div><div class="summaryTableDescription">
+	 Prefilters the specified view object, deciding whether it should be further processed.</div></td><td class="summaryTableOwnerCol">ViewAutowireFilter</td></tr></table></div><script language="javascript" type="text/javascript"><!--
+										showHideInherited();
+										--></script><div class="MainContent"><div class="detailSectionHeader">Property Detail</div><a name="propertyDetail"></a><a name="eventType"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">eventType</td><td class="detailHeaderType">property</td></tr></table><div class="detailBody"><code>eventType:String</code><p></p><p></p><p>
+	 The event type to listen to in the view roots. The listener will be registered for 
+	 the capture phase and then pass all views to the prefilter method. The default is
+	 <code>Event.ADDED_TO_STAGE</code>.
+	 </p><br/><span class="label"> Implementation </span><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;public function get eventType():String</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;public function set eventType(value:String):void</code><br/></div><a name="methodDetail"></a><div class="detailSectionHeader">Method Detail</div><a name="filter()"></a><a name="filter(flash.display.DisplayObject)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">filter</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td></tr></table><div class="detailBody"><code> public function filter(object:DisplayObject):<a href="../../../../../org/spicefactory/parsley/core/view/ViewAutowireMode.html">ViewAutowireMode</a></code><p></p><p></p><p>
+	 Makes the final decision whether a view object should be wired to the Context.
+	 
+	 <p>This method will only be invoked for objects which passed the prefilter method.
+	 In a multi-Context scenario in a modular application this method may be invoked
+	 in a different filter instance than the prefilter method. The latter will be invoked
+	 in the root Context in most cases, this method however will often be invoked in a child
+	 Context.</p>
+	 
+	 <p>The enumeration value returned by this method indicates how the framework should
+	 deal with this view object. See the <code>ViewAutowireMode</code> class for details.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">object</span>:DisplayObject</code> &mdash; the view object to filter
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../../org/spicefactory/parsley/core/view/ViewAutowireMode.html">ViewAutowireMode</a></code> &mdash; an enumeration value that indicates how the framework should
+	 deal with this view object
+	 </td></tr></table></div><a name="prefilter()"></a><a name="prefilter(flash.display.DisplayObject)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">prefilter</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function prefilter(object:DisplayObject):Boolean</code><p></p><p></p><p>
+	 Prefilters the specified view object, deciding whether it should be further processed.
+	 This is primarily for performance optimizations as the final decision whether a view
+	 gets wired or not will be made by the filter method. Only objects for which this method
+	 returns true will then dispatch a bubbling autowire event. This is necessary as we have to
+	 listen in the capture phase first to get a hold on every view object, but must then
+	 reroute the event from bottom to top to allow the Context with the lowest position
+	 in the view hierarchy to make the final decision.
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">object</span>:DisplayObject</code> &mdash; the view object to be filtered
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code>Boolean</code> &mdash; true if the specified view object should be further processed.
+	 </td></tr></table></div><br/><br/><hr><br/><p></p><center class="copyright"><footer></footer><br/>Mon Feb 6 2012, 01:04 AM +01:00  </center></div></body></html><!--<br/>Mon Feb 6 2012, 01:04 AM +01:00  -->

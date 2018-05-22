@@ -1,0 +1,998 @@
+<html>
+<head>
+    <title>Parsley + Spicelib Developer Manual</title>
+    <link rel="stylesheet" type="text/css" href="../css/manuals/treeview.css">
+    <link rel="stylesheet" type="text/css" href="../css/manuals/text.css">
+    <!-- Namespace source file -->
+    <script src="../js/manuals/utilities.js">..</script>
+    <!-- TreeView source file -->
+    <script src="../js/manuals/treeview.js">..</script>
+    <script language="Javascript" type="text/javascript">
+        <!--[CDATA[
+        var tree;
+        function treeInit() {
+	        tree = new YAHOO.widget.TreeView("nav_content");
+	        var root = tree.getRoot();
+	        var dataObj = {};
+	        // ]]-->
+
+
+dataObj = { label: "Home / Download + API Documentation", href:"splash.htm", target:"content"};
+var home = new YAHOO.widget.TextNode(dataObj, root, true);
+
+dataObj = { label: "Parsley Application Framework", href:"overview.html#intro", target:"content"};
+var node_parsley = new YAHOO.widget.TextNode(dataObj, root, true);
+
+
+
+dataObj = { label: "1&nbsp;Overview", href:"overview.html#intro", target:"content"};
+var node_overview_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "1.1&nbsp;Features List", href:"overview.html#features", target:"content"};
+var node_overview_features = new YAHOO.widget.TextNode(dataObj, node_overview_intro, false);
+
+dataObj = { label: "1.2&nbsp;What's New in Parsley 3.0", href:"overview.html#whatsnew_30", target:"content"};
+var node_overview_whatsnew_30 = new YAHOO.widget.TextNode(dataObj, node_overview_intro, false);
+
+dataObj = { label: "1.3&nbsp;Migrating from Parsley 2 to Parsley 3", href:"overview.html#migrate_30", target:"content"};
+var node_overview_migrate_30 = new YAHOO.widget.TextNode(dataObj, node_overview_intro, false);
+
+dataObj = { label: "1.3.1&nbsp;Migrating from Versions older than 2.4", href:"overview.html#migrate_older", target:"content"};
+var node_overview_migrate_older = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.2&nbsp;Migrating from Version 2.4", href:"overview.html#migrate_24", target:"content"};
+var node_overview_migrate_24 = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.3&nbsp;Repackaged APIs", href:"overview.html#migrate_repackaging", target:"content"};
+var node_overview_migrate_repackaging = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.4&nbsp;Reduced ObjectDefinitionBuilder API", href:"overview.html#migrate_defbuilder", target:"content"};
+var node_overview_migrate_defbuilder = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.5&nbsp;Redesigned Command Support", href:"overview.html#migrate_commands", target:"content"};
+var node_overview_migrate_commands = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.6&nbsp;The Legacy Commands Extension", href:"overview.html#migrate_legacycommands", target:"content"};
+var node_overview_migrate_legacycommands = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.7&nbsp;Full Command Migration", href:"overview.html#migrate_full", target:"content"};
+var node_overview_migrate_full = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.8&nbsp;Building the first Context with the ContextBuilder API", href:"overview.html#migrate_contextbuilder", target:"content"};
+var node_overview_migrate_contextbuilder = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.9&nbsp;Signature Change for MessageError handlers", href:"overview.html#migrate_messageerror", target:"content"};
+var node_overview_migrate_messageerror = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.3.10&nbsp;Changes in Extension APIs", href:"overview.html#migrate_extension", target:"content"};
+var node_overview_migrate_extension = new YAHOO.widget.TextNode(dataObj, node_overview_migrate_30, false);
+
+dataObj = { label: "1.4&nbsp;Building the Framework from Source", href:"overview.html#building", target:"content"};
+var node_overview_building = new YAHOO.widget.TextNode(dataObj, node_overview_intro, false);
+
+dataObj = { label: "1.5&nbsp;Dependencies", href:"overview.html#dependencies", target:"content"};
+var node_overview_dependencies = new YAHOO.widget.TextNode(dataObj, node_overview_intro, false);
+
+dataObj = { label: "2&nbsp;Getting Started", href:"tutorial.html#intro", target:"content"};
+var node_tutorial_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "2.1&nbsp;Hello World Sample Application", href:"tutorial.html#sample", target:"content"};
+var node_tutorial_sample = new YAHOO.widget.TextNode(dataObj, node_tutorial_intro, false);
+
+dataObj = { label: "2.2&nbsp;Adding the Framework SWCs", href:"tutorial.html#setup", target:"content"};
+var node_tutorial_setup = new YAHOO.widget.TextNode(dataObj, node_tutorial_intro, false);
+
+dataObj = { label: "2.3&nbsp;Defining Object Dependencies", href:"tutorial.html#dependencies", target:"content"};
+var node_tutorial_dependencies = new YAHOO.widget.TextNode(dataObj, node_tutorial_intro, false);
+
+dataObj = { label: "2.4&nbsp;Sending and Receiving Messages", href:"tutorial.html#messaging", target:"content"};
+var node_tutorial_messaging = new YAHOO.widget.TextNode(dataObj, node_tutorial_intro, false);
+
+dataObj = { label: "2.5&nbsp;Assembling the Objects", href:"tutorial.html#assembling", target:"content"};
+var node_tutorial_assembling = new YAHOO.widget.TextNode(dataObj, node_tutorial_intro, false);
+
+dataObj = { label: "2.6&nbsp;Initializing the Framework", href:"tutorial.html#initialize", target:"content"};
+var node_tutorial_initialize = new YAHOO.widget.TextNode(dataObj, node_tutorial_intro, false);
+
+dataObj = { label: "2.7&nbsp;Adding more Services", href:"tutorial.html#more", target:"content"};
+var node_tutorial_more = new YAHOO.widget.TextNode(dataObj, node_tutorial_intro, false);
+
+dataObj = { label: "3&nbsp;Configuration and Initialization", href:"config.html#intro", target:"content"};
+var node_config_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "3.1&nbsp;Configuration with AS3 Metadata", href:"config.html#metadata", target:"content"};
+var node_config_metadata = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "3.2&nbsp;MXML Configuration", href:"config.html#mxml", target:"content"};
+var node_config_mxml = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "3.3&nbsp;XML Configuration Files", href:"config.html#xml", target:"content"};
+var node_config_xml = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "3.4&nbsp;Runtime Configuration", href:"config.html#runtime", target:"content"};
+var node_config_runtime = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "3.5&nbsp;Configuration DSL", href:"config.html#dsl", target:"content"};
+var node_config_dsl = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "3.6&nbsp;ActionScript Configuration", href:"config.html#as3", target:"content"};
+var node_config_as3 = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "3.7&nbsp;Combining multiple Configuration mechanisms", href:"config.html#combine", target:"content"};
+var node_config_combine = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "3.8&nbsp;Configuration Properties", href:"config.html#properties", target:"content"};
+var node_config_properties = new YAHOO.widget.TextNode(dataObj, node_config_intro, false);
+
+dataObj = { label: "4&nbsp;Dependency Injection", href:"injection.html#intro", target:"content"};
+var node_injection_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "4.1&nbsp;Constructor Injection", href:"injection.html#constructor", target:"content"};
+var node_injection_constructor = new YAHOO.widget.TextNode(dataObj, node_injection_intro, false);
+
+dataObj = { label: "4.2&nbsp;Method Injection", href:"injection.html#method", target:"content"};
+var node_injection_method = new YAHOO.widget.TextNode(dataObj, node_injection_intro, false);
+
+dataObj = { label: "4.3&nbsp;Property Injection by Type", href:"injection.html#property_type", target:"content"};
+var node_injection_property_type = new YAHOO.widget.TextNode(dataObj, node_injection_intro, false);
+
+dataObj = { label: "4.4&nbsp;Property Injection by Id", href:"injection.html#property_id", target:"content"};
+var node_injection_property_id = new YAHOO.widget.TextNode(dataObj, node_injection_intro, false);
+
+dataObj = { label: "4.5&nbsp;Declaring Dependencies in MXML or XML", href:"injection.html#tags", target:"content"};
+var node_injection_tags = new YAHOO.widget.TextNode(dataObj, node_injection_intro, false);
+
+dataObj = { label: "4.6&nbsp;Overriding Dependencies in Child Contexts", href:"injection.html#override", target:"content"};
+var node_injection_override = new YAHOO.widget.TextNode(dataObj, node_injection_intro, false);
+
+dataObj = { label: "5&nbsp;Decoupled Bindings", href:"bindings.html#intro", target:"content"};
+var node_bindings_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "5.1&nbsp;Comparing Dependency Injection and Decoupled Bindings", href:"bindings.html#difference", target:"content"};
+var node_bindings_difference = new YAHOO.widget.TextNode(dataObj, node_bindings_intro, false);
+
+dataObj = { label: "5.2&nbsp;Basic Usage", href:"bindings.html#basics", target:"content"};
+var node_bindings_basics = new YAHOO.widget.TextNode(dataObj, node_bindings_intro, false);
+
+dataObj = { label: "5.3&nbsp;Avoiding Conflicts", href:"bindings.html#conflicts", target:"content"};
+var node_bindings_conflicts = new YAHOO.widget.TextNode(dataObj, node_bindings_intro, false);
+
+dataObj = { label: "5.4&nbsp;Using Scopes", href:"bindings.html#scopes", target:"content"};
+var node_bindings_scopes = new YAHOO.widget.TextNode(dataObj, node_bindings_intro, false);
+
+dataObj = { label: "5.5&nbsp;Publishing Managed Objects", href:"bindings.html#managed", target:"content"};
+var node_bindings_managed = new YAHOO.widget.TextNode(dataObj, node_bindings_intro, false);
+
+dataObj = { label: "5.6&nbsp;Persistent Properties", href:"bindings.html#persistence", target:"content"};
+var node_bindings_persistence = new YAHOO.widget.TextNode(dataObj, node_bindings_intro, false);
+
+dataObj = { label: "5.7&nbsp;Bindings in Flash", href:"bindings.html#flash", target:"content"};
+var node_bindings_flash = new YAHOO.widget.TextNode(dataObj, node_bindings_intro, false);
+
+dataObj = { label: "6&nbsp;Messaging", href:"messaging.html#intro", target:"content"};
+var node_messaging_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "6.1&nbsp;Dispatching Messages", href:"messaging.html#dispatching", target:"content"};
+var node_messaging_dispatching = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.2&nbsp;Receiving Messages", href:"messaging.html#receiving", target:"content"};
+var node_messaging_receiving = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.3&nbsp;Managed Events", href:"messaging.html#managed_events", target:"content"};
+var node_messaging_managed_events = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.4&nbsp;Injected MessageDispatchers", href:"messaging.html#injected_dispatchers", target:"content"};
+var node_messaging_injected_dispatchers = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.5&nbsp;MessageHandlers", href:"messaging.html#handlers", target:"content"};
+var node_messaging_handlers = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.6&nbsp;MessageBindings", href:"messaging.html#bindings", target:"content"};
+var node_messaging_bindings = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.7&nbsp;Intercepting Messages", href:"messaging.html#interceptors", target:"content"};
+var node_messaging_interceptors = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.8&nbsp;Error Handlers", href:"messaging.html#errorhandlers", target:"content"};
+var node_messaging_errorhandlers = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.9&nbsp;Using Selectors", href:"messaging.html#selectors", target:"content"};
+var node_messaging_selectors = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.10&nbsp;Using Scopes", href:"messaging.html#scopes", target:"content"};
+var node_messaging_scopes = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "6.11&nbsp;Using the Messaging API", href:"messaging.html#api", target:"content"};
+var node_messaging_api = new YAHOO.widget.TextNode(dataObj, node_messaging_intro, false);
+
+dataObj = { label: "7&nbsp;Managed Commands", href:"managedcommands.html#intro", target:"content"};
+var node_managedcommands_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "7.1&nbsp;Implementing a Command", href:"managedcommands.html#implementation", target:"content"};
+var node_managedcommands_implementation = new YAHOO.widget.TextNode(dataObj, node_managedcommands_intro, false);
+
+dataObj = { label: "7.1.1&nbsp;Synchronous Commands", href:"managedcommands.html#sync", target:"content"};
+var node_managedcommands_sync = new YAHOO.widget.TextNode(dataObj, node_managedcommands_implementation, false);
+
+dataObj = { label: "7.1.2&nbsp;Synchronous Commands with Result", href:"managedcommands.html#sync_result", target:"content"};
+var node_managedcommands_sync_result = new YAHOO.widget.TextNode(dataObj, node_managedcommands_implementation, false);
+
+dataObj = { label: "7.1.3&nbsp;Asynchronous Commands with Result", href:"managedcommands.html#async", target:"content"};
+var node_managedcommands_async = new YAHOO.widget.TextNode(dataObj, node_managedcommands_implementation, false);
+
+dataObj = { label: "7.1.4&nbsp;Asynchronous Commands with AsyncToken", href:"managedcommands.html#async_token", target:"content"};
+var node_managedcommands_async_token = new YAHOO.widget.TextNode(dataObj, node_managedcommands_implementation, false);
+
+dataObj = { label: "7.1.5&nbsp;Result Handlers in Commands", href:"managedcommands.html#result_handler", target:"content"};
+var node_managedcommands_result_handler = new YAHOO.widget.TextNode(dataObj, node_managedcommands_implementation, false);
+
+dataObj = { label: "7.1.6&nbsp;Changing the Result", href:"managedcommands.html#changing_result", target:"content"};
+var node_managedcommands_changing_result = new YAHOO.widget.TextNode(dataObj, node_managedcommands_implementation, false);
+
+dataObj = { label: "7.1.7&nbsp;Other Options", href:"managedcommands.html#other", target:"content"};
+var node_managedcommands_other = new YAHOO.widget.TextNode(dataObj, node_managedcommands_implementation, false);
+
+dataObj = { label: "7.2&nbsp;Mapping Commands to Messages", href:"managedcommands.html#mapping", target:"content"};
+var node_managedcommands_mapping = new YAHOO.widget.TextNode(dataObj, node_managedcommands_intro, false);
+
+dataObj = { label: "7.2.1&nbsp;Mapping Commands in MXML", href:"managedcommands.html#mapping_mxml", target:"content"};
+var node_managedcommands_mapping_mxml = new YAHOO.widget.TextNode(dataObj, node_managedcommands_mapping, false);
+
+dataObj = { label: "7.2.2&nbsp;Mapping Commands in XML", href:"managedcommands.html#mapping_xml", target:"content"};
+var node_managedcommands_mapping_xml = new YAHOO.widget.TextNode(dataObj, node_managedcommands_mapping, false);
+
+dataObj = { label: "7.2.3&nbsp;Mapping Commands Programmatically", href:"managedcommands.html#mapping_programmatic", target:"content"};
+var node_managedcommands_mapping_programmatic = new YAHOO.widget.TextNode(dataObj, node_managedcommands_mapping, false);
+
+dataObj = { label: "7.3&nbsp;Command Groups", href:"managedcommands.html#groups", target:"content"};
+var node_managedcommands_groups = new YAHOO.widget.TextNode(dataObj, node_managedcommands_intro, false);
+
+dataObj = { label: "7.3.1&nbsp;Declaring Groups in MXML", href:"managedcommands.html#groups_mxml", target:"content"};
+var node_managedcommands_groups_mxml = new YAHOO.widget.TextNode(dataObj, node_managedcommands_groups, false);
+
+dataObj = { label: "7.3.2&nbsp;Declaring Groups in XML", href:"managedcommands.html#groups_xml", target:"content"};
+var node_managedcommands_groups_xml = new YAHOO.widget.TextNode(dataObj, node_managedcommands_groups, false);
+
+dataObj = { label: "7.3.3&nbsp;Using Results from Preceding Commands", href:"managedcommands.html#groups_results", target:"content"};
+var node_managedcommands_groups_results = new YAHOO.widget.TextNode(dataObj, node_managedcommands_groups, false);
+
+dataObj = { label: "7.4&nbsp;Command Flows", href:"managedcommands.html#flows", target:"content"};
+var node_managedcommands_flows = new YAHOO.widget.TextNode(dataObj, node_managedcommands_intro, false);
+
+dataObj = { label: "7.5&nbsp;Starting a Command Programmatically", href:"managedcommands.html#programmatic", target:"content"};
+var node_managedcommands_programmatic = new YAHOO.widget.TextNode(dataObj, node_managedcommands_intro, false);
+
+dataObj = { label: "7.5.1&nbsp;Injecting a Command Factory", href:"managedcommands.html#inject_factory", target:"content"};
+var node_managedcommands_inject_factory = new YAHOO.widget.TextNode(dataObj, node_managedcommands_programmatic, false);
+
+dataObj = { label: "7.5.2&nbsp;Initiating Managed Execution Manually", href:"managedcommands.html#manual", target:"content"};
+var node_managedcommands_manual = new YAHOO.widget.TextNode(dataObj, node_managedcommands_programmatic, false);
+
+dataObj = { label: "7.6&nbsp;Handling Results and Observing Commands", href:"managedcommands.html#results", target:"content"};
+var node_managedcommands_results = new YAHOO.widget.TextNode(dataObj, node_managedcommands_intro, false);
+
+dataObj = { label: "7.6.1&nbsp;Result Handlers in Commands", href:"managedcommands.html#result_handler_internal", target:"content"};
+var node_managedcommands_result_handler_internal = new YAHOO.widget.TextNode(dataObj, node_managedcommands_results, false);
+
+dataObj = { label: "7.6.2&nbsp;Decoupled Result Handlers and Command Observers", href:"managedcommands.html#result_handler_internal", target:"content"};
+var node_managedcommands_result_handler_internal = new YAHOO.widget.TextNode(dataObj, node_managedcommands_results, false);
+
+dataObj = { label: "7.6.3&nbsp;Command Status Flags", href:"managedcommands.html#result_handler_internal", target:"content"};
+var node_managedcommands_result_handler_internal = new YAHOO.widget.TextNode(dataObj, node_managedcommands_results, false);
+
+dataObj = { label: "7.7&nbsp;Command Lifecycle", href:"managedcommands.html#lifecycle", target:"content"};
+var node_managedcommands_lifecycle = new YAHOO.widget.TextNode(dataObj, node_managedcommands_intro, false);
+
+dataObj = { label: "7.7.1&nbsp;Synchronous Commands", href:"managedcommands.html#lifecycle_sync", target:"content"};
+var node_managedcommands_lifecycle_sync = new YAHOO.widget.TextNode(dataObj, node_managedcommands_lifecycle, false);
+
+dataObj = { label: "7.7.2&nbsp;Asynchronous Commands", href:"managedcommands.html#lifecycle_async", target:"content"};
+var node_managedcommands_lifecycle_async = new YAHOO.widget.TextNode(dataObj, node_managedcommands_lifecycle, false);
+
+dataObj = { label: "8&nbsp;Object Lifecycle", href:"lifecycle.html#intro", target:"content"};
+var node_lifecycle_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "8.1&nbsp;About Managed Objects", href:"lifecycle.html#managed", target:"content"};
+var node_lifecycle_managed = new YAHOO.widget.TextNode(dataObj, node_lifecycle_intro, false);
+
+dataObj = { label: "8.2&nbsp;Using Factories", href:"lifecycle.html#factories", target:"content"};
+var node_lifecycle_factories = new YAHOO.widget.TextNode(dataObj, node_lifecycle_intro, false);
+
+dataObj = { label: "8.3&nbsp;Asynchronous Object Initialization", href:"lifecycle.html#async", target:"content"};
+var node_lifecycle_async = new YAHOO.widget.TextNode(dataObj, node_lifecycle_intro, false);
+
+dataObj = { label: "8.4&nbsp;Object Initialization Order", href:"lifecycle.html#order", target:"content"};
+var node_lifecycle_order = new YAHOO.widget.TextNode(dataObj, node_lifecycle_intro, false);
+
+dataObj = { label: "8.5&nbsp;Object Lifecycle Methods", href:"lifecycle.html#methods", target:"content"};
+var node_lifecycle_methods = new YAHOO.widget.TextNode(dataObj, node_lifecycle_intro, false);
+
+dataObj = { label: "8.6&nbsp;Lifecycle Observer Methods", href:"lifecycle.html#observer", target:"content"};
+var node_lifecycle_observer = new YAHOO.widget.TextNode(dataObj, node_lifecycle_intro, false);
+
+dataObj = { label: "8.7&nbsp;Dynamic Objects", href:"lifecycle.html#dynamic", target:"content"};
+var node_lifecycle_dynamic = new YAHOO.widget.TextNode(dataObj, node_lifecycle_intro, false);
+
+dataObj = { label: "9&nbsp;Dynamic View Wiring", href:"view.html#intro", target:"content"};
+var node_view_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "9.1&nbsp;Initializing View Wiring Support", href:"view.html#init", target:"content"};
+var node_view_init = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.2&nbsp;Explicit Component Wiring", href:"view.html#config_explicit", target:"content"};
+var node_view_config_explicit = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.3&nbsp;Component Wiring without Reflection", href:"view.html#config_noreflect", target:"content"};
+var node_view_config_noreflect = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.3.1&nbsp;The FastInject MXML Tag", href:"view.html#config_noreflect_tag", target:"content"};
+var node_view_config_noreflect_tag = new YAHOO.widget.TextNode(dataObj, node_view_config_noreflect, false);
+
+dataObj = { label: "9.3.2&nbsp;The FastInject API for ActionScript Components", href:"view.html#config_noreflect_api", target:"content"};
+var node_view_config_noreflect_api = new YAHOO.widget.TextNode(dataObj, node_view_config_noreflect, false);
+
+dataObj = { label: "9.3.3&nbsp;Custom ViewProcessors for Autowiring", href:"view.html#config_noreflect_custom", target:"content"};
+var node_view_config_noreflect_custom = new YAHOO.widget.TextNode(dataObj, node_view_config_noreflect, false);
+
+dataObj = { label: "9.4&nbsp;Automatic Component Wiring", href:"view.html#config_automatic", target:"content"};
+var node_view_config_automatic = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.5&nbsp;Metadata Configuration", href:"view.html#config_metadata", target:"content"};
+var node_view_config_metadata = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.6&nbsp;MXML and XML Configuration", href:"view.html#config_mxml_xml", target:"content"};
+var node_view_config_mxml_xml = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.7&nbsp;Component Lifecycle", href:"view.html#lifecycle", target:"content"};
+var node_view_lifecycle = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.7.1&nbsp;Controlling the Lifecycle of Components", href:"view.html#lifecycle_components", target:"content"};
+var node_view_lifecycle_components = new YAHOO.widget.TextNode(dataObj, node_view_lifecycle, false);
+
+dataObj = { label: "9.7.2&nbsp;Controlling the Lifecycle of View Roots", href:"view.html#lifecycle_viewroots", target:"content"};
+var node_view_lifecycle_viewroots = new YAHOO.widget.TextNode(dataObj, node_view_lifecycle, false);
+
+dataObj = { label: "9.7.3&nbsp;Settings for Individual Components", href:"view.html#lifecycle_individual", target:"content"};
+var node_view_lifecycle_individual = new YAHOO.widget.TextNode(dataObj, node_view_lifecycle, false);
+
+dataObj = { label: "9.7.4&nbsp;Beware of Memory Leaks", href:"view.html#lifecycle_leaks", target:"content"};
+var node_view_lifecycle_leaks = new YAHOO.widget.TextNode(dataObj, node_view_lifecycle, false);
+
+dataObj = { label: "9.7.5&nbsp;Be careful with Component Initialization Logic", href:"view.html#lifecycle_initialize", target:"content"};
+var node_view_lifecycle_initialize = new YAHOO.widget.TextNode(dataObj, node_view_lifecycle, false);
+
+dataObj = { label: "9.7.6&nbsp;Lifecycle Methods", href:"view.html#lifecycle_methods", target:"content"};
+var node_view_lifecycle_methods = new YAHOO.widget.TextNode(dataObj, node_view_lifecycle, false);
+
+dataObj = { label: "9.7.7&nbsp;Custom Lifecycle Handlers", href:"view.html#lifecycle_custom", target:"content"};
+var node_view_lifecycle_custom = new YAHOO.widget.TextNode(dataObj, node_view_lifecycle, false);
+
+dataObj = { label: "9.8&nbsp;Flex Popups and Native AIR Windows", href:"view.html#popup", target:"content"};
+var node_view_popup = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "9.9&nbsp;View Wiring in Modular Applications", href:"view.html#modules", target:"content"};
+var node_view_modules = new YAHOO.widget.TextNode(dataObj, node_view_intro, false);
+
+dataObj = { label: "10&nbsp;Building Modular Applications", href:"modules.html#intro", target:"content"};
+var node_modules_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "10.1&nbsp;Modular Contexts", href:"modules.html#context", target:"content"};
+var node_modules_context = new YAHOO.widget.TextNode(dataObj, node_modules_intro, false);
+
+dataObj = { label: "10.1.1&nbsp;Connecting a Context Hierarchy to a View Hierarchy", href:"modules.html#context_views", target:"content"};
+var node_modules_context_views = new YAHOO.widget.TextNode(dataObj, node_modules_context, false);
+
+dataObj = { label: "10.1.2&nbsp;Setting a Parent Context Manually", href:"modules.html#context_manual", target:"content"};
+var node_modules_context_manual = new YAHOO.widget.TextNode(dataObj, node_modules_context, false);
+
+dataObj = { label: "10.1.3&nbsp;Using Multiple Parent Contexts", href:"modules.html#context_multiple", target:"content"};
+var node_modules_context_multiple = new YAHOO.widget.TextNode(dataObj, node_modules_context, false);
+
+dataObj = { label: "10.2&nbsp;Context Lifecycle", href:"modules.html#lifecycle", target:"content"};
+var node_modules_lifecycle = new YAHOO.widget.TextNode(dataObj, node_modules_intro, false);
+
+dataObj = { label: "10.3&nbsp;Using Flex Modules", href:"modules.html#flex", target:"content"};
+var node_modules_flex = new YAHOO.widget.TextNode(dataObj, node_modules_intro, false);
+
+dataObj = { label: "11&nbsp;Building MVC Architectures", href:"mvc.html#intro", target:"content"};
+var node_mvc_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "11.1&nbsp;MVC Event Flow Example", href:"mvc.html#flow", target:"content"};
+var node_mvc_flow = new YAHOO.widget.TextNode(dataObj, node_mvc_intro, false);
+
+dataObj = { label: "11.2&nbsp;Example Command Implementation", href:"mvc.html#implementation", target:"content"};
+var node_mvc_implementation = new YAHOO.widget.TextNode(dataObj, node_mvc_intro, false);
+
+dataObj = { label: "12&nbsp;Localization", href:"resources.html#intro", target:"content"};
+var node_resources_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "12.1&nbsp;ResourceBindings", href:"resources.html#bindings", target:"content"};
+var node_resources_bindings = new YAHOO.widget.TextNode(dataObj, node_resources_intro, false);
+
+dataObj = { label: "12.2&nbsp;Localized Flex Applications", href:"resources.html#flex", target:"content"};
+var node_resources_flex = new YAHOO.widget.TextNode(dataObj, node_resources_intro, false);
+
+dataObj = { label: "12.3&nbsp;Localized Flash Applications", href:"resources.html#flash", target:"content"};
+var node_resources_flash = new YAHOO.widget.TextNode(dataObj, node_resources_intro, false);
+
+dataObj = { label: "12.3.1&nbsp;Configuration", href:"resources.html#flash_config", target:"content"};
+var node_resources_flash_config = new YAHOO.widget.TextNode(dataObj, node_resources_flash, false);
+
+dataObj = { label: "12.3.2&nbsp;XML Resource Bundle Files", href:"resources.html#flash_bundles", target:"content"};
+var node_resources_flash_bundles = new YAHOO.widget.TextNode(dataObj, node_resources_flash, false);
+
+dataObj = { label: "12.3.3&nbsp;Switching the active Locale", href:"resources.html#flash_switching", target:"content"};
+var node_resources_flash_switching = new YAHOO.widget.TextNode(dataObj, node_resources_flash, false);
+
+dataObj = { label: "13&nbsp;Extending the Framework", href:"extensions.html#intro", target:"content"};
+var node_extensions_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "13.1&nbsp;Available Extension Points", href:"extensions.html#points", target:"content"};
+var node_extensions_points = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "13.2&nbsp;Custom Metadata Tags", href:"extensions.html#metadata", target:"content"};
+var node_extensions_metadata = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "13.2.1&nbsp;The ObjectDefinitionDecorator Interface", href:"extensions.html#metadata_decorator", target:"content"};
+var node_extensions_metadata_decorator = new YAHOO.widget.TextNode(dataObj, node_extensions_metadata, false);
+
+dataObj = { label: "13.2.2&nbsp;Tasks performed by Custom Metadata", href:"extensions.html#metadata_tasks", target:"content"};
+var node_extensions_metadata_tasks = new YAHOO.widget.TextNode(dataObj, node_extensions_metadata, false);
+
+dataObj = { label: "13.2.3&nbsp;Sample Implementations", href:"extensions.html#metadata_sample", target:"content"};
+var node_extensions_metadata_sample = new YAHOO.widget.TextNode(dataObj, node_extensions_metadata, false);
+
+dataObj = { label: "13.2.4&nbsp;The ObjectProcessor Interface", href:"extensions.html#metadata_processor", target:"content"};
+var node_extensions_metadata_processor = new YAHOO.widget.TextNode(dataObj, node_extensions_metadata, false);
+
+dataObj = { label: "13.2.5&nbsp;Registering Metadata Tags", href:"extensions.html#metadata_register", target:"content"};
+var node_extensions_metadata_register = new YAHOO.widget.TextNode(dataObj, node_extensions_metadata, false);
+
+dataObj = { label: "13.3&nbsp;Custom MXML and XML Tags", href:"extensions.html#mxml_xml", target:"content"};
+var node_extensions_mxml_xml = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "13.3.1&nbsp;The Structure of Configuration Files", href:"extensions.html#mxml_xml_structure", target:"content"};
+var node_extensions_mxml_xml_structure = new YAHOO.widget.TextNode(dataObj, node_extensions_mxml_xml, false);
+
+dataObj = { label: "13.3.2&nbsp;The RootConfigurationElement Interface", href:"extensions.html#mxml_xml_root", target:"content"};
+var node_extensions_mxml_xml_root = new YAHOO.widget.TextNode(dataObj, node_extensions_mxml_xml, false);
+
+dataObj = { label: "13.3.3&nbsp;The NestedConfigurationElement Interface", href:"extensions.html#mxml_xml_nested", target:"content"};
+var node_extensions_mxml_xml_nested = new YAHOO.widget.TextNode(dataObj, node_extensions_mxml_xml, false);
+
+dataObj = { label: "13.3.4&nbsp;Example: The MessageConfirmation Tag", href:"extensions.html#mxml_xml_sample", target:"content"};
+var node_extensions_mxml_xml_sample = new YAHOO.widget.TextNode(dataObj, node_extensions_mxml_xml, false);
+
+dataObj = { label: "13.3.5&nbsp;Creating Custom MXML Namespaces", href:"extensions.html#mxml_xml_namespace_mxml", target:"content"};
+var node_extensions_mxml_xml_namespace_mxml = new YAHOO.widget.TextNode(dataObj, node_extensions_mxml_xml, false);
+
+dataObj = { label: "13.3.6&nbsp;Creating Custom XML Namespaces", href:"extensions.html#mxml_xml_namespace_xml", target:"content"};
+var node_extensions_mxml_xml_namespace_xml = new YAHOO.widget.TextNode(dataObj, node_extensions_mxml_xml, false);
+
+dataObj = { label: "13.4&nbsp;Working with ObjectDefinitions", href:"extensions.html#definitions", target:"content"};
+var node_extensions_definitions = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "13.4.1&nbsp;Creating New Definitions", href:"extenstions.html#definitions_create", target:"content"};
+var node_extenstions_definitions_create = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.2&nbsp;Defining Property Values", href:"extensions.html#definitions_properties", target:"content"};
+var node_extensions_definitions_properties = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.3&nbsp;Defining Constructor Arguments", href:"extensions.html#definitions_constructor", target:"content"};
+var node_extensions_definitions_constructor = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.4&nbsp;Standard Message Receivers", href:"extensions.html#definitions_standard_messaging", target:"content"};
+var node_extensions_definitions_standard_messaging = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.5&nbsp;Custom Message Receivers", href:"extensions.html#definitions_custom_messaging", target:"content"};
+var node_extensions_definitions_custom_messaging = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.6&nbsp;Custom Instantiators", href:"extensions.html#definitions_instantiators", target:"content"};
+var node_extensions_definitions_instantiators = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.7&nbsp;Custom ObjectProcessors", href:"extensions.html#definitions_processors", target:"content"};
+var node_extensions_definitions_processors = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.8&nbsp;Registering Definitions", href:"extensions.html#definitions_register", target:"content"};
+var node_extensions_definitions_register = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.9&nbsp;Defining Dependent Objects", href:"extensions.html#definitions_dependent", target:"content"};
+var node_extensions_definitions_dependent = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.4.10&nbsp;Reflection", href:"extensions.html#definitions_reflect", target:"content"};
+var node_extensions_definitions_reflect = new YAHOO.widget.TextNode(dataObj, node_extensions_definitions, false);
+
+dataObj = { label: "13.5&nbsp;Working with Scopes", href:"extensions.html#scopes", target:"content"};
+var node_extensions_scopes = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "13.6&nbsp;Custom Configuration Mechanisms", href:"extensions.html#config_processors", target:"content"};
+var node_extensions_config_processors = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "13.7&nbsp;Replacing IOC Kernel Services", href:"extensions.html#kernel", target:"content"};
+var node_extensions_kernel = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "13.8&nbsp;Initializing Extension Modules", href:"extensions.html#init", target:"content"};
+var node_extensions_init = new YAHOO.widget.TextNode(dataObj, node_extensions_intro, false);
+
+dataObj = { label: "14&nbsp;Remoting", href:"remoting.html#intro", target:"content"};
+var node_remoting_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "14.1&nbsp;Flex Remoting", href:"remoting.html#flex", target:"content"};
+var node_remoting_flex = new YAHOO.widget.TextNode(dataObj, node_remoting_intro, false);
+
+dataObj = { label: "14.2&nbsp;Pimento Data Services", href:"remoting.html#pimento", target:"content"};
+var node_remoting_pimento = new YAHOO.widget.TextNode(dataObj, node_remoting_intro, false);
+
+dataObj = { label: "14.3&nbsp;Cinnamon Remoting", href:"remoting.html#cinnamon", target:"content"};
+var node_remoting_cinnamon = new YAHOO.widget.TextNode(dataObj, node_remoting_intro, false);
+
+dataObj = { label: "15&nbsp;Logging Configuration", href:"logging.html#intro", target:"content"};
+var node_logging_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "15.1&nbsp;Logging Configuration for Flex", href:"logging.html#flex", target:"content"};
+var node_logging_flex = new YAHOO.widget.TextNode(dataObj, node_logging_intro, false);
+
+dataObj = { label: "15.2&nbsp;Logging Configuration for Flash", href:"logging.html#flash", target:"content"};
+var node_logging_flash = new YAHOO.widget.TextNode(dataObj, node_logging_intro, false);
+
+dataObj = { label: "15.3&nbsp;Configuration for Parsley Framework Logs", href:"logging.html#spicefactory", target:"content"};
+var node_logging_spicefactory = new YAHOO.widget.TextNode(dataObj, node_logging_intro, false);
+
+dataObj = { label: "16&nbsp;Troubleshooting Guide", href:"troubleshooting.html#intro", target:"content"};
+var node_troubleshooting_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "16.1&nbsp;Configure Logging", href:"troubleshooting.html#logging", target:"content"};
+var node_troubleshooting_logging = new YAHOO.widget.TextNode(dataObj, node_troubleshooting_intro, false);
+
+dataObj = { label: "16.2&nbsp;Silent Failure", href:"troubleshooting.html#silent", target:"content"};
+var node_troubleshooting_silent = new YAHOO.widget.TextNode(dataObj, node_troubleshooting_intro, false);
+
+dataObj = { label: "16.3&nbsp;Problems with View Wiring", href:"troubleshooting.html#views", target:"content"};
+var node_troubleshooting_views = new YAHOO.widget.TextNode(dataObj, node_troubleshooting_intro, false);
+
+dataObj = { label: "16.4&nbsp;Problems with Modules", href:"troubleshooting.html#modules", target:"content"};
+var node_troubleshooting_modules = new YAHOO.widget.TextNode(dataObj, node_troubleshooting_intro, false);
+
+dataObj = { label: "17&nbsp;Configuration Tag Reference", href:"tagref.html#intro", target:"content"};
+var node_tagref_intro = new YAHOO.widget.TextNode(dataObj, node_parsley, false);
+
+dataObj = { label: "17.1&nbsp;Dependency Injection", href:"tagref.html#injection", target:"content"};
+var node_tagref_injection = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.1.1&nbsp;Inject for Properties", href:"tagref.html#injection_properties", target:"content"};
+var node_tagref_injection_properties = new YAHOO.widget.TextNode(dataObj, node_tagref_injection, false);
+
+dataObj = { label: "17.1.2&nbsp;Inject for Methods", href:"tagref.html#injection_methods", target:"content"};
+var node_tagref_injection_methods = new YAHOO.widget.TextNode(dataObj, node_tagref_injection, false);
+
+dataObj = { label: "17.1.3&nbsp;InjectConstructor", href:"tagref.html#injection_constructor", target:"content"};
+var node_tagref_injection_constructor = new YAHOO.widget.TextNode(dataObj, node_tagref_injection, false);
+
+dataObj = { label: "17.2&nbsp;Decoupled Bindings", href:"tagref.html#bindings", target:"content"};
+var node_tagref_bindings = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.2.1&nbsp;Publish", href:"tagref.html#bindings_publish", target:"content"};
+var node_tagref_bindings_publish = new YAHOO.widget.TextNode(dataObj, node_tagref_bindings, false);
+
+dataObj = { label: "17.2.2&nbsp;PublishSubscribe", href:"tagref.html#bindings_publish_subscribe", target:"content"};
+var node_tagref_bindings_publish_subscribe = new YAHOO.widget.TextNode(dataObj, node_tagref_bindings, false);
+
+dataObj = { label: "17.2.3&nbsp;Subscribe", href:"tagref.html#bindings_subscribe", target:"content"};
+var node_tagref_bindings_subscribe = new YAHOO.widget.TextNode(dataObj, node_tagref_bindings, false);
+
+dataObj = { label: "17.3&nbsp;Messaging", href:"tagref.html#messaging", target:"content"};
+var node_tagref_messaging = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.3.1&nbsp;MessageDispatcher", href:"tagref.html#messaging_dispatcher", target:"content"};
+var node_tagref_messaging_dispatcher = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.3.2&nbsp;ManagedEvents", href:"tagref.html#messaging_managed_events", target:"content"};
+var node_tagref_messaging_managed_events = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.3.3&nbsp;MessageHandler", href:"tagref.html#messaging_handler", target:"content"};
+var node_tagref_messaging_handler = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.3.4&nbsp;MessageBinding", href:"tagref.html#messaging_binding", target:"content"};
+var node_tagref_messaging_binding = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.3.5&nbsp;MessageError", href:"tagref.html#messaging_error", target:"content"};
+var node_tagref_messaging_error = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.3.6&nbsp;MessageConfirmation", href:"tagref.html#messaging_confirmation", target:"content"};
+var node_tagref_messaging_confirmation = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.3.7&nbsp;Selector", href:"tagref.html#messaging_selector", target:"content"};
+var node_tagref_messaging_selector = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.4&nbsp;Messaging", href:"tagref.html#messaging", target:"content"};
+var node_tagref_messaging = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.4.1&nbsp;CommandComplete", href:"tagref.html#commands_complete", target:"content"};
+var node_tagref_commands_complete = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.4.2&nbsp;CommandResult", href:"tagref.html#commands_result", target:"content"};
+var node_tagref_commands_result = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.4.3&nbsp;CommandError", href:"tagref.html#commands_error", target:"content"};
+var node_tagref_commands_error = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.4.4&nbsp;CommandStatus", href:"tagref.html#commands_status", target:"content"};
+var node_tagref_commands_status = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.4.5&nbsp;MapCommand", href:"tagref.html#commands_map", target:"content"};
+var node_tagref_commands_map = new YAHOO.widget.TextNode(dataObj, node_tagref_messaging, false);
+
+dataObj = { label: "17.5&nbsp;Object Lifecycle", href:"tagref.html#lifecycle", target:"content"};
+var node_tagref_lifecycle = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.5.1&nbsp;AsyncInit", href:"tagref.html#lifecycle_asyncinit", target:"content"};
+var node_tagref_lifecycle_asyncinit = new YAHOO.widget.TextNode(dataObj, node_tagref_lifecycle, false);
+
+dataObj = { label: "17.5.2&nbsp;Init", href:"tagref.html#lifecycle_init", target:"content"};
+var node_tagref_lifecycle_init = new YAHOO.widget.TextNode(dataObj, node_tagref_lifecycle, false);
+
+dataObj = { label: "17.5.3&nbsp;Destroy", href:"tagref.html#lifecycle_destroy", target:"content"};
+var node_tagref_lifecycle_destroy = new YAHOO.widget.TextNode(dataObj, node_tagref_lifecycle, false);
+
+dataObj = { label: "17.5.4&nbsp;Observe", href:"tagref.html#lifecycle_observe", target:"content"};
+var node_tagref_lifecycle_observe = new YAHOO.widget.TextNode(dataObj, node_tagref_lifecycle, false);
+
+dataObj = { label: "17.6&nbsp;Localization", href:"tagref.html#resources", target:"content"};
+var node_tagref_resources = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.6.1&nbsp;ResourceBinding", href:"tagref.html#resources_binding", target:"content"};
+var node_tagref_resources_binding = new YAHOO.widget.TextNode(dataObj, node_tagref_resources, false);
+
+dataObj = { label: "17.7&nbsp;Extensibility", href:"tagref.html#extensions", target:"content"};
+var node_tagref_extensions = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.7.1&nbsp;Factory", href:"tagref.html#extensions_factory", target:"content"};
+var node_tagref_extensions_factory = new YAHOO.widget.TextNode(dataObj, node_tagref_extensions, false);
+
+dataObj = { label: "17.7.2&nbsp;Target", href:"tagref.html#extensions_target", target:"content"};
+var node_tagref_extensions_target = new YAHOO.widget.TextNode(dataObj, node_tagref_extensions, false);
+
+dataObj = { label: "17.8&nbsp;ActionScript Configuration", href:"tagref.html#asconfig", target:"content"};
+var node_tagref_asconfig = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.8.1&nbsp;ObjectDefinition", href:"tagref.html#asconfig_definition", target:"content"};
+var node_tagref_asconfig_definition = new YAHOO.widget.TextNode(dataObj, node_tagref_asconfig, false);
+
+dataObj = { label: "17.8.2&nbsp;DynamicObject", href:"tagref.html#asconfig_dynamicobject", target:"content"};
+var node_tagref_asconfig_dynamicobject = new YAHOO.widget.TextNode(dataObj, node_tagref_asconfig, false);
+
+dataObj = { label: "17.8.3&nbsp;Internal", href:"tagref.html#asconfig_internal", target:"content"};
+var node_tagref_asconfig_internal = new YAHOO.widget.TextNode(dataObj, node_tagref_asconfig, false);
+
+dataObj = { label: "17.9&nbsp;MXML and XML Configuration", href:"tagref.html#tags", target:"content"};
+var node_tagref_tags = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.9.1&nbsp;Variants of Metadata Tags", href:"tagref.html#tags_metadata", target:"content"};
+var node_tagref_tags_metadata = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.2&nbsp;Object", href:"tagref.html#tags_object", target:"content"};
+var node_tagref_tags_object = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.3&nbsp;DynamicObject", href:"tagref.html#tags_dynamicobject", target:"content"};
+var node_tagref_tags_dynamicobject = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.4&nbsp;NestedObject", href:"tagref.html#tags_nestedobject", target:"content"};
+var node_tagref_tags_nestedobject = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.5&nbsp;View", href:"tagref.html#tags_view", target:"content"};
+var node_tagref_tags_view = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.6&nbsp;ConstructorArgs", href:"tagref.html#tags_constructor", target:"content"};
+var node_tagref_tags_constructor = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.7&nbsp;Property", href:"tagref.html#tags_property", target:"content"};
+var node_tagref_tags_property = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.8&nbsp;DynamicProperty", href:"tagref.html#tags_dynamicproperty", target:"content"};
+var node_tagref_tags_dynamicproperty = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.9&nbsp;ObjectRef", href:"tagref.html#tags_ref", target:"content"};
+var node_tagref_tags_ref = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.10&nbsp;Array", href:"tagref.html#tags_array", target:"content"};
+var node_tagref_tags_array = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.11&nbsp;StaticPropertyRef", href:"tagref.html#tags_static", target:"content"};
+var node_tagref_tags_static = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.12&nbsp;Simple Values", href:"tagref.html#tags_simple", target:"content"};
+var node_tagref_tags_simple = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.13&nbsp;Include", href:"tagref.html#tags_include", target:"content"};
+var node_tagref_tags_include = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.9.14&nbsp;Variable", href:"tagref.html#tags_variable", target:"content"};
+var node_tagref_tags_variable = new YAHOO.widget.TextNode(dataObj, node_tagref_tags, false);
+
+dataObj = { label: "17.10&nbsp;Flex Component Wiring", href:"tagref.html#view", target:"content"};
+var node_tagref_view = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.10.1&nbsp;Configure", href:"tagref.html#view_configure", target:"content"};
+var node_tagref_view_configure = new YAHOO.widget.TextNode(dataObj, node_tagref_view, false);
+
+dataObj = { label: "17.11&nbsp;Flex Logging", href:"tagref.html#logging_flex", target:"content"};
+var node_tagref_logging_flex = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.11.1&nbsp;Target", href:"tagref.html#logging_flex_target", target:"content"};
+var node_tagref_logging_flex_target = new YAHOO.widget.TextNode(dataObj, node_tagref_logging_flex, false);
+
+dataObj = { label: "17.12&nbsp;Flash Logging", href:"tagref.html#logging_flash", target:"content"};
+var node_tagref_logging_flash = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.12.1&nbsp;LogFactory", href:"tagref.html#logging_flash_factory", target:"content"};
+var node_tagref_logging_flash_factory = new YAHOO.widget.TextNode(dataObj, node_tagref_logging_flash, false);
+
+dataObj = { label: "17.12.2&nbsp;Logger", href:"tagref.html#logging_flash_logger", target:"content"};
+var node_tagref_logging_flash_logger = new YAHOO.widget.TextNode(dataObj, node_tagref_logging_flash, false);
+
+dataObj = { label: "17.12.3&nbsp;Appender", href:"tagref.html#logging_flash_appender", target:"content"};
+var node_tagref_logging_flash_appender = new YAHOO.widget.TextNode(dataObj, node_tagref_logging_flash, false);
+
+dataObj = { label: "17.13&nbsp;Flash Localization", href:"tagref.html#resources_flash", target:"content"};
+var node_tagref_resources_flash = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.13.1&nbsp;ResourceManager", href:"tagref.html#resources_flash_manager", target:"content"};
+var node_tagref_resources_flash_manager = new YAHOO.widget.TextNode(dataObj, node_tagref_resources_flash, false);
+
+dataObj = { label: "17.13.2&nbsp;Locale", href:"tagref.html#resources_flash_locale", target:"content"};
+var node_tagref_resources_flash_locale = new YAHOO.widget.TextNode(dataObj, node_tagref_resources_flash, false);
+
+dataObj = { label: "17.13.3&nbsp;ResourceBundle", href:"tagref.html#resources_flash_bundle", target:"content"};
+var node_tagref_resources_flash_bundle = new YAHOO.widget.TextNode(dataObj, node_tagref_resources_flash, false);
+
+dataObj = { label: "17.14&nbsp;Pimento Data Services", href:"tagref.html#pimento", target:"content"};
+var node_tagref_pimento = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.14.1&nbsp;Config", href:"tagref.html#pimento_config", target:"content"};
+var node_tagref_pimento_config = new YAHOO.widget.TextNode(dataObj, node_tagref_pimento, false);
+
+dataObj = { label: "17.14.2&nbsp;Service", href:"tagref.html#pimento_service", target:"content"};
+var node_tagref_pimento_service = new YAHOO.widget.TextNode(dataObj, node_tagref_pimento, false);
+
+dataObj = { label: "17.15&nbsp;Cinnamon Remoting", href:"tagref.html#cinnamon", target:"content"};
+var node_tagref_cinnamon = new YAHOO.widget.TextNode(dataObj, node_tagref_intro, false);
+
+dataObj = { label: "17.15.1&nbsp;Channel", href:"tagref.html#cinnamon_channel", target:"content"};
+var node_tagref_cinnamon_channel = new YAHOO.widget.TextNode(dataObj, node_tagref_cinnamon, false);
+
+dataObj = { label: "17.15.2&nbsp;Service", href:"tagref.html#cinnamon_service", target:"content"};
+var node_tagref_cinnamon_service = new YAHOO.widget.TextNode(dataObj, node_tagref_cinnamon, false);
+
+dataObj = { label: "Spicelib AS3 Library", href:"spicelib-overview.html#intro", target:"content"};
+var node_spicelib = new YAHOO.widget.TextNode(dataObj, root, true);
+
+
+
+dataObj = { label: "18&nbsp;Spicelib Overview", href:"spicelib-overview.html#intro", target:"content"};
+var node_spicelib__overview_intro = new YAHOO.widget.TextNode(dataObj, node_spicelib, false);
+
+dataObj = { label: "18.1&nbsp;Purpose of the library", href:"spicelib-overview.html#purpose", target:"content"};
+var node_spicelib__overview_purpose = new YAHOO.widget.TextNode(dataObj, node_spicelib__overview_intro, false);
+
+dataObj = { label: "18.2&nbsp;Spicelib Projects", href:"spicelib-overview.html#projects", target:"content"};
+var node_spicelib__overview_projects = new YAHOO.widget.TextNode(dataObj, node_spicelib__overview_intro, false);
+
+dataObj = { label: "18.3&nbsp;Project Dependencies", href:"spicelib-overview.html#dependencies", target:"content"};
+var node_spicelib__overview_dependencies = new YAHOO.widget.TextNode(dataObj, node_spicelib__overview_intro, false);
+
+dataObj = { label: "19&nbsp;Reflection", href:"reflection.html#intro", target:"content"};
+var node_reflection_intro = new YAHOO.widget.TextNode(dataObj, node_spicelib, false);
+
+dataObj = { label: "19.1&nbsp; The basics", href:"reflection.html#basics", target:"content"};
+var node_reflection_basics = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.2&nbsp;Obtaining ClassInfo instances", href:"reflection.html#classinfo", target:"content"};
+var node_reflection_classinfo = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.3&nbsp;Automatic type conversion", href:"reflection.html#conversion", target:"content"};
+var node_reflection_conversion = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.4&nbsp;Reflecting on properties", href:"reflection.html#properties", target:"content"};
+var node_reflection_properties = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.5&nbsp;Reflecting on methods", href:"reflection.html#methods", target:"content"};
+var node_reflection_methods = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.6&nbsp;Reflecting on constructors", href:"reflection.html#constructors", target:"content"};
+var node_reflection_constructors = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.7&nbsp;Reflecting on metadata tags", href:"reflection.html#metadata", target:"content"};
+var node_reflection_metadata = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.8&nbsp;Mapping classes to metadata tags", href:"reflection.html#metadata_mapping", target:"content"};
+var node_reflection_metadata_mapping = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "19.9&nbsp;Working with ApplicationDomains", href:"reflection.html#appdomains", target:"content"};
+var node_reflection_appdomains = new YAHOO.widget.TextNode(dataObj, node_reflection_intro, false);
+
+dataObj = { label: "20&nbsp;XML to Object Mapper", href:"xmlmapper.html#intro", target:"content"};
+var node_xmlmapper_intro = new YAHOO.widget.TextNode(dataObj, node_spicelib, false);
+
+dataObj = { label: "20.1&nbsp;Usage Example", href:"xmlmapper.html#example", target:"content"};
+var node_xmlmapper_example = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.2&nbsp;Metadata Configuration and Defaults", href:"xmlmapper.html#config", target:"content"};
+var node_xmlmapper_config = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.3&nbsp;Mapping Attributes", href:"xmlmapper.html#attributes", target:"content"};
+var node_xmlmapper_attributes = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.4&nbsp;Mapping Child Text Nodes", href:"xmlmapper.html#childtextnodes", target:"content"};
+var node_xmlmapper_childtextnodes = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.5&nbsp;Mapping Text Nodes", href:"xmlmapper.html#textnodes", target:"content"};
+var node_xmlmapper_textnodes = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.6&nbsp;Mapping Child Elements", href:"xmlmapper.html#childelements", target:"content"};
+var node_xmlmapper_childelements = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.7&nbsp;Mapping disjointed Choices", href:"xmlmapper.html#choices", target:"content"};
+var node_xmlmapper_choices = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.8&nbsp;Working with Namespaces", href:"xmlmapper.html#namespaces", target:"content"};
+var node_xmlmapper_namespaces = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.9&nbsp;Validation", href:"xmlmapper.html#validation", target:"content"};
+var node_xmlmapper_validation = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.10&nbsp;Programmatic Mapper Setup", href:"xmlmapper.html#programmatic", target:"content"};
+var node_xmlmapper_programmatic = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.11&nbsp;Custom Mapping Tags", href:"xmlmapper.html#tags", target:"content"};
+var node_xmlmapper_tags = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "20.12&nbsp;Creating Custom Mappers", href:"xmlmapper.html#custom", target:"content"};
+var node_xmlmapper_custom = new YAHOO.widget.TextNode(dataObj, node_xmlmapper_intro, false);
+
+dataObj = { label: "21&nbsp;The Command Framework", href:"commands.html#intro", target:"content"};
+var node_commands_intro = new YAHOO.widget.TextNode(dataObj, node_spicelib, false);
+
+dataObj = { label: "21.1&nbsp;Implementing a Command", href:"commands.html#implementation", target:"content"};
+var node_commands_implementation = new YAHOO.widget.TextNode(dataObj, node_commands_intro, false);
+
+dataObj = { label: "21.1.1&nbsp;Synchronous Commands", href:"commands.html#sync", target:"content"};
+var node_commands_sync = new YAHOO.widget.TextNode(dataObj, node_commands_implementation, false);
+
+dataObj = { label: "21.1.2&nbsp;Asynchronous Commands", href:"commands.html#async", target:"content"};
+var node_commands_async = new YAHOO.widget.TextNode(dataObj, node_commands_implementation, false);
+
+dataObj = { label: "21.1.3&nbsp;Error Handling", href:"commands.html#errors", target:"content"};
+var node_commands_errors = new YAHOO.widget.TextNode(dataObj, node_commands_implementation, false);
+
+dataObj = { label: "21.1.4&nbsp;Command Cancellation", href:"commands.html#cancellation", target:"content"};
+var node_commands_cancellation = new YAHOO.widget.TextNode(dataObj, node_commands_implementation, false);
+
+dataObj = { label: "21.1.5&nbsp;Producing a Result", href:"commands.html#results", target:"content"};
+var node_commands_results = new YAHOO.widget.TextNode(dataObj, node_commands_implementation, false);
+
+dataObj = { label: "21.1.6&nbsp;Executing a Command", href:"commands.html#execution", target:"content"};
+var node_commands_execution = new YAHOO.widget.TextNode(dataObj, node_commands_implementation, false);
+
+dataObj = { label: "21.2&nbsp;Command Groups", href:"commands.html#groups", target:"content"};
+var node_commands_groups = new YAHOO.widget.TextNode(dataObj, node_commands_intro, false);
+
+dataObj = { label: "21.2.1&nbsp;Command Sequences", href:"commands.html#sequences", target:"content"};
+var node_commands_sequences = new YAHOO.widget.TextNode(dataObj, node_commands_groups, false);
+
+dataObj = { label: "21.2.2&nbsp;Parallel Command Execution", href:"commands.html#parallel", target:"content"};
+var node_commands_parallel = new YAHOO.widget.TextNode(dataObj, node_commands_groups, false);
+
+dataObj = { label: "21.2.3&nbsp;Lazy Command Instantiation", href:"commands.html#groups_lazy", target:"content"};
+var node_commands_groups_lazy = new YAHOO.widget.TextNode(dataObj, node_commands_groups, false);
+
+dataObj = { label: "21.2.4&nbsp;Timeouts and Delayed Execution", href:"commands.html#groups_timeouts", target:"content"};
+var node_commands_groups_timeouts = new YAHOO.widget.TextNode(dataObj, node_commands_groups, false);
+
+dataObj = { label: "21.2.5&nbsp;Combining the APIs for Single and Grouped Commands", href:"commands.html#groups_combine_APIs", target:"content"};
+var node_commands_groups_combine_APIs = new YAHOO.widget.TextNode(dataObj, node_commands_groups, false);
+
+dataObj = { label: "21.3&nbsp;Passing Data to Commands", href:"commands.html#data", target:"content"};
+var node_commands_data = new YAHOO.widget.TextNode(dataObj, node_commands_intro, false);
+
+dataObj = { label: "21.3.1&nbsp;Using a Shared Model Instance", href:"commands.html#shared_model", target:"content"};
+var node_commands_shared_model = new YAHOO.widget.TextNode(dataObj, node_commands_data, false);
+
+dataObj = { label: "21.3.2&nbsp;Data Passed by the Framework", href:"commands.html#pass_results", target:"content"};
+var node_commands_pass_results = new YAHOO.widget.TextNode(dataObj, node_commands_data, false);
+
+dataObj = { label: "21.3.3&nbsp;Passing Data into the Constructor", href:"commands.html#data_constructor", target:"content"};
+var node_commands_data_constructor = new YAHOO.widget.TextNode(dataObj, node_commands_data, false);
+
+dataObj = { label: "21.3.4&nbsp;Passing Data to the Execute Method", href:"commands.html#data_execute", target:"content"};
+var node_commands_data_execute = new YAHOO.widget.TextNode(dataObj, node_commands_data, false);
+
+dataObj = { label: "21.3.5&nbsp;Passing Data Programmatically", href:"commands.html#data_programmatically", target:"content"};
+var node_commands_data_programmatically = new YAHOO.widget.TextNode(dataObj, node_commands_data, false);
+
+dataObj = { label: "21.4&nbsp;Command Flows", href:"commands.html#flows", target:"content"};
+var node_commands_flows = new YAHOO.widget.TextNode(dataObj, node_commands_intro, false);
+
+dataObj = { label: "21.4.1&nbsp;Linking by Result Type", href:"commands.html#link_type", target:"content"};
+var node_commands_link_type = new YAHOO.widget.TextNode(dataObj, node_commands_flows, false);
+
+dataObj = { label: "21.4.2&nbsp;Linking by Result Value", href:"commands.html#link_value", target:"content"};
+var node_commands_link_value = new YAHOO.widget.TextNode(dataObj, node_commands_flows, false);
+
+dataObj = { label: "21.4.3&nbsp;Linking by Result Property", href:"commands.html#link_property", target:"content"};
+var node_commands_link_property = new YAHOO.widget.TextNode(dataObj, node_commands_flows, false);
+
+dataObj = { label: "21.4.4&nbsp;Linking to the End of the Flow", href:"commands.html#link_end", target:"content"};
+var node_commands_link_end = new YAHOO.widget.TextNode(dataObj, node_commands_flows, false);
+
+dataObj = { label: "21.4.5&nbsp;Specifying Fallback Links", href:"commands.html#link_default", target:"content"};
+var node_commands_link_default = new YAHOO.widget.TextNode(dataObj, node_commands_flows, false);
+
+dataObj = { label: "21.4.6&nbsp;Custom Links", href:"commands.html#custom_links", target:"content"};
+var node_commands_custom_links = new YAHOO.widget.TextNode(dataObj, node_commands_flows, false);
+
+dataObj = { label: "21.5&nbsp;Extending the Framework", href:"commands.html#extensions", target:"content"};
+var node_commands_extensions = new YAHOO.widget.TextNode(dataObj, node_commands_intro, false);
+
+dataObj = { label: "21.5.1&nbsp;Implementing a Command Adapter", href:"commands.html#adapter", target:"content"};
+var node_commands_adapter = new YAHOO.widget.TextNode(dataObj, node_commands_extensions, false);
+
+dataObj = { label: "21.5.2&nbsp;Implementing a Result Processor", href:"commands.html#resultprocessors", target:"content"};
+var node_commands_resultprocessors = new YAHOO.widget.TextNode(dataObj, node_commands_extensions, false);
+
+dataObj = { label: "21.5.3&nbsp;Using the Lifecycle Hooks", href:"commands.html#lifecycle", target:"content"};
+var node_commands_lifecycle = new YAHOO.widget.TextNode(dataObj, node_commands_extensions, false);
+
+dataObj = { label: "22&nbsp;Logging for Flash Applications", href:"spicelib-logging.html#intro", target:"content"};
+var node_spicelib__logging_intro = new YAHOO.widget.TextNode(dataObj, node_spicelib, false);
+
+dataObj = { label: "22.1&nbsp;Adding log statements to application code", href:"spicelib-logging.html#application", target:"content"};
+var node_spicelib__logging_application = new YAHOO.widget.TextNode(dataObj, node_spicelib__logging_intro, false);
+
+dataObj = { label: "22.2&nbsp;Log levels", href:"spicelib-logging.html#levels", target:"content"};
+var node_spicelib__logging_levels = new YAHOO.widget.TextNode(dataObj, node_spicelib__logging_intro, false);
+
+dataObj = { label: "22.3&nbsp;Configuration", href:"spicelib-logging.html#config", target:"content"};
+var node_spicelib__logging_config = new YAHOO.widget.TextNode(dataObj, node_spicelib__logging_intro, false);
+
+dataObj = { label: "22.3.1&nbsp;Using Parsley XML Tags", href:"spicelib-logging.html#config_parsley", target:"content"};
+var node_spicelib__logging_config_parsley = new YAHOO.widget.TextNode(dataObj, node_spicelib__logging_config, false);
+
+dataObj = { label: "22.3.2&nbsp;Programmatic Configuration", href:"spicelib-logging.html#config_programmatic", target:"content"};
+var node_spicelib__logging_config_programmatic = new YAHOO.widget.TextNode(dataObj, node_spicelib__logging_config, false);
+
+dataObj = { label: "22.4&nbsp;Customizing the Logging Framework", href:"spicelib-logging.html#customize", target:"content"};
+var node_spicelib__logging_customize = new YAHOO.widget.TextNode(dataObj, node_spicelib__logging_intro, false);
+
+
+            <!--[CDATA[
+            tree.draw();
+            
+        }
+        // ]]-->
+        </script>
+    </head>
+    <body onLoad="treeInit();">
+	
+	
+		<div style="float: left; width: 331px; height: 99%; border-right: 2px solid #ebd3d3;">
+	
+			<div id="project_name" style="margin-left: 10px; margin-top: 10px;">
+				<img src="../img/parsley-spicelib.jpg" width="276" height="23" alt="Parsley + Spicelib"/>
+			</div>	
+			
+			<div id="project_name" style="margin-left: 18px; margin-top: 10px; font-size: 12px; font-weight: bold;">DEVELOPER MANUAL</div>
+			
+			<div id="rule_horiz"> </div>
+			
+			<!-- BEGIN NAV WRAPPER -->
+		
+			<div class="yui-skin-sam" id="nav_wrapper">
+				<div style="margin-left: 12px;" id="nav_content"></div>
+			</div>
+			<!-- END NAV WRAPPER -->
+			
+		</div>
+		
+ 
+</body>
+</html>

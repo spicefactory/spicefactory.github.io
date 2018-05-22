@@ -1,0 +1,1114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>21 The Command Framework</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>21 The Command Framework</h1>
+
+<p class="paragraph">The Command Framework is a general abstraction for synchronous and asynchronous operations. It aims at simplifying
+and streamlining the creation of asynchronous operations and grouping them for sequential or parallel execution.</p>
+
+<p class="paragraph">Many operations in Flex and Flash operations are asynchronous, as AS3 is not multithreaded and there are no 
+blocking calls. Most of these operations come with their own APIs and their own particular set of events
+that mark completion or failure of its execution. Chaining several of these operations together usually requires
+a lot of plumbing that distracts from the actual business logic. With Spicelib Commands it is easier to keep
+each operation in a clean self-contained unit and easily chain them together with a convenient, fluent builder API.</p>
+
+<p class="paragraph">The Commands Framework is a replacement for the Task Framework that was part of Spicelib 1 and 2.
+It is intended to be simpler to use and more powerful at the same time. The Task Framework is discontinued
+and no longer part of Spicelib 3.</p>
+<h2><a name="implementation"></a>21.1 Implementing a Command</h2>
+
+<p class="paragraph">The implementation of a command follows simple naming conventions. It does not require to extend a framework base class
+or implement a framework interface. There are two major reasons for this design decision. The first is to keep command implementations
+very simple and lightweight and useful even when used without the framework. The second is to keep the method signatures flexible
+to allow to pass data and callbacks to the execute method, as you'll see in the examples. The only downside is a negligible loss in type-safety.</p>
+
+<p class="paragraph">The style of command implementation shown in this section is just the default. The documentation focuses on this style as it is very
+straightforward and should be sufficient for most use cases. If you are picky about details, prefer to code against interfaces or base classes
+instead, have special requirements or are a framework developer who needs additional functionality you can read <a href="commands.php#extensions">21.5&nbsp;Extending the Framework</a>
+for an overview over alternatives.</p>
+
+
+
+
+<h3><a name="sync"></a>21.1.1 Synchronous Commands</h3>
+
+<p class="paragraph">A synchronous command may look as simple as this:</p>
+
+<pre><code>public class SimpleCommand {
+
+    public function execute (): void {
+    
+        trace("I execute, Therefore I am");
+        
+    }
+    
+}
+</code></pre>    
+   
+<p class="paragraph">The only naming convention a synchronous command needs to adhere to, is to have a public method called
+execute. It may have parameters (see <a href="commands.php#data_execute">21.3.4&nbsp;Passing Data to the Execute Method</a>) or a return type (see <a href="commands.php#results">21.1.5&nbsp;Producing a Result</a>),
+but both are optional.</p>    
+
+
+
+<h3><a name="async"></a>21.1.2 Asynchronous Commands</h3>
+
+
+<p class="paragraph">An asynchronous command has to accept a callback function either as a method parameter or a public property.
+It invokes the callback method to signal command completion.</p>
+
+
+
+<p class="subheadline"> Callback as a Method Parameter </p>
+
+<p class="paragraph">Any parameter in the execute method that is of type Function is interpreted as being the callback for an asynchronous
+command. The ordering does not matter, if you also want the framework pass data from previous commands the callback may
+be at any position in the parameter list:</p>
+
+<pre><code>public class MyAsyncCommand {
+
+    public function execute (callback: Function): void {
+    
+        callback(true);
+        
+    }
+    
+}
+</code></pre>  
+
+<p class="paragraph">In the example above the actual execution is synchronous, since the callback is invoked immediately. This is legal, as it 
+allows to implement commands with transparent caching for example (if the result is already available, return it immediately, otherwise
+call some service asynchronously). See the next section for an example for such a command.</p>
+
+
+<p class="subheadline"> Callback as a Public Property </p>
+
+<p class="paragraph">When you start an asynchronous operation, you usually want to keep the callback as a reference and invoke it later. You can store it in a property
+manually when receiving it as a method parameter in the execute method, but in most cases it is more convenient to get it injected into a property:</p>
+
+<pre><code>public class MyAsyncCommand {
+
+    public var callback:Function;
+
+    public function execute (): void {
+    
+        // rest of the implementation omitted for clarity:
+        
+        var result:Object = getResultFromCache();
+        
+        if (result) {
+            callback(result);
+        }
+        else {
+            getService().fetchData(resultHandler, errorHandler);
+        }        
+    }
+    
+    private function resultHandler (result: Object): void {
+        callback(result);
+    }
+    
+    private function errorHandler (error: ErrorEvent): void {
+        callback(error);
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">The naming convention requires that the public property is called callback. In the example above the callback gets invoked immediately
+when cached data is available, otherwise the result and error handlers invoke it later. As you see they both just pass the result or error
+instance to the callback, see the next section to understand how the framework interprets these parameters.</p>
+
+
+<p class="subheadline"> How to Invoke the Callback </p>
+
+<p class="paragraph">The callback invocation is interpreted differently depending on whether you pass a parameter and what type it is of. Each asynchronous command
+can have three different final states after execution, and they are interpreted by the callback as follows:</p>
+
+<ul>
+<li> <strong>Cancellation</strong>: Invoking the callback without parameters. </li>
+<li> <strong>Error</strong>: Passing an instance of <code>Error</code> or <code>ErrorEvent</code> to the callback. </li>
+<li> <strong>Success</strong>: Passing any other type to the callback which gets interpreted as the result of the command. </li>
+</ul>
+
+<p class="paragraph">Per default only <code>Error</code> or <code>ErrorEvent</code> instances are interpreted as an error outcome, but the list
+can be extended with custom error types:</p>
+
+<pre><code>LightCommandAdapter.addErrorType(FaultEvent);
+</code></pre>
+
+<p class="paragraph">Here we add the Flex <code>FaultEvent</code> as an error type. Since Spicelib Commands is a pure AS3 library it does not know
+about Flex classes. The <code>LightCommandAdapter</code> is the class that adapts the type of command demonstrated in this chapter
+to the framework interfaces.</p>
+
+<p class="paragraph">When the command does not produce a result, it is recommended to simply pass <code>true</code> to the callback, as no parameter
+is interpreted as cancellation.</p>
+
+<p class="paragraph">Invoking the callback with more than one parameter is illegal and leads to an error. A function reference is quite weak
+in terms of type-safety, but it allows to keep the command implementation decoupled from the framework APIs. Later releases
+might alternatively allow the injection of a concrete type (e.g. <code>CommandCallback</code>) with a more explicit, typed API.</p> 
+
+
+
+<h3><a name="errors"></a>21.1.3 Error Handling</h3>
+
+<p class="paragraph">If you want to signal an error condition instead of successful completion you can do that for synchronous and asynchronous
+commands in two different ways:</p>
+
+
+<p class="subheadline"> Synchronous Commands </p>
+
+<pre><code>public class FaultyCommand {
+
+    public function execute (): void {
+    
+        throw new Error("Sorry, I do not function properly");
+        
+    }
+    
+}
+</code></pre>  
+
+<p class="paragraph">A synchronous command may simply throw an error. If it is executed in a sequence or flow this will lead to 
+the configured error handling and potentially cancel the sequence or flow with an error event.</p>
+
+
+<p class="subheadline"> Asynchronous Commands </p>
+
+<pre><code>public class FaultyCommand {
+
+    public var callback:Function;
+
+    public function execute (): void {
+    
+        getService().fetchData(resultHandler, errorHandler);
+    }
+    
+    [...]
+    
+    private function errorHandler (error: ErrorEvent): void {
+        callback(error);
+    }
+    
+}
+</code></pre>  
+
+<p class="paragraph">For an asynchronous command an error condition can be signalled by passing a parameter type which is interpreted as an error
+like already shown in the previous section.</p>
+
+
+
+<h3><a name="cancellation"></a>21.1.4 Command Cancellation</h3>
+
+<p class="paragraph">An asynchronous command can support cancellation. There are two ways to cancel a command: from within by invoking
+the callback without parameters, like already shown in preceding sections, or from the outside when the command has
+a method called <code>cancel</code>.</p>
+
+
+<p class="subheadline"> Cancellation from within the Command </p>
+
+<pre><code>public class MyCancellableCommand {
+
+    public var callback:Function;
+    
+    public function execute (): void {
+    
+        callback(); // invocation without parameters interpreted as cancellation
+        
+    }
+    
+}
+</code></pre>  
+
+
+<p class="subheadline"> Cancellation from the Outside </p>
+
+<pre><code>public class MyCancellableCommand {
+
+    public var callback:Function;
+    
+    public function execute (): void {
+    
+        // start operation
+        
+    }
+    
+    public function cancel (): void {
+    
+        // cancel operation
+        
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">Here the command adds a method called <code>cancel</code>. If the command is part of a sequence or flow which
+gets cancelled, the framework will invoke the <code>cancel</code> method so that you can stop whatever asynchronous
+operation you started. When the active command in a sequence does not have a cancel method, the entire sequence
+cannot be cancelled and invocation of its cancel method leads to an error. Still, adding a cancel method is 
+entirely optional.</p>
+
+<p class="paragraph">When a command gets cancelled from the outside there is no need to invoke the callback to signal cancellation.</p>
+
+<p class="paragraph">Note that such a cancel method is only meant to be called by the framework. Invoking it directly in your
+application code does not have any effect as the framework cannot intercept these calls.</p>
+
+
+
+<h3><a name="results"></a>21.1.5 Producing a Result</h3>
+
+<p class="paragraph">Any command (both synchronous and asynchronous) can produce a result. This is particularly useful as the 
+result value can get injected into subsequent commands (either to their constructor or their execute method) and also
+to result handlers you add to command executors (see the next section).</p>
+
+
+<p class="subheadline"> Synchronous Commands </p>
+
+<p class="paragraph">A synchronous command can produce a result through a return value:</p>
+
+<pre><code>public class CommandWithResult {
+
+    public function execute (): String {
+    
+        return "Hello World!";
+        
+    }
+    
+}
+</code></pre>    
+
+<p class="paragraph">The result can be of any type.</p>
+
+
+<p class="subheadline"> Asynchronous Commands </p>
+
+<p class="paragraph">An asynchronous command can produce a result through passing a value to the callback function:</p>
+
+<pre><code>public class MyAsyncCommand {
+
+    public var callback:Function;
+
+    public function execute (): void {
+    
+        getService().fetchData(resultHandler);
+        
+    }
+    
+    private function resultHandler (result: Object): void {
+        callback(result);
+    }
+    
+}
+</code></pre>
+
+<p class="paragraph">Again, the result can be of any type, except for the few interpreted as an error (like <code>Error</code> and <code>ErrorEvent</code>).</p>
+
+
+
+<h3><a name="execution"></a>21.1.6 Executing a Command</h3>
+
+<p class="paragraph">The framework comes with a fluent API to create commands, add result and error handlers, specify timeouts and execute them.
+For a single command this is usually not particularly useful, as you could as well just instantiate and invoke them yourself. But even
+for a single command it allows to wrap features like timeouts around your command without the need to deal with this type of functionality
+in the command implementation.</p>
+
+<pre><code>Commands.wrap(new MySimpleCommand())
+    .timeout(10000)
+    .result(resultHandler)
+    .error(errorHandler)
+    .execute();
+
+private function resultHandler (result: Object): void {
+    [...]
+}
+
+private function errorHandler (cause: Object): void {
+    [...]
+}
+</code></pre>
+
+<p class="paragraph">The real power of this API though is grouping commands for sequential or parallel execution or to command flows where
+subsequent commands are determined by dynamic links that interpret the result of the preceding command. You can find examples
+for how to execute these command types in <a href="commands.php#groups">21.2&nbsp;Command Groups</a> and <a href="commands.php#flows">21.4&nbsp;Command Flows</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<h2><a name="groups"></a>21.2 Command Groups</h2>
+
+<p class="paragraph">The real power behind the concept of abstracting asynchronous operations becomes apparent when
+you want to execute more than just one command. Spicelib Commands allow for grouping commands
+for parallel or sequential execution. There is also an advanced grouping mode called command flows
+that uses dynamic decision points between commands. See <a href="commands.php#flows">21.4&nbsp;Command Flows</a> for details.
+This chapter only covers sequential and parallel execution.</p>
+
+
+
+<h3><a name="sequences"></a>21.2.1 Command Sequences</h3>
+
+<p class="paragraph">A simple sequence with 2 commands can be created and executed like this:</p>
+
+<pre><code>Commands
+    .asSequence()
+    .add(new LoginCommand())
+    .add(new LoadUserProfileCommand())
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+    
+private function resultHandler (result: UserProfile): void {
+
+    [...]
+    
+}
+
+private function errorHandler (failure: CommandFailure): void {
+    
+    trace("Command " + failure.target + " failed, cause: " + failure.cause);
+    
+}
+</code></pre>
+
+<p class="paragraph">The fluent API allows to declare the commands and handlers of the group and execute it in one statement.</p>
+
+<p class="paragraph">The error handler always has to accept a parameter of type <code>CommandFailure</code>. This is a type that neither
+extends <code>Error</code> nor <code>ErrorEvent</code>. It allows to inspect the target command in the group that failed
+as well as the cause (usually an instance of type <code>Error</code> nor <code>ErrorEvent</code>, but potentially something
+else).</p>
+
+<p class="paragraph">The result handler above is only interested in the last result produced in that sequence. This might be quite common
+for sequences, in particular in cases where the result of previous commands get injected into and processed by subsequent
+commands (see <a href="commands.php#data">21.3&nbsp;Passing Data to Commands</a> for details).</p>
+
+<p class="paragraph">Alternatively all results produced by the sequence may get inspected:</p>
+
+<pre><code>Commands
+    .asSequence()
+    .add(new LoadContactsCommand())
+    .add(new LoadUserProfileCommand())
+    .allResults(resultHandler)
+    .execute();
+    
+private function resultHandler (result: CommandData): void {
+
+    trace("Contacts: " + result.getObject(Contacts));
+    trace("Profile: " + result.getObject(UserProfile));
+    
+}
+</code></pre>
+
+
+<h3><a name="parallel"></a>21.2.2 Parallel Command Execution</h3>
+
+<p class="paragraph">Less common than sequences, but still quite handy to have when needed.
+The syntax is identical expect for calling <code>inParallel</code> instead of <code>asSequence</code>:</p>
+
+<pre><code>Commands
+    .inParallel()
+    .add(new LoadContactsCommand())
+    .add(new LoadUserProfileCommand())
+    .allResults(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre>
+
+<p class="paragraph">The rules for result and error handlers are the same as for sequences.</p>
+
+
+
+<h3><a name="groups_lazy"></a>21.2.3 Lazy Command Instantiation</h3>
+
+<p class="paragraph">Instead of passing existing instances to <code>add</code>, you can alternatively just 
+specify the command class. This way the instantiation will be deferred until the command actually gets used.
+This might be useful for flows (where some commands may never get executed) or when you want to pass results
+of preceding commands to the constructor of a subsequent one, which is only possible if the framework creates
+the instance for you.</p>
+
+<pre><code>Commands
+    .asSequence()
+    .<span style="color:#FF0000;">create</span>(LoginCommand)
+    .<span style="color:#FF0000;">create</span>(LoadUserProfileCommand)
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre> 
+
+
+
+<h3><a name="groups_timeouts"></a>21.2.4 Timeouts and Delayed Execution</h3>
+
+<p class="paragraph">Command Groups allow for the same set of optional features like the methods for executing a single command:</p>
+
+<pre><code>Commands
+    .asSequence()
+    <span style="color:#FF0000;">.delay(1000)</span>
+    .add(new LoginCommand())
+    .add(new LoadUserProfileCommand())
+    <span style="color:#FF0000;">.timeout(30000)</span>
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre>
+
+<p class="paragraph">In case of sequences the delay can be placed anywhere in the sequence, before the first or between
+two commands.</p>
+
+
+
+<h3><a name="groups_combine_APIs"></a>21.2.5 Combining the APIs for Single and Grouped Commands</h3>
+
+<p class="paragraph">Sometimes you may want to use the API for dealing with a single command to define something
+specific to that instance and then add it as part of a sequence or flow. In this case you can simply
+call <code>build</code> in the end instead of <code>execute</code>, which just gives you a command instance
+with those extra features applied, but without actually executing it. You can then add it to any
+group of commands:</p>
+
+<pre><code>var login:Command = Commands
+    .wrap(new LoginCommand())
+    .timeout(30000)
+    .result(someHandlerOnlyForThisCommand)
+    .<span style="color:#FF0000;">build</span>();
+    
+Commands
+    .asSequence()
+    .add(<span style="color:#FF0000;">login</span>)
+    .add(new LoadUserProfileCommand())
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre>
+
+
+<h2><a name="data"></a>21.3 Passing Data to Commands</h2>
+
+<p class="paragraph">Often all commands executed in a sequence are self-contained and do not need to know each other.
+But sometimes the result of one command is needed when executing one of the subsequent commands.
+Preferrably this happens without the subsequent command needing any kind of knowledge about
+the type of the command that produced the result or any of its implementation details.
+This section provides an overview over the available options for passing results in a decoupled way.</p>
+
+
+
+<h3><a name="shared_model"></a>21.3.1 Using a Shared Model Instance</h3>
+
+<p class="paragraph">When the commands executed in a sequence are all relatively close in a sense that they belong 
+to the same functional area of the application, the most straightforward way is often to use 
+a shared application-specific model instance that multiple commands have access to:</p>
+
+<pre><code>var <span style="color:#FF0000;">model</span>:LoginModel = new LoginModel();
+Commands
+    .asSequence()
+    .add(new LoginCommand(<span style="color:#FF0000;">model</span>))
+    .add(new LoadUserProfileCommand(<span style="color:#FF0000;">model</span>))
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre>
+
+<p class="paragraph">Here the model gets passed to the constructor of both command instances. The first one can pass
+the result to the model before dispatching the complete event, so that the second instance has access
+to it when it gets executed.</p>
+
+<p class="paragraph">For objects from the same functional area where decoupling commands from each other is not a concern,
+this might sometimes be the best approach, as it is very easy to use and does not require any help from the framework.</p>
+
+
+
+<h3><a name="pass_results"></a>21.3.2 Data Passed by the Framework</h3>
+
+<p class="paragraph">When you want to keep commands decoupled in cases where the tasks they perform are largely unrelated,
+you can rely on the framework to pass the results for you. There are multiple different approaches available
+as described below. Note that although this is based on some sort of injection, it does not require an
+IOC container. This section still only describes the capabilities of the standalone Spicelib Commands project.</p>
+
+
+
+<h3><a name="data_constructor"></a>21.3.3 Passing Data into the Constructor</h3>
+
+<p class="paragraph">Any result from a command that has already been completed as part of a sequence or flow can be
+passed to the constructor of a subsequent command:</p>
+
+<pre><code>function MyCommand (user:User, config:XML) {
+    this.user = user;
+    this.config = config;
+}
+</code></pre>
+
+<p class="paragraph">The logic for finding the result to inject is fairly simple: the framework looks for the result by type
+(reflecting on the constructor argument types), and if there is more than one matching type picks the one
+that was added last. This should already cover most real-world requirements. If you need more complex result
+lookup capabilities, you can still do explicit lookups as described further below.</p>
+
+<p class="paragraph">If no matching result is found, the sequence will abort with an error, unless you marked the parameter
+as optional:</p>
+
+<pre><code>function MyCommand (user:User, config:XML = null) {
+</code></pre> 
+
+<p class="paragraph">It should be obvious that constructor injection can only work when you pass the type
+of the command to the <code>create</code> method instead of an existing instance, as you need
+to leave it up to the framework to instantiate the command for you in this case:</p>
+
+<pre><code>Commands
+    .asSequence()
+    .<span style="color:#FF0000;">create</span>(LoginCommand)
+    .<span style="color:#FF0000;">create</span>(LoadUserProfileCommand)
+    .<span style="color:#FF0000;">create</span>(MyCommand)
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre> 
+
+<p class="paragraph">It is recommended to only use constructor injection when you target Flash Player 10.1 or newer,
+as older players had a nasty reflection bug that always reported <code>*</code> as the parameter type
+when you reflected before the VM created the first instance of that class.</p>
+
+
+
+<h3><a name="data_execute"></a>21.3.4 Passing Data to the Execute Method</h3>
+
+<p class="paragraph">Alternatively results from preceding commands can also get injected into the execute method:</p>
+
+<pre><code>public function execute (user: User, config: XML): void {
+    
+    [...]
+    
+}
+</code></pre>
+
+<p class="paragraph">The rules are the same as for constructor injection: the framework looks for the result by type
+(reflecting on the parameter types), and if there is more than one matching type picks the one
+that was added last.</p>
+
+<p class="paragraph">Obviously this type of injection also works for existing command instances:</p>
+
+<pre><code>Commands
+    .asSequence()
+    .add(LoginCommand)
+    .add(LoadUserProfileCommand)
+    .add(MyCommand)
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre> 
+
+
+
+<h3><a name="data_programmatically"></a>21.3.5 Passing Data Programmatically</h3>
+
+<p class="paragraph">Sometimes you want to be flexible. You might want to expect a User instance as a parameter
+of the execute method, and in some cases it might come from a preceding login command, while in
+other cases it might already be available. In the latter case you can manually pass data when
+wiring up the commands:</p>
+
+<pre><code>var user:User = ...;
+
+Commands
+    .asSequence()
+    .add(LoadUserProfileCommand)
+    .add(MyCommand)
+    .<span style="color:#FF0000;">data(user)</span>
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre> 
+
+<p class="paragraph">The outcome is the same as in previous examples where the User instance was produced by a login command.
+The data method in the builder API can be invoked multiple times.</p>
+ 
+<h2><a name="flows"></a>21.4 Command Flows</h2>
+
+<p class="paragraph">Command Flows add the concept of decision points to define a dynamic sequence of commands. 
+The command builder API offers several declarative means of defining decision points based on 
+result type, value or property value to cover the most common scenarios as well as a way to add a custom link
+instance in case some other type of decision logic is required. A command link simply determines the next
+command to execute based on the result of the previous command.</p>
+
+
+
+<h3><a name="link_type"></a>21.4.1 Linking by Result Type</h3>
+
+<p class="paragraph">Let's show a simple example where you want to execute the command to load the admin console of your application
+only when the user that just logged in is indeed an administrator. This example assumes that the instance
+returned from the server is different depending on the role of the user:</p>
+
+<pre><code>var profileLoader:Command = new ProfileLoaderCommand("some/serviceUrl");
+
+var flow:CommandFlowBuilder = Commands.asFlow();
+
+flow.add(new LoginCommand())
+    .<span style="color:#FF0000;">linkResultType(AdminUser)</span>.toCommandType(LoadAdminConsoleCommand)
+    .<span style="color:#FF0000;">linkResultType(User)</span>.toCommandInstance(profileLoader);
+        
+flow.create(LoadAdminConsoleCommand)
+    .linkAllResults().toCommandInstance(profileLoader);
+    
+flow.timeout(30000)    
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre>   
+
+<p class="paragraph">We use the <code>linkResultType</code> method to branch to different command types based on the type of the result
+produced by the <code>LoginCommand</code>.</p>
+
+
+
+<h3><a name="link_value"></a>21.4.2 Linking by Result Value</h3>
+
+
+<p class="paragraph">You may not always have commands that finish with a different result
+type for all possible outcomes. In these cases you can alternatively link by value and not by class and use
+something like String constants that the commands may set as a result:</p>
+
+<pre><code>var profileLoader:Command = new ProfileLoaderCommand("some/serviceUrl");
+
+var flow:CommandFlowBuilder = Commands.asFlow();
+
+flow.add(new LoginCommand())
+    .<span style="color:#FF0000;">linkResultValue(MyConstants.ADMIN_LOGIN)</span>.toCommandType(LoadAdminConsoleCommand)
+    .<span style="color:#FF0000;">linkResultValue(MyConstants.USER_LOGIN)</span>.toCommandInstance(profileLoader);
+        
+flow.create(LoadAdminConsoleCommand)
+    .linkAllResults().toCommandInstance(profileLoader);
+    
+flow.add(profileLoader)
+    .linkAllResults().toFlowEnd();
+    
+flow.timeout(30000)    
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre>
+
+
+
+<h3><a name="link_property"></a>21.4.3 Linking by Result Property</h3>
+
+
+<p class="paragraph">If the result type is always the same, but carries a property value that can be used to determine the
+next command, the following syntax can be used:</p>
+
+<pre><code>var profileLoader:Command = new ProfileLoaderCommand("some/serviceUrl");
+
+var flow:CommandFlowBuilder = Commands.asFlow();
+
+flow.add(new LoginCommand())
+    .<span style="color:#FF0000;">linkResultProperty("isAdmin", true)</span>.toCommandType(LoadAdminConsoleCommand)
+    .<span style="color:#FF0000;">linkResultProperty("isAdmin", false)</span>.toCommandInstance(profileLoader);
+        
+flow.create(LoadAdminConsoleCommand)
+    .linkAllResults().toCommandInstance(profileLoader);
+
+flow.add(profileLoader)
+    .linkAllResults().toFlowEnd();
+       
+flow.timeout(30000)    
+    .lastResult(resultHandler)
+    .error(errorHandler)
+    .execute();
+</code></pre>
+
+<p class="paragraph">Here the login command will always return an instance of <code>User</code>, but the <code>isAdmin</code> property
+lets us know whether she has the admin role:</p>
+
+<pre><code>public class User {
+
+    public var isAdmin: Boolean;
+    
+    [...]
+    
+}
+</code></pre>
+
+
+
+<h3><a name="link_end"></a>21.4.4 Linking to the End of the Flow</h3>
+
+<p class="paragraph">Like already shown in all preceding examples, a link can explicitly point to the end of the flow:</p>
+
+<pre><code>flow.add(profileLoader)
+    .linkAllResults().<span style="color:#FF0000;">toFlowEnd()</span>;
+</code></pre>
+
+<p class="paragraph">Since the default behaviour of a command flow in case no link matches the result is to cancel the flow,
+the end of the flow has to be specified explicitly to reach successful completion of the flow.</p>
+
+
+
+<h3><a name="link_default"></a>21.4.5 Specifying Fallback Links</h3>
+
+<p class="paragraph">Whenever none of the specified links match it is interpreted as cancellation of the flow.
+Alternatively you can also specify a catch-all link like this:</p>
+
+<pre><code>flow.add(new LoginCommand())
+    .linkResultType(AdminUser).toCommandType(LoadAdminConsoleCommand)
+    .linkResultType(User).toCommandInstance(profileLoader);
+    .<span style="color:#FF0000;">linkAllResults</span>().toCommandType(InitGuestModeCommand);
+</code></pre>    
+
+<p class="paragraph">Here the final link is only processed if the first two links both do not match the results.</p>
+
+
+
+<h3><a name="custom_links"></a>21.4.6 Custom Links</h3>
+
+<p class="paragraph">The examples above covered a more declarative way of linking commands that should be fine for many
+real world scenarios. Nevertheless sometimes you'd require custom logic. The best way to add a very
+simple condition is an inline function:</p>
+
+<pre><code>flow.add(new LoginCommand())
+    .linkFunction(function (result: CommandResult, processor: CommandLinkProcessor): void {
+        if (event.result is User && User(event.result).loginCount &lt; 3) {
+            processor.executeCommand(create(ShowNewUserDashboardCommand));
+        }
+        else {
+        	processor.executeCommand(create(LoadUserProfileCommand));
+        }
+    });
+    
+    private function create (commandType: Class): Command {
+        return Commands.create(commandType).build();
+    }
+</code></pre>  
+
+<p class="paragraph">The signature of the method is the same as for the <code>link</code> method in the <code>CommandLink</code>
+interface. Instead of specifying the next command to execute you can alternatively trigger the successfull
+completion of the flow, an Error or flow cancellation, using the methods of the <code>CommandLinkProcessor</code> instance.</p> 
+ 
+<p class="paragraph">Finally, if the logic is more complex and it is justified to extract it into a separate class
+you can also use any implementation of the <code>CommandLink</code> interface:</p>
+
+<pre><code>flow.add(new LoginCommand()).link(new MyCustomLink());
+</code></pre>
+
+<p class="paragraph">The <code>linkFunction</code> and <code>link</code> methods produce the only type of links that
+even get processed when the preceding command finished with an Error. This way even different     
+error conditions can be linked if required. The other declarative ways of linking like the 
+<code>linkResultType</code> or <code>linkResultProperty</code> methods are only considered when
+the preceding command completed successfully.</p>
+
+
+<h2><a name="extensions"></a>21.5 Extending the Framework</h2>
+
+
+<p class="paragraph">The preceding sections primarily covered the basic functionality of the library. It should be sufficient
+for most real world scenarios. This chapter gives an overview over available extension points. It is only
+relevant if you want to tweak Spicelib Commands to your needs or want to integrate it into another framework
+(like an IOC container for example).</p> 
+
+<p class="paragraph">The two major extension points are command adapters and the lifecycle hooks.</p>
+
+
+
+<h3><a name="adapter"></a>21.5.1 Implementing a Command Adapter</h3>
+
+<p class="paragraph">Adapters usually serve one of the following two purposes:</p>
+
+<ul>
+<li> Allow for the seamless integration of classes from existing APIs (e.g. the Flash or Flex APIs) that do
+not implement one of the Spicelib Command interfaces. </li>
+<li> Allow for the creation of command types that resemble the built-in default command type like demonstrated
+in <a href="commands.php#implementation">21.1&nbsp;Implementing a Command</a>, but come with additional or tweaked functionality. </li>
+</ul>
+
+<p class="paragraph">To integrate a new adapter the following steps must be performed:</p>
+
+<ul> 
+<li> Create an implementation of the <code>CommandAdapter</code> interface </li>
+<li> Create an implementation of the <code>CommandAdapterFactory</code> interface </li>
+<li> Register the new factory </li>
+</ul>
+
+<p class="paragraph">The remaining sections explain these steps.</p>
+
+
+<p class="subheadline"> Implementing the CommandAdapter interface </p>
+
+<p class="paragraph">To make your life easier you can extend the <code>AbstractSuspendableCommand</code> base class
+that covers some of the basic plumbing and then implement the <code>CommandAdapter</code> interface
+on top of it.</p>
+
+<p class="paragraph">Your adapter then must override the <code>doExecute</code> method to execute the target method
+and then invoke the protected <code>complete</code> or <code>error</code> methods when the target command
+finished its execution. If your adapter supports cancellable or suspendable commands, it is also
+supposed to override the <code>doCancel</code> and/or <code>doSuspend</code> and <code>doResume</code> methods.</p>
+
+<p class="paragraph">The default command type of the library is itself based on an adapter.
+If you want to study the implementation as an example you can browse the code 
+of the <code>LightCommandAdapter</code> class.</p>
+
+
+<p class="subheadline"> Implementing the CommandAdapterFactory interface </p>
+
+<p class="paragraph">This class is responsible to actually create new adapter instances based on an already
+existing target command instance. The interface is simple:</p>
+
+<pre><code>public interface CommandAdapterFactory {
+
+    function createAdapter (instance:Object, domain:ApplicationDomain = null) : CommandAdapter;
+    
+}
+</code></pre>
+
+<p class="paragraph">Whenever a command instance that does not already implement one of the Command interfaces
+is added to one of the executors created by the various command builder APIs, the framework
+consults all available command adapter factories to try to turn the command instance into
+an adapter instance. The adapter factories will be executed one after the other until one
+of them returns an adapter (Chain of Responsibility pattern). In case your adapter factory
+does not "recognize" the provided instance it should return null to signal to the framework
+that it should ask the next adapter. If no factory feels responsible for a command instance,
+an error will be thrown.</p>
+
+
+<p class="subheadline"> Registering a CommandAdapterFactory </p>
+
+<p class="paragraph">Finally the factory must be registered with the framework:</p>
+
+<pre><code>CommandAdapterFactories
+    .addFactory(new MyFactory())
+    .order(1);
+</code></pre>
+
+<p class="paragraph">The order determines which factory gets asked in which order in case there are 
+multiple factories registered.</p>
+
+
+
+<h3><a name="resultprocessors"></a>21.5.2 Implementing a Result Processor</h3> 
+
+<p class="paragraph">A result processor can be registered to process certain types of results.
+This allows to transparently modify or transform these result types without
+the need of the command itself being aware of this kind of processing.</p>
+
+<p class="paragraph">A result processor itself must be implemented as a command.
+The class can then get registered centrally, causing the framework to create
+a new instance of that result processor command for each matching result
+produced by some other command.</p>
+
+<p class="paragraph">This section will show the <code>AsyncToken</code> support from Parsley as
+an example. The Spicelib Commands library does not know about AsyncTokens as it does
+not depend on the Flex SDK and can be used in pure Flash applications, too.</p>
+
+<p class="paragraph">A result processor for an AsyncToken works around the fact that the moment
+a command returns an AsyncToken the actual result is not available yet. It removes
+the need for plumbing around Responders inside the command itself, if we move this
+taks to an external result processor.</p>
+
+<p class="paragraph">The implementation of this processor looks like this:</p>
+
+<pre><code>public class AsyncTokenResultProcessor {
+    
+    
+    private var active: Boolean;
+    private var callback: Function;
+    
+    
+    public function execute (token: AsyncToken, callback: Function): void {
+        this.callback = callback;
+        active = true;
+        token.addResponder(new Responder(result, fault));
+    }
+    
+    private function result (event: ResultEvent): void {
+        if (!active) return;
+        callback(event.result);
+        active = false;
+    }
+    
+    private function fault (event: FaultEvent): void {
+        if (!active) return;
+        callback(event.fault);
+        active = false;
+    }
+    
+    public function cancel (): void {
+        active = false;
+    }
+    
+    
+}
+</code></pre>
+
+<p class="paragraph">The AsyncToken produced by any other command will get passed to the execute method
+of this processor. It then adds a responder and waits for either a result or a fault
+to be returned. In both cases the result or the fault are then simply passed to the
+callback.</p>
+
+<p class="paragraph">To register this processor only one more line of code is needed (must be executed
+before the first command is started):</p>
+
+<pre><code>ResultProcessors.forResultType(AsyncToken).processorType(AsyncTokenResultProcessor);
+</code></pre>
+
+<p class="paragraph">In this special case we also must tell the framework that an instance of <code>Fault</code>
+signals an error condition (again Spicelib does not depend on the Flex SDK, so it does not
+know about Faults):</p>
+
+<pre><code>LightCommandAdapter.addErrorType(Fault);
+</code></pre>
+
+<p class="paragraph">Without this registration, Faults would simply be interpreted as successful results.</p>
+
+<p class="paragraph">With all these pieces in place, a command based on an AsyncToken can then look as simple as this:</p>
+
+<pre><code>public class GetUserListCommand {
+
+	private var service: RemoteObject;
+
+	function GetUserListCommand (service: RemoteObject) {
+	    this.service = service;
+	}
+	
+
+    public function execute (): AsyncToken {
+    
+    	return service.getUserList();
+        
+    }
+    
+}
+</code></pre>  
+ 
+<p class="paragraph">The result processor would kick in as soon as this command returns the AsyncToken and treat
+the result produced of this processor as the final result, not the AsyncToken.</p>
+
+<p class="paragraph">Note that if you are using Spicelib Commands in Parsley and add the parsley-flex.swc, 
+the result processor shown above will be registered automatically.</p>
+
+<p class="paragraph">Similarly you could create result processors for <code>URLLoader</code> objects or other
+asynchronously executing objects.</p>
+
+<p class="paragraph">But result processors can also be project-specific, processing or transforming command
+results centrally.</p>
+
+
+
+<h3><a name="lifecycle"></a>21.5.3 Using the Lifecycle Hooks</h3> 
+
+<p class="paragraph">Another extension point provided by the library are the lifecycle hooks. They are particularly
+useful when you want to integrate the Spicelib Commands into a different kind of framework, like
+an IOC container for example. The Parsley framework is using these hooks in version 3 for the
+redesigned command support. But other containers can integrate in the same way.</p>
+
+<p class="paragraph">For integration into a container, usually the following functionality is desirable:</p>
+
+<ul>
+<li> Injection of managed objects into the command instances </li>
+<li> Adding the command itself to the container during its execution </li>
+</ul>
+
+<p class="paragraph">To make this work the <code>CommandExecutor</code> interface contains a method
+called prepare that allows to pass customized implementations of the <code>CommandData</code>
+and <code>CommandLifecycle</code> interfaces down to the executed commands:</p>
+
+<pre><code>public interface CommandExecutor extends SuspendableCommand {
+    
+    function prepare (lifecycle:CommandLifecycle, data:CommandData) : void;
+    
+    [...]
+    
+}
+</code></pre>
+
+<p class="paragraph">All built-in executors like those for executing command flows or sequences implement
+this interface. When the prepare method is invoked before executing the flow or sequence
+the specified <code>CommandLifecycle</code> and <code>CommandData</code> instances will get passed
+down to all individual commands.</p>
+
+
+<p class="subheadline"> The CommandLifecycle Interface </p>
+
+<p class="paragraph">The interface looks like this:</p>
+
+<pre><code>public interface CommandLifecycle {
+    
+    function createInstance (type:Class, data:CommandData) : Object;
+    
+    function beforeExecution (command:Object, data:CommandData) : void;
+    
+    function afterCompletion (command:Object, result:CommandResult) : void;
+    
+}
+</code></pre>
+
+<p class="paragraph">It is responsible for creating command instances, and it may execute additional logic
+before and after execution of the command. The <code>beforeExecution</code> and <code>afterExecution</code>
+methods are the hooks that can be used for adding and removing commands to a container.</p>
+
+
+<p class="subheadline"> The CommandData Interface </p>
+
+<p class="paragraph">Finally the CommandData interface can be used to integrate the simple injection features
+of Spicelib Commands (that allow for injection of results produced by preceding commands)
+with the injection facility of a container.</p>
+
+<pre><code>public interface CommandData {
+    
+    function getObject (type:Class = null) : Object;
+     
+    function getAllObjects (type:Class = null) : Array;
+     
+}
+</code></pre>
+
+<p class="paragraph">These methods will get invoked by the framework when an execute method
+or a command constructor expects a specific type to get injected. Your custom
+<code>CommandData</code> implementation will only get invoked when the framework
+cannot find a matching type itself (e.g. from the results of preceding commands).
+This allows for seamless integration.</p>
+
+
+<p class="subheadline"> Putting it all together </p>
+
+<p class="paragraph">Once you have your custom <code>CommandLifecycle</code> and <code>CommandData</code>
+implementations you may want to create a nice builder API so that your users do not
+need to care about these low-level details. This builder API might be similar to the
+one built into Spicelib. It would allow to create, group and execute commands
+and under the hood it would silently create instances of the lifecylce and data
+implementations and pass them to the <code>prepare</code> method of your executor.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

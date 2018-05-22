@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><!-- saved from url=(0014)about:internet --><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" href="../../../../style.css" type="text/css" media="screen"><link rel="stylesheet" href="../../../../print.css" type="text/css" media="print"><link rel="stylesheet" href="../../../../override.css" type="text/css"><meta name="keywords" content="ViewSettingsBuilder,org.spicefactory.parsley.context.ViewSettingsBuilder,addDecorator,addViewLifecycle,autoremoveComponents,autoremoveViewRoots,autowireComponents,autowireFilter,bindingManager,build,complete,config,context,defaultReceiverScope,definitionRegistry,description,disable,domain,error,findParentInView,forType,globalErrorHandler,install,lifecycleManager,localScopeUuid,messageRouter,messageSettings,newBuilder,newBuilder,newSetup,object,objectDefinition,parent,persistenceManager,scope,scopeExtensions,scopeManager,services,setImplementation,unhandledError,viewManager,viewProcessor,viewRoot,viewSettings"><title>org.spicefactory.parsley.context.ViewSettingsBuilder</title></head><body><script language="javascript" type="text/javascript" src="../../../../asdoc.js"></script><script language="javascript" type="text/javascript" src="../../../../help.js"></script><script language="javascript" type="text/javascript" src="../../../../cookies.js"></script><script language="javascript" type="text/javascript"><!--
+				asdocTitle = 'ViewSettingsBuilder - Parsley + Spicelib API';
+				var baseRef = '../../../../';
+				window.onload = configPage;
+			--></script>
+<script type="text/javascript">
+			scrollToNameAnchor();
+		</script><table class="titleTable" cellpadding="0" cellspacing="0" id="titleTable" style="display:none"><tr><td class="titleTableTitle" align="left">Parsley + Spicelib API</td><td class="titleTableTopNav" align="right"><a href="../../../../package-summary.html" onclick="loadClassListFrame('../../../../all-classes.html')">All Packages</a>&nbsp;|&nbsp;<a href="../../../../class-summary.html" onclick="loadClassListFrame('../../../../all-classes.html')">All Classes</a>&nbsp;|&nbsp;<a href="../../../../all-index-A.html" onclick="loadClassListFrame('../../../../index-list.html')">Index</a>&nbsp;|&nbsp;<a id="framesLink1" href="../../../../index.html?org/spicefactory/parsley/context/ViewSettingsBuilder.html&amp;org/spicefactory/parsley/context/class-list.html">Frames</a><a id="noFramesLink1" style="display:none" href="" onclick="parent.location=document.location"> No Frames </a></td><td class="titleTableLogo" align="right" rowspan="3"><img src="../../../../images/logo.jpg" class="logoImage" alt=" Adobe Logo " title=" Adobe Logo "></td></tr><tr class="titleTableRow2"><td class="titleTableSubTitle" id="subTitle" align="left">ViewSettingsBuilder</td><td class="titleTableSubNav" id="subNav" align="right"><a href="#methodSummary">Methods</a></td></tr><tr class="titleTableRow3"><td colspan="3">&nbsp;</td></tr></table><script language="javascript" type="text/javascript" xml:space="preserve">
+				<!--
+				
+					if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("ViewSettingsBuilder"); titleBar_setSubNav(false,false,false,false,false,false,false,false,true,false,false	,false,false,false,false,false);}	
+				-->
+			</script><div xmlns:fn="http://www.w3.org/2005/xpath-functions" class="MainContent"><table class="classHeaderTable" cellpadding="0" cellspacing="0"><tr><td class="classHeaderTableLabel">Package</td><td><a href="package-detail.html" onclick="javascript:loadClassListFrame('class-list.html')">org.spicefactory.parsley.context</a></td></tr><tr><td class="classHeaderTableLabel">Class</td><td class="classSignature">public  class  ViewSettingsBuilder</td></tr><tr><td class="classHeaderTableLabel">Inheritance</td><td class="inheritanceList">ViewSettingsBuilder  <img src="../../../../images/inherit-arrow.gif" title="Inheritance" alt="Inheritance" class="inheritArrow"> Object</td></tr><tr><td class="classHeaderTableLabel">Implements</td><td> org.spicefactory.parsley.context.SetupPart</td></tr></table><p></p><p></p><p></p>
+ Builder for settings related to view wiring.
+ 
+ <p></p><br/><hr></div><a name="methodSummary"></a><div class="summarySection"><div class="summaryTableTitle">Public Methods </div><table cellspacing="0" cellpadding="3" class="summaryTable " id="summaryTableMethod"><tr><th>&nbsp;</th><th colspan="2">Method</th><th class="summaryTableOwnerCol">Defined By</th></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#addViewLifecycle()" class="signatureLink">addViewLifecycle</a>(viewType:Class, lifecycle:Class, ... params):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></div><div class="summaryTableDescription">
+	 Adds a lifecycle handler class for a particular type of view component.</div></td><td class="summaryTableOwnerCol">ViewSettingsBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#autoremoveComponents()" class="signatureLink">autoremoveComponents</a>(value:Boolean):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></div><div class="summaryTableDescription">
+	 Indicates whether components should automatically be removed from the Context
+	 when they are removed from the stage.</div></td><td class="summaryTableOwnerCol">ViewSettingsBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#autoremoveViewRoots()" class="signatureLink">autoremoveViewRoots</a>(value:Boolean):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></div><div class="summaryTableDescription">
+	 Indicates whether view root should automatically be removed from the Context
+	 when they are removed from the stage.</div></td><td class="summaryTableOwnerCol">ViewSettingsBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#autowireComponents()" class="signatureLink">autowireComponents</a>(value:Boolean):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></div><div class="summaryTableDescription">
+	 Indicates whether view components will be automatically wired to the
+	 Context.</div></td><td class="summaryTableOwnerCol">ViewSettingsBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#autowireFilter()" class="signatureLink">autowireFilter</a>(filter:<a href="../../../../org/spicefactory/parsley/core/view/ViewAutowireFilter.html">ViewAutowireFilter</a>):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></div><div class="summaryTableDescription">
+	 Sets the filter responsible for selecting views that should be autowired to the Context.</div></td><td class="summaryTableOwnerCol">ViewSettingsBuilder</td></tr><tr class=""><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><div class="summarySignature"><a href="#viewProcessor()" class="signatureLink">viewProcessor</a>():<a href="../../../../org/spicefactory/parsley/context/ServiceBuilder.html">ServiceBuilder</a></div><div class="summaryTableDescription">
+	 The view processor service registration for these settings.</div></td><td class="summaryTableOwnerCol">ViewSettingsBuilder</td></tr></table></div><script language="javascript" type="text/javascript"><!--
+										showHideInherited();
+										--></script><div class="MainContent"><a name="methodDetail"></a><div class="detailSectionHeader">Method Detail</div><a name="addViewLifecycle()"></a><a name="addViewLifecycle(Class,Class,restParam)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">addViewLifecycle</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td></tr></table><div class="detailBody"><code> public function addViewLifecycle(viewType:Class, lifecycle:Class, ... params):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code><p></p><p></p><p>
+	 Adds a lifecycle handler class for a particular type of view component.
+	 This hook allows to control the lifecycle differently than with the default
+	 handler.
+	 An example use case is an AIR window which has unreliable stage events, 
+	 so that it is safer to listen to its <code>CLOSE</code> event instead.
+	 
+	 <p>The specified lifecylce class must implement the <code>ViewLifecycle</code> interface.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">viewType</span>:Class</code> &mdash; the class for which to use the specified lifecycle class (this includes subclasses)
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code><span class="label">lifecycle</span>:Class</code> &mdash; the lifecycle class to instantiate for each view instance
+	 </td></tr><tr><td class="paramSpacer">&nbsp;</td></tr><tr><td width="20px"></td><td><code>... <span class="label">params</span></code> &mdash; parameters to get passed to the constructor of the lifecylce class 
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code> &mdash; the original setup instance for method chaining
+	 </td></tr></table></div><a name="autoremoveComponents()"></a><a name="autoremoveComponents(Boolean)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">autoremoveComponents</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function autoremoveComponents(value:Boolean):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code><p></p><p></p><p>
+	 Indicates whether components should automatically be removed from the Context
+	 when they are removed from the stage. The default value is true.
+	 When set to false the component must dispatch a custom "removeView" 
+	 event type to signal that it wishes to be removed from the Context.
+	 When set to true the removedFromStage event will be used instead.
+	 The framework will ignore intermediate stage events caused
+	 by LayoutManagers performing some kind of reparenting to make it 
+	 more robust. 
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">value</span>:Boolean</code> &mdash; whether components should automatically be removed from the Context
+	 when they are removed from the stage
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code> &mdash; the original setup instance for method chaining
+	 </td></tr></table></div><a name="autoremoveViewRoots()"></a><a name="autoremoveViewRoots(Boolean)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">autoremoveViewRoots</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function autoremoveViewRoots(value:Boolean):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code><p></p><p></p><p>
+	 Indicates whether view root should automatically be removed from the Context
+	 when they are removed from the stage. The default value is true.
+	 When set to false the view root must dispatch a custom "removeView" 
+	 event type to signal that it wishes to be removed from the Context.
+	 When set to true the removedFromStage event will be used instead.
+	 The framework will ignore intermediate stage events caused
+	 by LayoutManagers performing some kind of reparenting to make it 
+	 more robust. 
+	 
+	 <p>The difference to the setting for component removal is that
+	 a view root is the actual display object that listens to bubbling
+	 events from the components below. If you are using the <code>&lt;ContextBuilder&gt;</code>
+	 MXML tag then the component it is placed upon automatically becomes a view root 
+	 for the Context created by that builder. Further view roots for popups or windows
+	 may be added explicitly through <code>ViewManager.addViewRoot()</code>.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">value</span>:Boolean</code> &mdash; whether view roots should automatically be removed from the Context
+	 when they are removed from the stage
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code> &mdash; the original setup instance for method chaining
+	 </td></tr></table></div><a name="autowireComponents()"></a><a name="autowireComponents(Boolean)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">autowireComponents</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function autowireComponents(value:Boolean):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code><p></p><p></p><p>
+	 Indicates whether view components will be automatically wired to the
+	 Context. The default value is false. If set to true the only requirement
+	 for a view to get wired is that a corresponding %lt;View> tag is added
+	 to the MXML or XML configuration. When set to false the component must explicitly
+	 signal that it wishes to get wired to the Context through dispatching a "configureView"
+	 event of adding a &lt;parsley:Configure/> tag.
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">value</span>:Boolean</code> &mdash; whether view components will be automatically wired to the Context
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code> &mdash; the original setup instance for method chaining
+	 </td></tr></table></div><a name="autowireFilter()"></a><a name="autowireFilter(org.spicefactory.parsley.core.view.ViewAutowireFilter)"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">autowireFilter</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function autowireFilter(filter:<a href="../../../../org/spicefactory/parsley/core/view/ViewAutowireFilter.html">ViewAutowireFilter</a>):<a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code><p></p><p></p><p>
+	 Sets the filter responsible for selecting views that should be autowired to the Context.
+	 
+	 <p>The framework has a builtin autowire filter that automatically picks those components
+	 that have a matching %lt;View> tag in the MXML or XML configuration. If you want to
+	 rely on this behaviour you just have to call <code>autowireComponents(true)</code> on this
+	 builder. A custom filter can be used to apply a different behaviour, like picking components
+	 simply based on class or package names.</p>
+	 
+	 </p><p><span class="label"> Parameters </span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20px"></td><td><code><span class="label">filter</span>:<a href="../../../../org/spicefactory/parsley/core/view/ViewAutowireFilter.html">ViewAutowireFilter</a></code> &mdash; the filter responsible for selecting views that should be autowired to the Context
+	 </td></tr></table></p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../org/spicefactory/parsley/context/ContextBuilderSetup.html">ContextBuilderSetup</a></code> &mdash; the original setup instance for method chaining
+	 </td></tr></table></div><a name="viewProcessor()"></a><table class="detailHeader" cellpadding="0" cellspacing="0"><tr><td class="detailHeaderName">viewProcessor</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td></tr></table><div class="detailBody"><code> public function viewProcessor():<a href="../../../../org/spicefactory/parsley/context/ServiceBuilder.html">ServiceBuilder</a></code><p></p><p></p><p>
+	 The view processor service registration for these settings.
+	 This hook allows to install alternative implementations to be used for processing all
+	 views in the associated Context and its children unless overwritten in a child.
+	 
+	 <p>When specifying an implementation or decorator for this service, it must implement the
+	 <code>ViewProcessor</code> interface.</p>
+	 
+	 </p><p></p><span class="label">Returns</span><table cellpadding="0" cellspacing="0" border="0"><tr><td width="20"></td><td><code><a href="../../../../org/spicefactory/parsley/context/ServiceBuilder.html">ServiceBuilder</a></code> &mdash; the builder for specifying the implementation or decorators for the ViewProcessor
+	 </td></tr></table></div><br/><br/><hr><br/><p></p><center class="copyright"><footer></footer><br/>Mon Feb 6 2012, 01:04 AM +01:00  </center></div></body></html><!--<br/>Mon Feb 6 2012, 01:04 AM +01:00  -->

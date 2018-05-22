@@ -1,0 +1,610 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>20 XML to Object Mapper</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>20 XML to Object Mapper</h1>
+
+<p class="paragraph">Since version 2.0 Spicelib contains a small but powerful and flexibel XML-to-Object Mapper.
+It allows you to map from XML to AS3 classes - in both directions. It comes with builtin mappers
+which cover the most common use cases like mapping properties of AS3 classes to XML attributes
+or child elements. But it is easily extensible to add your custom mappers for some of your XML
+elements and combine them with the builtin ones. In version 2.3 support for metadata configuration
+was added, leading to a significantly easier setup.</p>
+<h2><a name="example"></a>20.1 Usage Example</h2> 
+
+<p class="paragraph">Let's start with a simple example. Consider this XML structure:</p>
+
+<pre><code>&lt;order&gt;
+    &lt;book 
+        isbn="0942407296" 
+        page-count="256"
+        title="Rain"
+        author="Karen Duve"
+    /&gt;
+    &lt;book 
+        isbn="0953892201" 
+        page-count="272"
+        title="Perfume"
+        author="Patrick Suskind"
+        comment="Special Offer"
+    /&gt;    
+&lt;/order&gt;
+</code></pre>
+
+<p class="paragraph">Now we create two classes that this XML structure should map to:</p>
+
+<pre><code>public class Order {
+
+    [ChoiceType("com.foo.Book")]
+    public var books:Array;
+    
+}
+</code></pre>
+
+<pre><code>public class Book {
+
+    [Required]
+    public var isbn:String;
+    
+    [Required]
+    public var pageCount:int;
+    
+    [Required]
+    public var title:String;
+    
+    [Required]
+    public var author:String;
+    
+    public var comment:String;
+    
+}
+</code></pre>
+
+<p class="paragraph">It should be obvious how XML elements and attributes are supposed to map to these two classes and their properties.
+The only details that probably need a bit of explanation are the <code>[Required]</code> and <code>[ChoiceType]</code> metadata tags. 
+The former gives hint to the validator. So for the <code>book</code> element only the <code>comment</code> attribute is optional.
+If any of the other 4 attributes would be missing the mapping operation will fail. For more details see 
+<a href="xmlmapper.php#validation">20.9&nbsp;Validation</a>.</p>
+
+<p class="paragraph">The <code>[ChoiceType]</code> metadata tag lists the classes that are permitted as elements in the Array. All XML elements
+that map to the Book class or any subtype are valid child elements in this case. If this tag would be omitted, all tags
+would be allowed. For most mapping types there are sensible defaults. For simple property types like String and int the default
+is to map them to XML attributes, the same way as if you would add the <code>[Attribute]</code> metadata tag to the property declaration.</p>
+
+<p class="paragraph">Next we create the mapper that is responsible for transforming this structure;</p>
+
+<pre><code>var mapper:XmlObjectMapper = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Order)
+    .mappedClasses(Book)
+    .build();    
+</code></pre>
+
+<p class="paragraph">Here we are using the DSL for the mapper setup introduced with version 2.3. First we specify that our elements
+are unqualified, support for namespaces is also included of course. Then we have to specify the root element of our
+mapping and finally all other mapped classes used in any nested tags (in this case only one - Book). Metadata will be processed
+on the specified classes to look for any custom mappings.</p>
+
+
+<p class="paragraph">The mapper we created is now ready to use. This is how we would map from XML to objects:</p>
+
+<pre><code>var xml:XML = ...;
+var order:Order = mapper.mapToObject(xml) as Order;
+</code></pre>
+
+<p class="paragraph">And this is how we'd map from objects to XML:</p>
+
+<pre><code>var order:Order = ...;
+var xml:XML = mapper.mapToXml(order);
+</code></pre>
+<h2><a name="config"></a>20.2 Metadata Configuration and Defaults</h2>
+
+<p class="paragraph">Although the mappings support metadata configuration the most convenient way to set up your mappings is to rely on the
+defaults (configuration by convention). A third option to determine how a particular property should map to XML is programmatic
+setup.</p>
+
+
+<p class="subheadline"> Configuration Precedence </p>
+
+<p class="paragraph">For each property of a class the mapper determines if and how it should be mapped by checking and applying configuration 
+options in the following order:</p>
+
+<ul>
+<li> <strong>Programmatic Setup:</strong> If a property has been configured programmatically, any metadata configuration for that property
+will be ignored. This way you could even use metadata to set the defaults and override it when needed. For details see
+<a href="xmlmapper.php#programmatic">20.10&nbsp;Programmatic Mapper Setup</a>. </li>
+
+<li> <strong>Metadata Tags:</strong> If there is no programmatic setup the mapper will look for a metadata tag on that property to
+determine if and how the property should be mapped. The available tags will be presented in the following sections. </li>
+
+<li> <strong>Default Behaviour:</strong> When there is no programmatic setup and no metadata tag the default behaviours will be applied
+for a property, depending on its type, as listed below. </li>
+</ul>
+
+
+<p class="subheadline"> Default Behaviours </p>
+
+<p class="paragraph">The default behaviour if no programmatic or metadata configuration was applied is as follows:</p>
+
+<ul>
+<li> <strong>Simple Property Types:</strong> For a property of type <code>String</code>, <code>Number</code>, <code>int</code>, <code>uint</code>,
+<code>Boolean</code>, <code>Date</code>, <code>Class</code> and <code>ClassInfo</code>, the default behaviour is to map to an XML attribute.
+You can also map other types to attributes, but those would require an explicit <code>[Attribute]</code> tag on the property (or
+corresponding programmatic setup). </li>
+
+<li> <strong>Other non-Array Types:</strong> Other types will be mapped as an association to other mapped classes (or in XML terminology 
+to a choice of child elements). The permitted types will be deduced from the type of the property. All XML elements 
+that map to that type (including subtypes) are allowed as a child element. If there is more than one matching child element
+the mapper will throw an Error. </li>
+
+<li> <strong>Array Types:</strong> These will also be mapped as an association, but will allow more than one matching child element,
+assembling all mapped objects into the Array property. In this case the permitted type for the elements of the Array cannot
+be deduced, so all mapped classes would be allowed. Therefor relying on defaults for Array properties is often not desirable.
+Instead the <code>[ChoiceType}</code> or <code>[ChoiceId]</code> tags may be used to explicitly specify the permitted types.
+See <a href="xmlmapper.php#childelements">20.6&nbsp;Mapping Child Elements</a> and <a href="xmlmapper.php#choices">20.7&nbsp;Mapping disjointed Choices</a> for examples. </li>
+</ul>
+
+
+<p class="subheadline"> Naming Conventions </p>
+
+<p class="paragraph">As you can see in our first example in this chapter, we were mapping the <code>pageCount</code> property
+to the <code>page-count</code> XML attribute. Per default the mapper always translates camel-case ActionScript names
+into dash notation which is more common in XML. So using <code>pageCount</code> as the attribute name in XML would
+actually give you an error.</p>
+
+<p class="paragraph">This is just the default behavior though and you can easily apply your own naming strategy:</p>
+
+<pre><code>var mapper:XmlObjectMapper = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Order)
+    <span style="color:#FF0000;">.defaultNamingStrategy(new MyNamingStrategy());</span>
+    .mappedClasses(Book)
+    .build();    
+</code></pre> 
+
+<p class="paragraph"><code>NamingStrategy</code> is a trivial interface with just a single method that translates an ActionScript
+name to an XML name.</p>
+
+<p class="paragraph">The NamingStrategy is useful to change the convention globally. But you can also explicitly specify the name
+for a single element or attribute. See the following section on <a href="xmlmapper.php#attributes">20.3&nbsp;Mapping Attributes</a> for an example
+on how to do that for a property that maps to an XML attribute. If you want to specify the matching XML element
+name for a class name, you can do that with the <code>XmlMapping</code> tag:</p>
+
+<pre><code>[XmlMapping(elementName="product")]
+public class ProductModel 
+</code></pre>
+<h2><a name="attributes"></a>20.3 Mapping Attributes</h2>
+
+<p class="paragraph">Properties with a simple type like <code>String</code>, <code>int</code>, <code>Boolean</code>, <code>Class</code> or <code>Date</code>
+can be mapped to attributes:</p>
+
+<pre><code>public class Song {
+
+    public var year:int;
+    public var title:String;
+    public var artist:String;
+    
+}
+</code></pre>
+
+<pre><code>&lt;song
+    year="1989" 
+    title="Monkey Gone To Heaven"
+    artist="Pixies"
+/&gt;
+</code></pre>
+
+<p class="paragraph">Since mapping to XML attributes is the default for simple properties, no metadata configuration is required
+on the properties in this case. You can use the <code>[Attribute]</code> metadata tag whenever the property type
+is not one of the simple types automatically mapped to attributes (see <a href="xmlmapper.php#config">20.2&nbsp;Metadata Configuration and Defaults</a>) or when the
+name of the attribute does not match the property name:</p>
+
+<pre><code>[Attribute("song-title")]
+public var title:String;
+</code></pre>
+
+<p class="paragraph">Otherwise the setup for such a mapper is straightforward:</p>
+
+<pre><code>var xml:XML = ...;
+var song:Song = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Song)
+    .build()
+    .mapToObject(xml) as Song;    
+</code></pre>
+<h2><a name="childtextnodes"></a>20.4 Mapping Child Text Nodes</h2>
+
+<p class="paragraph">Properties with a simple type like <code>String</code>, <code>int</code>, <code>Boolean</code>, <code>Class</code> or <code>Date</code>
+can also be mapped to child text nodes, a mechanism very similar to mapping to attributes:</p>
+
+<pre><code>public class Song {
+
+    public var year:int;
+    public var title:String;
+    public var artist:String;
+    
+}
+</code></pre>
+
+<pre><code>&lt;song&gt;
+    &lt;year&gt;1989&lt;/year&gt; 
+    &lt;title&gt;Monkey Gone To Heaven&lt;/title&gt;
+    &lt;artist&gt;Pixies&lt;/artist&gt;
+&lt;/song&gt;
+</code></pre>
+
+<p class="paragraph">The default for simple property types is to map them to XML attributes. Thus, for switching to text nodes in child elements
+you'd usually have to use explicit metadata configuration then:</p>
+
+<pre><code>[ChildTextNode]
+public var year:int;
+</code></pre>
+
+<p class="paragraph">But if all or most of your XML elements follow this pattern, you can also switch the default globally and
+thus avoid any metadata configuration:</p>
+
+<pre><code>var xml:XML = ...;
+var song:Song = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Song)
+    <span style="color:#FF0000;">.defaultSimpleMappingType(SimpleMappingType.CHILD_TEXT_NODE)</span>
+    .build()
+    .mapToObject(xml) as Song;    
+</code></pre>
+<h2><a name="textnodes"></a>20.5 Mapping Text Nodes</h2>
+
+<p class="paragraph">This is different from mapping to child text nodes. It maps a property to the text node that belongs to the
+same element. Since this can only apply for a single property it is often combined with attribute mapping like
+in the following example:</p>
+
+<pre><code>public class Song {
+
+    public var year:int;
+
+    public var artist:String;
+
+    [TextNode]
+    public var title:String;
+    
+}
+</code></pre>
+
+<pre><code>&lt;song year="2000" artist="Goldfrapp"&gt;Felt Mountain&lt;/song&gt;
+</code></pre>
+
+<p class="paragraph">This is how the mapping for the example above would be initialized:</p>
+
+<pre><code>var xml:XML = ...;
+var song:Song = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Song)
+    .build()
+    .mapToObject(xml) as Song;    
+</code></pre>
+<h2><a name="childelements"></a>20.6 Mapping Child Elements</h2>
+
+<p class="paragraph">Mapping to child elements allows you to build a hierarchy of nested mappers like shown in the usage example in the 
+beginning of this chapter.</p>
+
+<pre><code>public class Album {
+
+    public var year:int;
+    public var title:String;
+    public var artist:String;
+    
+    [ChoiceType("com.foo.Song")]
+    public var songs:Array;
+    
+}
+
+public class Song {
+
+    public var duration:String;
+    public var title:String;
+    
+}
+</code></pre>
+
+<pre><code>&lt;album year="2000" artist="Goldfrapp" title="Felt Mountain"&gt;
+    &lt;song title="Lovely Head" duration="3:50"/&gt;
+    &lt;song title="Pilots" duration="4:30"/&gt;
+    &lt;song title="Deer Stop" duration="4:07"/&gt;
+    &lt;song title="Utopia" duration="4:18"/&gt;
+&lt;/album&gt;
+</code></pre>
+
+<p class="paragraph">In this example the <code>song</code> child elements will be mapped into the <code>songs</code> property of
+the <code>Album</code> class. Again we could also use the defaults, but that would allow any tag to be nested
+inside the <code>album</code> tag. That's why we explicitly specify the permitted type (including subtypes) with
+the <code>[ChoiceType]</code> metadata tag.</p> 
+
+<p class="paragraph">This is how you would set up such a mapper:</p>
+
+<pre><code>var xml:XML = ...;
+var album:Album = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Album)
+    .mappedClasses(Song)
+    .build()
+    .mapToObject(xml) as Album;    
+</code></pre>
+<h2><a name="choices"></a>20.7 Mapping disjointed Choices</h2>
+
+<p class="paragraph">In the preceding section we mapped to child elements through the use of the <code>[ChoiceType]</code> tag, which allows
+us to specify the permitted types for the elements of an Array in a polymorphic way. Sometimes though this is not sufficient
+if the permitted types for an Array are not part of a distinct type hierarchy. In such a case a choice with a string
+identifier can be used, so that you can explicitly specify which classes are permitted.</p>
+
+<pre><code>public class Order {
+
+    [ChoiceId("products")]
+    public var products:Array;
+    
+}
+
+public class Album {
+
+    public var artist:String;
+    public var title:String;
+    public var duration:String;
+    
+}
+
+public class Book {
+
+    public var author:String;
+    public var title:String;
+    public var pageCount:String;  
+
+}
+</code></pre>
+
+<pre><code>&lt;order&gt;
+    &lt;album artist="Goldfrapp" title="Felt Mountain"  duration="38:50"/&gt;
+    &lt;album artist="Unkle" title="Never, Never, Land"  duration="49:27"/&gt;
+    &lt;book author="Karen Duve" title"Rain" pageCount="256"/&gt;
+    &lt;book author="Judith Hermann" title"Summerhouse, Later" pageCount="224"/&gt;
+&lt;/order&gt;
+</code></pre>
+
+<p class="paragraph">In the mapper setup we then have to list all classes that should be associated with that choice id:</p>
+
+<pre><code>var xml:XML = ...;
+var order:Order = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Order)
+    <span style="color:#FF0000;">.choiceId("products", Album, Book)</span>
+    .build()
+    .mapToObject(xml) as Order;    
+</code></pre>
+<h2><a name="namespaces"></a>20.8 Working with Namespaces</h2>
+
+<p class="paragraph">So far we only used unqualified XML elements in all examples to keep them simple. Therefor we always used
+<code>XmlObjectMappings.forUnqualifiedElements()</code> to start the mapper setup. But of course the mapper fully
+supports namespaces, too. If you only use a single namespace the overall setup is quite similar to that for
+unqualified elements. Consider the example from the preceding section, just adding a namespace to all elements:</p>
+
+<pre><code>&lt;order <span style="color:#FF0000;">xmlns="http://www.mynamespace.com"</span>&gt;
+    &lt;album artist="Goldfrapp" title="Felt Mountain"  duration="38:50"/&gt;
+    &lt;album artist="Unkle" title="Never, Never, Land"  duration="49:27"/&gt;
+    &lt;book author="Karen Duve" title"Rain" pageCount="256"/&gt;
+    &lt;book author="Judith Hermann" title"Summerhouse, Later" pageCount="224"/&gt;
+&lt;/order&gt;
+</code></pre>
+
+<p class="paragraph">To set up the corresponding mapper we then have to explicitly specify the namespace:</p>
+
+<pre><code>var xml:XML = ...;
+var order:Order = XmlObjectMappings
+    <span style="color:#FF0000;">.forNamespace("http://www.mynamespace.com")</span>
+    .withRootElement(Order)
+    .choiceId("products", Album, Book)
+    .build()
+    .mapToObject(xml) as Order;    
+</code></pre>
+
+<p class="paragraph">Finally, in some cases you may wish to work with multiple namespaces in the same document. Consider
+you'd want to add a separate namespace for software products to the example above:</p>
+
+<pre><code>&lt;order 
+    xmlns="http://www.mynamespace.com" 
+    <span style="color:#FF0000;">xmlns:sf="http://www.mynamespace.com/software"</span>&gt;
+    &lt;album artist="Goldfrapp" title="Felt Mountain"  duration="38:50"/&gt;
+    &lt;album artist="Unkle" title="Never, Never, Land"  duration="49:27"/&gt;
+    &lt;book author="Karen Duve" title"Rain" pageCount="256"/&gt;
+    &lt;book author="Judith Hermann" title"Summerhouse, Later" pageCount="224"/&gt;
+    <span style="color:#FF0000;">&lt;sf:software product="PageDesigner" version="4.0"/&gt;</span>
+&lt;/order&gt;
+</code></pre>
+
+<p class="paragraph">For such a scenario we'd set up separate groups of mappings for each namespace and then
+merge them:</p>
+
+<pre><code>var xml:XML = ...;
+var softwareNS:XmlObjectMappings = XmlOhjectMappings
+    <span style="color:#FF0000;">.forNamespace("http://www.mynamespace.com/software")</span>
+    .withoutRootElement()
+    .choiceId("products", Software);
+    
+var order:Order = XmlObjectMappings
+    .forNamespace("http://www.mynamespace.com")
+    .withRootElement(Order)
+    .choidId("products", Album, Book)
+    <span style="color:#FF0000;">.mergedMappings(softwareNS)</span>
+    .build()
+    .mapToObject(xml) as Order;    
+</code></pre>
+
+<p class="paragraph">As you see such a merged namespace often does not need a root element and you also do not need to call
+<code>build</code> on the namespaces to be merged. You can also see that merging namespaces also means to merge
+all choices with the same id. This way the choice with the id <code>products</code> in our example can contain
+child elements from different namespaces.</p>
+<h2><a name="validation"></a>20.9 Validation</h2>
+
+<p class="paragraph">Like shown in <a href="xmlmapper.php#example">20.1&nbsp;Usage Example</a> you can place <code>[Required]</code> metadata on properties so that the
+mapper throws an Error if the attribute or child element that the property is mapped to is not present in XML.
+This section provides some more detail on the exact semantics of this feature.</p>
+
+<p class="subheadline"> Validating single valued properties </p>
+
+<p class="paragraph">When a property is single valued, either with a simple type that maps to an attribute or a text node
+or typed to a class that maps to a child element, the validation process includes the following checks:</p>
+
+<ul>
+<li> If the property is marked with the <code>[Required]</code> tag the mapper checks if the attribute, text node
+or child element is present in the mapped XML and throws an error if it is missing. Without the metadata tag
+the mapped XML element is considered optional. </li>
+
+<li> If the single valued property is mapped to a child element the mapper validates that there is at most
+a single occurence of that element and throws an Error if otherwise. </li>
+</ul>
+
+
+<p class="subheadline"> Validating Array properties </p>
+
+<p class="paragraph">Array properties cannot be mapped to attributes (as multiple occurences of the same attribute in a single
+element are not possible). If they are mapped to child text nodes or child elements, the validation process
+includes the following checks:</p>
+
+<ul>
+<li> If the property is marked with the <code>[Required]</code> tag the mapper checks if the child text node
+or child element has at least a single occurence and throws an Error if otherwise. </li>
+
+<li> Without the <code>[Required]</code> tag any number of occurences for the child element (including 0)
+are permitted. </li>
+</ul> 
+
+
+<p class="subheadline"> Ignoring properties </p>
+
+<p class="paragraph">Sometimes a class may contain properties that should not be mapped to XML. You can exclude individual
+properties from the mapping with the <code>[Ignore]</code> tag:</p>
+
+<pre><code>[Ignore]
+public var somethingUnusual:String;
+</code></pre>
+
+<p class="paragraph">Without this tag (and without any other mapping tag on that property) the mapper would create the 
+default mappings for that property.</p> 
+
+
+<p class="subheadline"> Ignoring xml elements and attributes </p>
+
+<p class="paragraph">In some scenarios you may not be able to create strict mappings as the XML may contain child elements or attributes
+which are not relevant for the client side and should be ignored. To do that for a particular mapped class
+you can add the <code>[XmlMapping]</code> metadata to the class declaration:</p>
+
+<pre><code>[XmlMapping(ignoreUnmappedAttributes="true", ignoreUnmappedChildren="true")]
+public class Order {
+</code></pre>
+
+<p class="paragraph">Without these settings any attribute or child element unknown to the mapper would lead to an Error.</p>
+<h2><a name="programmatic"></a>20.10 Programmatic Mapper Setup</h2>
+
+<p class="paragraph">There may be edge cases where neither the default settings nor the available metadata tags provide
+the required behaviour for a particular property. In these cases you can mix the default behaviour
+with explicit programmatic setup:</p>
+
+<pre><code>var xml:XML = ...;
+var mappings:XmlObjectMappings = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Order);
+<span style="color:#FF0000;">mappings    
+    .newMapperBuilder(Album)
+        .mapToAttribute("title")
+        .mapToChildTextNode("artist");</span>
+var order:Order = mappings
+    .choidId("products", Album, Book)
+    .build()
+    .mapToObject(xml) as Order;    
+</code></pre>
+
+<p class="paragraph">In the example above we set up the mapper for the Album class programmatically. The mapper will still 
+look for metadata or apply the default behaviour for all properties of the Album class that were not explicitly
+mapped. This would even allow to use metadata in the class and override it in specific scenarios through
+programmatic setup.</p>
+<h2><a name="tags"></a>20.11 Custom Mapping Tags</h2>
+
+<p class="paragraph">Similarly like with the metadata tags for Parsley configuration, you can create additional mapping tags 
+in case the builtin ones are not sufficient. For this you'd simply have to implement the <code>MetadataMapperDecorator</code>
+interface:</p>
+
+<pre><code>public interface MetadataMapperDecorator {
+
+    function decorate (builder:MetadataMapperBuilder) : void;
+	
+}
+</code></pre>
+
+<p class="paragraph">For each metadata tag on any property of a mapped class the <code>decorate</code> method would be invoked.
+For full examples you may browse the existing implementations, as all builtin tags use this hook, too. They
+reside in the package <code>org.spicefactory.lib.xml.mapper.metadata</code>.</p>
+
+<p class="paragraph">Like with the Parsley metadata tags, make sure that they meet the following requirements:</p>
+
+<ul>
+<li> They must contain the <code>[Metadata]</code> tag on the class level. See the existing tags for examples. 
+For details on how mapping metadata to classes works in general you may wish to read <a href="reflection.php#metadata_mapping">19.8&nbsp;Mapping classes to metadata tags</a>. </li>
+
+<li> You must call <code>Metadata.registerMetadataClass(MyTag)</code> for each of the implementations before you create
+the first mapper. </li>
+
+<li> Make sure that the metadata tag gets compile into the application, using the <code>-keep-as3-metadata</code> option. </li>
+</ul>
+<h2><a name="custom"></a>20.12 Creating Custom Mappers</h2>
+
+
+<p class="paragraph">Finally there may even be a scenario where none of the available mapping types are sufficient. In this case
+you can create a custom mapper implementing the <code>XmlObjectMapper</code> element from scratch.</p>
+
+<p class="paragraph">The interface is quite simple:</p>
+
+<pre><code>public interface XmlObjectMapper {
+	
+	function get objectType () : ClassInfo;
+
+	function get elementName () : QName;
+	
+	function mapToObject (element:XML, context:XmlProcessorContext) : Object;
+
+	function mapToXml (object:Object, context:XmlProcessorContext) : XML;
+	
+}
+</code></pre>
+
+<p class="paragraph">It specifies the class and the XML element name that should be mapped and then two methods for mapping
+in both directions. In case you have a large and complex XML structure where you can use existing property
+mappers for most of the tags, but need a custom mapper for a single tag, you can combine the builtin 
+mappers with your custom one:</p>
+
+<pre><code>var xml:XML = ...;
+var order:Order = XmlObjectMappings
+    .forUnqualifiedElements()
+    .withRootElement(Order)
+    <span style="color:#FF0000;">.customMapper(new MyCustomMapper())</span>
+    .choidId("products", Album, Book)
+    .build()
+    .mapToObject(xml) as Order;    
+</code></pre>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

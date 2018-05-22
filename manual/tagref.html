@@ -1,0 +1,1380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>17 Configuration Tag Reference</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>17 Configuration Tag Reference</h1>
+
+
+<p class="paragraph">This chapter serves as a pure reference for all configuration tags, listing all their attributes. 
+For examples or more detailed explanations we will link to the corresponding chapters.</p>
+
+<p class="paragraph">The reference covers Metadata, MXML and XML tags. Many of the tags are available for all three
+configuration modes. Some only for one or two of them. The corresponding section will list which
+of these options are available.</p>
+<h2><a name="injection"></a>17.1 Dependency Injection</h2>
+
+
+<h3><a name="injection_properties"></a>17.1.1 Inject for Properties</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Inject]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Tag </td><td> N/A </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="injection.php#property_type">4.3&nbsp;Property Injection by Type</a> and <a href="injection.php#property_id">4.4&nbsp;Property Injection by Id</a> </td></tr>
+<tr><td> Comment </td><td> For MXML or XML see <a href="tagref.php#tags_property">17.9.7&nbsp;Property</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> Specifies the id of the object to inject, if omitted injection by type is performed. </td></tr>
+<tr><td> <code>required</code> </td><td> optional </td><td> Indicates whether the dependency is required, default if omitted: <code>true</code>. </td></tr>
+</table>
+
+
+<h3><a name="injection_methods"></a>17.1.2 Inject for Methods</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Inject]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Tag </td><td> N/A </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="injection.php#method">4.2&nbsp;Method Injection</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<p class="paragraph">None</p>
+
+
+<h3><a name="injection_constructor"></a>17.1.3 InjectConstructor</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[InjectConstructor]</code> </td></tr>
+<tr><td> may be placed on </td><td> class declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Tag </td><td> N/A </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="injection.php#constructor">4.1&nbsp;Constructor Injection</a> </td></tr>
+<tr><td> Comment </td><td> For MXML or XML see <a href="tagref.php#tags_constructor">17.9.6&nbsp;ConstructorArgs</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<p class="paragraph">None</p>
+<h2><a name="bindings"></a>17.2 Decoupled Bindings</h2>
+
+
+<h3><a name="bindings_publish"></a>17.2.1 Publish</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Publish]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> &lt;Publish/&gt; </td></tr>
+<tr><td> XML Tag </td><td> &lt;publish/&gt; </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="bindings.php#intro">5&nbsp;Decoupled Bindings</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>objectId</code> </td><td> optional </td><td> The id the property value is published with. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope the property value is published to. </td></tr>
+<tr><td> <code>managed</code> </td><td> optional </td><td> Indicates whether the value published by this property should be 
+added to the Context (turned into a managed object) while being published. </td></tr>
+<tr><td> <code>changeEvent</code> </td><td> optional (Flash only) </td><td> The event that signals that the property value has changed.
+Default is <code>change</code>. Not needed in Flex applications where this feature relies on the Flex Binding facility. </td></tr>
+<tr><td> <code>property</code> </td><td> required for MXML/XML </td><td> The name of the property that holds the value to publish.
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+
+<h3><a name="bindings_publish_subscribe"></a>17.2.2 PublishSubscribe</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[PublishSubscribe]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> &lt;PublishSubscribe/&gt; </td></tr>
+<tr><td> XML Tag </td><td> &lt;publish-subscribe/&gt; </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="bindings.php#intro">5&nbsp;Decoupled Bindings</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>objectId</code> </td><td> optional </td><td> The id the property value is published with. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope the property value is published to. </td></tr>
+<tr><td> <code>managed</code> </td><td> optional </td><td> Indicates whether the value published by this property should be 
+added to the Context (turned into a managed object) while being published. </td></tr>
+<tr><td> <code>persistent</code> </td><td> optional </td><td> Indicates whether the value published by this property should be 
+persisted and automatically retrieved back when the application starts the next time. The default implementation is
+based on Local SharedObjects, but can be swapped. </td></tr>
+<tr><td> <code>changeEvent</code> </td><td> optional (Flash only) </td><td> The event that signals that the property value has changed.
+Default is <code>change</code>. Not needed in Flex applications where this feature relies on the Flex Binding facility. </td></tr>
+<tr><td> <code>property</code> </td><td> required for MXML/XML </td><td> The name of the property that holds the value to publish.
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+
+<h3><a name="bindings_subscribe"></a>17.2.3 Subscribe</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Subscribe]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> &lt;Subscribe/&gt; </td></tr>
+<tr><td> XML Tag </td><td> &lt;subscribe/&gt; </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="bindings.php#intro">5&nbsp;Decoupled Bindings</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>objectId</code> </td><td> optional </td><td> The id the source is published with. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope the binding listens to. </td></tr>
+<tr><td> <code>property</code> </td><td> required for MXML/XML </td><td> The name of the property that binds to the subscribed value.
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+<h2><a name="messaging"></a>17.3 Messaging</h2>
+
+
+<h3><a name="messaging_dispatcher"></a>17.3.1 MessageDispatcher</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[MessageDispatcher]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;MessageDispatcher/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;message-dispatcher/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="messaging.php#injected_dispatchers">6.4&nbsp;Injected MessageDispatchers</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>property</code> </td><td> required for MXML/XML </td><td> The property the injected dispatcher function should be injected into. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope through which the message should be dispatched. If this attribute is omitted the 
+message will be dispatched through all scopes associated with the Context the dispatching object lives in. </td></tr>
+</table>
+
+
+<h3><a name="messaging_managed_events"></a>17.3.2 ManagedEvents</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[ManagedEvents]</code> </td></tr>
+<tr><td> may be placed on </td><td> class declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;ManagedEvents/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;managed-events/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="messaging.php#managed_events">6.3&nbsp;Managed Events</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>names</code> </td><td> required </td><td> The names (types) of the events dispatched from the annotated object that the container should manage. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope through which the event should be dispatched. If this attribute is omitted the 
+event will be dispatched through all scopes associated with the Context the dispatching object lives in. </td></tr>
+</table>
+
+
+<h3><a name="messaging_handler"></a>17.3.3 MessageHandler</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[MessageHandler]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;MessageHandler/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;message-handler/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="messaging.php#handlers">6.5&nbsp;MessageHandlers</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the message that the annotated method wishes to receive. If omitted
+all messages will be received (rarely useful). </td></tr>
+<tr><td> <code>messageProperties</code> </td><td> optional </td><td> If specified not the message itself will be passed to the method, but
+instead the listed properties of the message as method parameters. </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The order in which handlers should be invoked. The default value is <code>int.MAX_VALUE</code>. </td></tr>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The method the message instance should be passed to. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+<h3><a name="messaging_binding"></a>17.3.4 MessageBinding</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[MessageBinding]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;MessageBinding/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;message-binding/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="messaging.php#bindings">6.6&nbsp;MessageBindings</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> required </td><td> The type (class) of the message that the annotated property should be bound to. </td></tr>
+<tr><td> <code>messageProperty</code> </td><td> required </td><td> The name of the property of the message class whose value should be 
+bound to the targetProperty. </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The order in which bindings should be executed. The default value is <code>int.MAX_VALUE</code>. </td></tr>
+<tr><td> <code>targetProperty</code> </td><td> required for MXML/XML </td><td> The name of the property that the message property value should be bound to. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+<h3><a name="messaging_error"></a>17.3.5 MessageError</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[MessageError]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;MessageError/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;message-error/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="messaging.php#errorhandlers">6.8&nbsp;Error Handlers</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the message that was passed to the handler or interceptor that 
+threw an Error. If omitted the error handler applies to all message types. </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message was dispatched to the handler or interceptor
+that threw an Error. The default is the global scope. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The order in which error handlers should be invoked. The default value is <code>int.MAX_VALUE</code>. </td></tr>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The interceptor method. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+<h3><a name="messaging_confirmation"></a>17.3.6 MessageConfirmation</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;MessageConfirmation/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;message-confirmation/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> Simple utility tag that opens an Alert for matching messages and only continues with
+message processing if the user clicks OK. This is a Flex-only feature. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the message that the alert should be shown for. </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>text</code> </td><td> required </td><td> The text to display in the Alert. </td></tr>
+<tr><td> <code>title</code> </td><td> required </td><td> The title to display in the Alert. </td></tr>
+</table>
+
+
+
+<h3><a name="messaging_selector"></a>17.3.7 Selector</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Selector]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<p class="paragraph">None</p>
+<h2><a name="messaging"></a>17.4 Messaging</h2>
+
+
+<h3><a name="commands_complete"></a>17.4.1 CommandComplete</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[CommandComplete]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;CommandComplete/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;command-complete/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="managedcommands.php#results">7.6&nbsp;Handling Results and Observing Commands</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the message that the annotated method wishes to receive. If omitted
+the type will be deduced from the method parameter (if available). </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The order in which complete handlers should be invoked. The default value is <code>int.MAX_VALUE</code>. </td></tr>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The method the result should be passed to. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+
+<h3><a name="commands_result"></a>17.4.2 CommandResult</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[CommandResult]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;CommandResult/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;command-result/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="managedcommands.php#results">7.6&nbsp;Handling Results and Observing Commands</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the message that the annotated method wishes to receive. If omitted
+the type will be deduced from the second method parameter (if available). </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The order in which result handlers should be invoked. The default value is <code>int.MAX_VALUE</code>. </td></tr>
+<tr><td> <code>immediate</code> </td><td> optional </td><td> Indicates whether the result handler should get invoked immediately after the result is available 
+when the result is produced by a command in a sequence or flow. The default is false which means the result handler will get 
+invoked when the entire sequence completed. Has no effect on a single command. </td></tr>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The method the result should be passed to. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+
+<h3><a name="commands_error"></a>17.4.3 CommandError</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[CommandError]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;CommandError/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;command-error/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="managedcommands.php#results">7.6&nbsp;Handling Results and Observing Commands</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the message that the annotated method wishes to receive. If omitted
+the type will be deduced from the second method parameter (if available). </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The order in which error handlers should be invoked. The default value is <code>int.MAX_VALUE</code>. </td></tr>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The method the error should be passed to. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+
+<h3><a name="commands_status"></a>17.4.4 CommandStatus</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[CommandStatus]</code> </td></tr>
+<tr><td> may be placed on </td><td> Boolean property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;CommandStatus/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;command-status/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="managedcommands.php#results">7.6&nbsp;Handling Results and Observing Commands</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the message that the annotated method wishes to receive. If omitted
+the type will be deduced from the second method parameter (if available). </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>property</code> </td><td> required for MXML/XML </td><td> The property which will act as a boolean flag for the matching command type. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+
+<h3><a name="commands_map"></a>17.4.5 MapCommand</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;MapCommand/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;map-command/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="managedcommands.php#mapping">7.2&nbsp;Mapping Commands to Messages</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> required </td><td> The type (class) of the command to create. </td></tr>
+<tr><td> <code>messageType</code> </td><td> optional </td><td> The type (class) of the message that the command wishes to receive. If omitted
+the type will be deduced from the method parameter (if available). </td></tr>
+<tr><td> <code>selector</code> </td><td> optional </td><td> An selector value for filtering in addition to message selection by type.
+See <a href="messaging.php#selectors">6.9&nbsp;Using Selectors</a>. </td></tr>
+<tr><td> <code>scope</code> </td><td> optional </td><td> The scope from which the message should be received. The default is the global scope. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The order in which commands should be invoked. The default value is <code>int.MAX_VALUE</code>. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">Any tag listed in 14.1 through 14.5, ConstructorArgs, Property, All Custom Configuration Tags that implement the
+<code>ObjectDefinitionDecorator</code> interface.</p>
+
+<h2><a name="lifecycle"></a>17.5 Object Lifecycle</h2>
+
+
+<h3><a name="lifecycle_asyncinit"></a>17.5.1 AsyncInit</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[AsyncInit]</code> </td></tr>
+<tr><td> may be placed on </td><td> class declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;AsyncInit/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;async-init/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="lifecycle.php#async">8.3&nbsp;Asynchronous Object Initialization</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>completeEvent</code> </td><td> optional </td><td> The event type signalling that the object is fully initialized. 
+Default <code>Event.COMPLETE</code>. </td></tr>
+<tr><td> <code>errorEvent</code> </td><td> optional </td><td> The event type signalling that the object failed to initialize correctly. 
+Default <code>ErrorEvent.ERROR</code>. </td></tr>
+</table>
+
+
+
+<h3><a name="lifecycle_init"></a>17.5.2 Init</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Init]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Init/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;init/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="lifecycle.php#methods">8.5&nbsp;Object Lifecycle Methods</a> </td></tr>
+<tr><td> Note </td><td> The old name of this tag (PostConstruct) has been deprecated. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The name of the method to invoke when the object is fully initialized. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+
+<h3><a name="lifecycle_destroy"></a>17.5.3 Destroy</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Destroy]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Destroy/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;destroy/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="lifecycle.php#methods">8.5&nbsp;Object Lifecycle Methods</a> </td></tr>
+<tr><td> Note </td><td> The old name of this tag (PreDestroy) has been deprecated. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The name of the method to invoke when the object is fully initialized. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+<h3><a name="lifecycle_observe"></a>17.5.4 Observe</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Observe]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Observe/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;observe/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="lifecycle.php#observer">8.6&nbsp;Lifecycle Observer Methods</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>phase</code> </td><td> optional </td><td> The lifecycle phase to observe. The default is <code>postInit</code>. The other permitted 
+values are <code>preConfigure</code>, <code>preInit</code>, <code>preDestroy</code> and <code>postDestroy</code>. </td></tr>
+<tr><td> <code>objectId</code> </td><td> optional </td><td> The id of the object to observe. If omitted the observer method will
+be invoked for all matching types (polymorphically). </td></tr>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The name of the method to invoke when the object is fully initialized. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+<h2><a name="resources"></a>17.6 Localization</h2>
+
+
+<h3><a name="resources_binding"></a>17.6.1 ResourceBinding</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[ResourceBinding]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;ResourceBinding/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;resource-binding/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="resources.php#bindings">12.1&nbsp;ResourceBindings</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>bundle</code> </td><td> required </td><td> The bundle name of the resource. </td></tr>
+<tr><td> <code>key</code> </td><td> required </td><td> The resource key. </td></tr>
+<tr><td> <code>property</code> </td><td> required for MXML/XML </td><td> The name of the property that the resource should be bound to. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+<h2><a name="extensions"></a>17.7 Extensibility</h2>
+
+
+<h3><a name="extensions_factory"></a>17.7.1 Factory</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Factory]</code> </td></tr>
+<tr><td> may be placed on </td><td> method declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Factory/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;factory/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="lifecycle.php#factories">8.2&nbsp;Using Factories</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>method</code> </td><td> required for MXML/XML </td><td> The name of the method that produces the obejcts. 
+Will be automatically set when used as a Metadata Tag. </td></tr>
+</table>
+
+
+<h3><a name="extensions_target"></a>17.7.2 Target</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Target]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Tag </td><td> N/A </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="extensions.php#metadata">13.2&nbsp;Custom Metadata Tags</a> in Creating Custom Configuration Tags 
+(final section titled "Metadata on Properties or Methods") </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<p class="paragraph">None</p>
+<h2><a name="asconfig"></a>17.8 ActionScript Configuration</h2>
+
+
+<h3><a name="asconfig_definition"></a>17.8.1 ObjectDefinition</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[ObjectDefinition]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="config.php#as3">3.6&nbsp;ActionScript Configuration</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>lazy</code> </td><td> optional </td><td> When set to false (default) the object will be instantiated when the container initializes. 
+When set to true the object will be instantiated on demand. </td></tr>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id the object should be registered with. If omitted the name of the property
+that produces (or holds) the object will be used as the id. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The initialization order. Only considered for non-lazy objects,
+processed in ascending order. Default <code>int.MAX_VALUE</code>. </td></tr>
+</table>
+
+
+<h3><a name="asconfig_dynamicobject"></a>17.8.2 DynamicObject</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[DynamicObject]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="config.php#as3">3.6&nbsp;ActionScript Configuration</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id the object should be registered with. If omitted the name of the property
+that produces (or holds) the object will be used as the id. </td></tr>
+</table>
+
+
+<h3><a name="asconfig_internal"></a>17.8.3 Internal</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> <code>[Internal]</code> </td></tr>
+<tr><td> may be placed on </td><td> property declaration </td></tr>
+<tr><td> MXML and XML Namespace </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> May be placed on properties in an AS3 Configuration Class that should not be included in the IOC Container. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<p class="paragraph">None</p>
+<h2><a name="tags"></a>17.9 MXML and XML Configuration</h2>
+
+
+<h3><a name="tags_metadata"></a>17.9.1 Variants of Metadata Tags</h3>
+
+<p class="paragraph">This section lists tags that can only be used in MXML and XML configuration and not as Metadata in classes.
+Nevertheless most of the other tags documented in previous sections can be used as MXML or XML tags, too (their tag names
+are listed if this is the case). But for the tags in previous sections the most common use case is to use them as Metadata.</p>
+
+
+<h3><a name="tags_object"></a>17.9.2 Object</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Object/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;object/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="config.php#mxml">3.2&nbsp;MXML Configuration</a> and <a href="config.php#xml">3.3&nbsp;XML Configuration Files</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> required </td><td> The type of the object to create. </td></tr>
+<tr><td> <code>lazy</code> </td><td> optional </td><td> When set to false (default) the object will be instantiated when the container initializes
+(but only if the singleton attribute keeps the default value (true). When set to true the object will be instantiated
+on demand. Can only be used in root object definitions, not in inline definitions. </td></tr>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id the object should be registered with. If omitted the name of the property
+that produces (or holds) the object will be used as the id. Can only be used in root object definitions, not in inline definitions. </td></tr>
+<tr><td> <code>order</code> </td><td> optional </td><td> The initialization order. Only considered for non-lazy singletons,
+processed in ascending order. Default <code>int.MAX_VALUE</code>. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">Any tag listed in 14.1 through 14.5, ConstructorArgs, Property, All Custom Configuration Tags that implement the
+<code>ObjectDefinitionDecorator</code> interface.</p>
+
+
+
+<h3><a name="tags_dynamicobject"></a>17.9.3 DynamicObject</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;DynamicObject/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;dynamic-object/&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="lifecycle.php#dynamic">8.7&nbsp;Dynamic Objects</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> required </td><td> The type of the object to create. </td></tr>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id the object should be registered with. If omitted the name of the property
+that produces (or holds) the object will be used as the id. Can only be used in root object definitions, not in inline definitions. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">Any tag listed in 14.1 through 14.5, ConstructorArgs, Property, All Custom Configuration Tags that implement the
+<code>ObjectDefinitionDecorator</code> interface.</p>
+
+
+<h3><a name="tags_nestedobject"></a>17.9.4 NestedObject</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;NestedObject/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>N/A (simply use &lt;object&gt;)</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> Needed in MXML for inline object definitions. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> required </td><td> The type of the object to create. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">Any tag listed in 14.1 through 14.5, ConstructorArgs, Property, All Custom Configuration Tags that implement the
+<code>ObjectDefinitionDecorator</code> interface.</p>
+
+
+<h3><a name="tags_view"></a>17.9.5 View</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;View/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;view&gt;</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="view.php#config_mxml_xml">9.6&nbsp;MXML and XML Configuration</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> required </td><td> The type of the view that should be configured. </td></tr>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id of the view that should be configured. </td></tr>
+</table>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">Any tag listed in 14.1 through 14.5, all Custom Configuration Tags that implement the
+<code>ObjectDefinitionDecorator</code> interface except those that deal with object creation
+as the View tag configures objects which already have been created by the Flex framework.</p>
+
+
+
+<h3><a name="tags_constructor"></a>17.9.6 ConstructorArgs</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;ConstructorArgs/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;constructor-args/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to explicitly specify the constructor arguments in MXML or XML as a list of child tags </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+None
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">Any tag listed in <a href="tagref.php#tags_simple">17.9.12&nbsp;Simple Values</a>, Object, Array, StaticPropertyRef or any tag that is mapped
+to a simple object or a tag that implements <code>NestedConfigurationElement</code>.</p>
+
+
+
+<h3><a name="tags_property"></a>17.9.7 Property</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Property/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;property/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to explicitly specify a property value in MXML or XML.
+The value may be a simple value or a dependency injected by type or by id. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>name</code> </td><td> required </td><td> The name of the property. </td></tr>
+<tr><td> <code>value</code> </td><td> optional </td><td> May be used for simple values (instead of a nested child node specifying the value). </td></tr>
+<tr><td> <code>idRef</code> </td><td> optional </td><td> Specifies a dependency for this property, referring to another object in the container by id. </td></tr>
+<tr><td> <code>typeRef</code> </td><td> optional </td><td> Specifies a dependency for this property, referring to another object in the container by type. </td></tr>
+<tr><td> <code>required</code> </td><td> optional </td><td> Indicates whether the dependency is required (only applied if idRef or typeRef is set). </td></tr>
+</table>
+
+<p class="paragraph">The attributes <code>value</code>, <code>idRef</code> and <code>typeRef</code> are mutually exclusive.</p>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">A single Child Elements may be used to specify the value for the property if neither value, idRef nor typeRef have been
+set as an attribute. Allowed are the same tags that are allowed as children of the ConstructorArgs tag:
+Any tag listed in <a href="tagref.php#tags_simple">17.9.12&nbsp;Simple Values</a>, Object, Array, StaticPropertyRef or any tag that is mapped
+to a simple object or a tag that implements <code>NestedConfigurationElement</code>.</p>
+
+
+
+<h3><a name="tags_dynamicproperty"></a>17.9.8 DynamicProperty</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;DynamicProperty/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;dynamic-property/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to explicitly specify a property value for a dynamic class in MXML or XML.
+The value may be a simple value or a dependency injected by type or by id. This tag is useful for configuring
+generic Objects or a Dictionary for example. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>name</code> </td><td> required </td><td> The name of the property. </td></tr>
+<tr><td> <code>value</code> </td><td> optional </td><td> May be used for simple values (instead of a nested child node specifying the value). </td></tr>
+<tr><td> <code>idRef</code> </td><td> optional </td><td> Specifies a dependency for this property, referring to another object in the container by id. </td></tr>
+<tr><td> <code>typeRef</code> </td><td> optional </td><td> Specifies a dependency for this property, referring to another object in the container by type. </td></tr>
+<tr><td> <code>required</code> </td><td> optional </td><td> Indicates whether the dependency is required (only applied if idRef or typeRef is set). </td></tr>
+</table>
+
+<p class="paragraph">The attributes <code>value</code>, <code>idRef</code> and <code>typeRef</code> are mutually exclusive.</p>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">A single Child Elements may be used to specify the value for the property if neither value, idRef nor typeRef have been
+set as an attribute. Allowed are the same tags that are allowed as children of the ConstructorArgs tag:
+Any tag listed in <a href="tagref.php#tags_simple">17.9.12&nbsp;Simple Values</a>, Object, Array, StaticPropertyRef or any tag that is mapped
+to a simple object or a tag that implements <code>NestedConfigurationElement</code>.</p>
+
+
+
+<h3><a name="tags_ref"></a>17.9.9 ObjectRef</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;ObjectRef/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;object-ref/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to specify a reference to another object in the container by id or by type. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>idRef</code> </td><td> optional </td><td> Specifies a dependency for this property, referring to another object in the container by id. </td></tr>
+<tr><td> <code>typeRef</code> </td><td> optional </td><td> Specifies a dependency for this property, referring to another object in the container by type. </td></tr>
+<tr><td> <code>required</code> </td><td> optional </td><td> Indicates whether the dependency is required (only applied if idRef or typeRef is set). </td></tr>
+</table>
+
+<p class="paragraph">The attributes <code>idRef</code> and <code>typeRef</code> are mutually exclusive.</p>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None.</p>
+
+
+<h3><a name="tags_array"></a>17.9.10 Array</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Array/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;array/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to specify Array values in MXML or XML, specifying the elements as a list of child tags.
+Should be preferred over fx:Array if it contains special Parsley tags as children (they won't be processed within a regular
+fx:Array tag). </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+None
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">Any tag listed in <a href="tagref.php#tags_simple">17.9.12&nbsp;Simple Values</a>, Object, Array, StaticPropertyRef or any tag that is mapped
+to a simple object or a tag that implements <code>NestedConfigurationElement</code>.</p>
+
+
+<h3><a name="tags_static"></a>17.9.11 StaticPropertyRef</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;static-property-ref/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to refer to a static property in XML configuration files. Not necessary
+in MXML configuration, use normal binding syntax in MXML (e.g. value="{Environment.CONSTANT}"). </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>type</code> </td><td> required </td><td> The class the static property value should be fetched from. </td></tr>
+<tr><td> <code>property</code> </td><td> required </td><td> The name of the static property. </td></tr>
+</table>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+
+
+<h3><a name="tags_simple"></a>17.9.12 Simple Values</h3>
+
+<p class="paragraph">For MXML configuration you can use the builtin tags to specify simple values like <code>fx:String</code> or <code>fx:int</code>.
+For XML configuration Parsley includes a number of tags that can be used for simple values:</p>
+
+<ul>
+<li> string </li>
+<li> boolean </li>
+<li> int </li>
+<li> uint </li>
+<li> number </li>
+<li> date </li>
+<li> class </li>
+<li> null </li>
+</ul>
+
+<p class="paragraph">Example:</p>
+
+<pre><code>&lt;object type="com.example.FooManager"&gt;
+    &lt;constructor-args&gt;
+        &lt;string&gt;Hello&lt;/string&gt;
+        &lt;int&gt;7&lt;/int&gt;
+        &lt;boolean&gt;true&lt;/boolean&gt;
+        &lt;object-ref id-ref="barManager"/&gt;
+    &lt;/constructor-args&gt;
+&lt;/object&gt;
+</code></pre>
+
+
+<h3><a name="tags_include"></a>17.9.13 Include</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;include/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to include additional XML configuration files. You can place any number of
+include tags in XML configuration files. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>filename</code> </td><td> required </td><td> The name of the file to include. </td></tr>
+</table>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+
+
+<h3><a name="tags_variable"></a>17.9.14 Variable</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> <code>N/A</code> </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;variable/&gt;</code> </td></tr>
+<tr><td> Description </td><td> May be used to declare variables which may be used in XML attributes or text nodes
+with the notation <code>${variableName}</code>. </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>name</code> </td><td> required </td><td> The name of the variable. </td></tr>
+<tr><td> <code>value</code> </td><td> required </td><td> The value of the variable. </td></tr>
+</table>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+<h2><a name="view"></a>17.10 Flex Component Wiring</h2>
+
+
+<h3><a name="view_configure"></a>17.10.1 Configure</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Namespace </td><td> <code>http://www.spicefactory.org/parsley</code> </td></tr>
+<tr><td> MXML Tag </td><td> <code>&lt;Configure/&gt;</code> </td></tr>
+<tr><td> XML Tag </td><td> N/A </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="view.php#config_explicit">9.2&nbsp;Explicit Component Wiring</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>targets</code> </td><td> optional </td><td> The objects that should be wired to the Context. If omitted only the document object
+the tag was placed in will be wired. </td></tr>
+<tr><td> <code>reuse</code> </td><td> optional </td><td> Indicates whether the wiring should happen repeatedly whenever the 
+object is added to the stage. When set to false it is only wired once. The default is true. </td></tr>
+<tr><td> <code>autoremove</code> </td><td> optional </td><td> Indicates whether the wired objects should be removed from
+the Context when the view containing the Configure tag is removed from stage. The default is true. </td></tr>
+</table>
+<h2><a name="logging_flex"></a>17.11 Flex Logging</h2>
+
+
+<h3><a name="logging_flex_target"></a>17.11.1 Target</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A (the builtin MXML tags for LogTargets can be used instead) </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley/flex/logging</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;target/&gt;</code> </td></tr>
+<tr><td> Required Initialization </td><td> <code>FlexLoggingXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="logging.php#flex">15.1&nbsp;Logging Configuration for Flex</a> </td></tr>
+</table>
+
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id of the <code>LogTarget</code>, usually not needed. </td></tr>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the <code>LogTarget</code>, defaults to <code>TraceTarget</code> if omitted. </td></tr>
+<tr><td> <code>level</code> </td><td> optional </td><td> The minimum level that this target should log. </td></tr>
+<tr><td> attributes of <code>LineFormattedTarget</code> </td><td> optional </td><td> If the specified type extends <code>LineFormattedTarget</code>
+all properties of that class can be set: <code>field-separator</code>, <code>include-category</code>, <code>include-level</code>,
+<code>include-date</code>, <code>include-time</code>. </td></tr>
+</table>
+<h2><a name="logging_flash"></a>17.12 Flash Logging</h2>
+
+
+<h3><a name="logging_flash_factory"></a>17.12.1 LogFactory</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley/flash/logging</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;factory/&gt;</code> </td></tr>
+<tr><td> Required Initialization </td><td> <code>FlashLoggingXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="logging.php#flash">15.2&nbsp;Logging Configuration for Flash</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id of the <code>LogFactory</code>, usually not needed. </td></tr>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the <code>LogFactory</code>, defaults to <code>DefaultLogFactory</code> which
+is usually sufficient. </td></tr>
+<tr><td> <code>context</code> </td><td> optional </td><td> Boolean attribute (defaults to <code>true</code>). Indicates whether this factory should
+be set as the factory for the <code>LogContext</code> class. Should only be set to <code>false</code> for special requirements. </td></tr>
+<tr><td> <code>root-level</code> </td><td> optional </td><td> The default log level for loggers for which no level has been specified explicitly.
+Defaults to <code>LogLevel.TRACE</code>. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<table>
+<tr><td> <code>appender</code> </td><td> optional </td><td> One or more Appenders that handle the log output. Usually at least one is required
+to see any output. </td></tr>
+<tr><td> <code>logger</code> </td><td> optional </td><td> Configuration for individual loggers. Only required for loggers which should not use
+the <code>root-level</code>. </td></tr>
+</table>
+
+
+<h3><a name="logging_flash_logger"></a>17.12.2 Logger</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley/flash/logging</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;logger/&gt;</code> </td></tr>
+<tr><td> Required Initialization </td><td> <code>FlashLoggingXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="logging.php#flash">15.2&nbsp;Logging Configuration for Flash</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>name</code> </td><td> required </td><td> The name of the Logger. </td></tr>
+<tr><td> <code>level</code> </td><td> required </td><td> The minum level this Logger should log. Valid values are <code>trace</code>, <code>debug</code>,
+<code>info</code>, <code>warn</code>, <code>error</code> and <code>fatal</code>. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+
+
+<h3><a name="logging_flash_appender"></a>17.12.3 Appender</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley/flash/logging</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;appender/&gt;</code> </td></tr>
+<tr><td> Required Initialization </td><td> <code>FlashLoggingXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="logging.php#flash">15.2&nbsp;Logging Configuration for Flash</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>ref</code> </td><td> required </td><td> The id of the <code>Appender</code> class configured in the Parsley Context. For configuring
+the <code>Appender</code> itself you can use regular Parsley <code>&lt;object&gt;</code> tags. </td></tr>
+<tr><td> <code>threshold</code> </td><td> required </td><td> The minum level this Appender should log. May be used as an additional filter mechanism
+in addition to the level settings for individual loggers. Valid values are <code>trace</code>, <code>debug</code>,
+<code>info</code>, <code>warn</code>, <code>error</code> and <code>fatal</code>. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+<h2><a name="resources_flash"></a>17.13 Flash Localization</h2>
+
+
+<h3><a name="resources_flash_manager"></a>17.13.1 ResourceManager</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley/flash/resources</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;resource-manager/&gt;</code> </td></tr>
+<tr><td> Required Initialization </td><td> <code>FlashResourceXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="resources.php#flash">12.3&nbsp;Localized Flash Applications</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id of the <code>ResourceManager</code>, usually not needed as you should only
+configure one <code>ResourceManager</code> instance and thus are able to inject it by type. </td></tr>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the <code>ResourceManager</code>, defaults to <code>DefaultResourceManager</code> which
+is usually sufficient. </td></tr>
+<tr><td> <code>cacheable</code> </td><td> optional </td><td> Boolean attribute (defaults to <code>false</code>). Indicates whether the ResourceManager
+should cache loaded bundles. </td></tr>
+<tr><td> <code>persistent</code> </td><td> optional </td><td> Boolean attribute (defaults to <code>false</code>). Indicates whether the ResourceManager
+should store the last active locale in a Local Shared Object and restore it on the next application start. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<table>
+<tr><td> <code>locale</code> </td><td> optional </td><td> The locales supported by this ResourceManager. </td></tr>
+</table>
+
+
+<h3><a name="resources_flash_locale"></a>17.13.2 Locale</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley/flash/resources</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;locale/&gt;</code> </td></tr>
+<tr><td> Required Initialization </td><td> <code>FlashResourceXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="resources.php#flash">12.3&nbsp;Localized Flash Applications</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>language</code> </td><td> optional </td><td> The language code for this locale, a lowercase ISO 639 code (e.g. <code>en</code> or <code>fr</code>). </td></tr>
+<tr><td> <code>country</code> </td><td> optional </td><td> The country/region code for this locale, an uppercase ISO 3166 2-letter code
+(e.g. <code>US</code> or <code>FR</code>). </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+
+
+<h3><a name="resources_flash_bundle"></a>17.13.3 ResourceBundle</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML Tag </td><td> N/A </td></tr>
+<tr><td> XML Namespace </td><td> <code>http://www.spicefactory.org/parsley/flash/resources</code> </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;resource-bundle/&gt;</code> </td></tr>
+<tr><td> Required Initialization </td><td> <code>FlashResourceXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="resources.php#flash">12.3&nbsp;Localized Flash Applications</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> required </td><td> The id of the bundle. </td></tr>
+<tr><td> <code>basename</code> </td><td> required </td><td> The basename of files containing messages for this bundle. 
+For the locale <code>en_US</code> for example the basename messages/tooltips will instruct Parsley to load the 
+following files: <code>messages/tooltips_en_US.xml</code>, <code>messages/tooltips_en.xml</code> and <code>messages/tooltips.xml</code>. </td></tr>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the <code>ResourceBundle</code>, defaults to <code>DefaultResourceBundle</code> which
+is usually sufficient. </td></tr>
+
+<tr><td> <code>loader-factory</code> </td><td> optional </td><td> The type (class) of the <code>BundleLoaderFactory</code>, 
+responsible for loading the bundle files. Defaults to <code>DefaultResourceBundle</code> which
+is usually sufficient. </td></tr>
+<tr><td> <code>localized</code> </td><td> optional </td><td> Boolean attribute (defaults to <code>true</code>). If set to false the framework will only load 
+the resources for the basename like <code>messages/tooltips.xml</code> and not look for files with localized messages. </td></tr>
+<tr><td> <code>ignore-country</code> </td><td> optional </td><td> Boolean attribute (defaults to <code>false</code>). If set to true the framework will 
+ignore the country code of the active locale for this bundle. </td></tr>
+</table>
+
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+<h2><a name="pimento"></a>17.14 Pimento Data Services</h2>
+
+
+<h3><a name="pimento_config"></a>17.14.1 Config</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace  </td><td> <code>http://www.spicefactory.org/parsley/pimento</code> </td></tr>
+<tr><td> MXML Tag </td><td> &lt;Config/&gt; </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;config/&gt;</code> </td></tr>
+<tr><td> Required Initialization for XML </td><td> <code>PimentoXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="remoting.php#pimento">14.2&nbsp;Pimento Data Services</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id of the configuration instance. </td></tr>
+<tr><td> <code>url</code> </td><td> required </td><td> The URL that Pimento should connect to. </td></tr>
+<tr><td> <code>timeout</code> </td><td> optional </td><td> Specifies the request timeout in milliseconds. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+
+
+<h3><a name="pimento_service"></a>17.14.2 Service</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace  </td><td> <code>http://www.spicefactory.org/parsley/pimento</code> </td></tr>
+<tr><td> MXML Tag </td><td> &lt;Service/&gt; </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;service/&gt;</code> </td></tr>
+<tr><td> Required Initialization for XML </td><td> <code>PimentoXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="remoting.php#pimento">14.2&nbsp;Pimento Data Services</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id that this service will be registered with in the Parsley IOC Container. </td></tr>
+<tr><td> <code>name</code> </td><td> required </td><td> The name of the service as registered on the server-side. </td></tr>
+<tr><td> <code>type</code> </td><td> required </td><td> The AS3 service implementation (usually generated with Pimentos Ant Task). </td></tr>
+<tr><td> <code>config</code> </td><td> optional </td><td> The id of the <code>PimentoConfig</code> instance to use for this service. Only required
+if you have more than one <code>config</code> tag in your Context. If there is only one (like in most use cases)
+it will be automatically detected. </td></tr>
+<tr><td> <code>timeout</code> </td><td> optional </td><td> Specifies the request timeout in milliseconds. </td></tr>
+</table>
+<h2><a name="cinnamon"></a>17.15 Cinnamon Remoting</h2>
+
+
+<h3><a name="cinnamon_channel"></a>17.15.1 Channel</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace  </td><td> <code>http://www.spicefactory.org/parsley/cinnamon</code> </td></tr>
+<tr><td> MXML Tag </td><td> &lt;Channel/&gt; </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;channel/&gt;</code> </td></tr>
+<tr><td> Required Initialization for XML </td><td> <code>CinnamonXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="remoting.php#cinnamon">14.3&nbsp;Cinnamon Remoting</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id of the channel instance. </td></tr>
+<tr><td> <code>url</code> </td><td> required </td><td> The URL that the channel should connect to. </td></tr>
+<tr><td> <code>type</code> </td><td> optional </td><td> The type (class) of the channel, defaults to <code>NetConnectionServiceChannel</code>. </td></tr>
+<tr><td> <code>timeout</code> </td><td> optional </td><td> Specifies the request timeout in milliseconds. </td></tr>
+</table>
+
+<p class="subheadline"> Child Elements </p>
+
+<p class="paragraph">None</p>
+
+
+<h3><a name="cinnamon_service"></a>17.15.2 Service</h3>
+
+<table>
+<tr><td> Metadata Tag </td><td> N/A </td></tr>
+<tr><td> MXML and XML Namespace  </td><td> <code>http://www.spicefactory.org/parsley/cinnamon</code> </td></tr>
+<tr><td> MXML Tag </td><td> &lt;Service/&gt; </td></tr>
+<tr><td> XML Tag </td><td> <code>&lt;service/&gt;</code> </td></tr>
+<tr><td> Required Initialization for XML </td><td> <code>CinnamonXmlSupport.initialize()</code> </td></tr>
+<tr><td> Detailed Explanation </td><td> <a href="remoting.php#cinnamon">14.3&nbsp;Cinnamon Remoting</a> </td></tr>
+</table>
+
+<p class="subheadline"> Attributes </p>
+
+<table>
+<tr><td> <code>id</code> </td><td> optional </td><td> The id that this service will be registered with in the Parsley IOC Container. </td></tr>
+<tr><td> <code>name</code> </td><td> required </td><td> The name of the service as registered on the server-side. </td></tr>
+<tr><td> <code>type</code> </td><td> required </td><td> The AS3 service implementation (usually generated with Pimentos Ant Task). </td></tr>
+<tr><td> <code>channel</code> </td><td> optional </td><td> Reference to the id of the <code>ServiceChannel</code> instance. Only required
+if you have more than one <code>channel</code> tag in your Context. If there is only one (like in most use cases)
+it will be automatically detected. </td></tr>
+<tr><td> <code>timeout</code> </td><td> optional </td><td> Specifies the request timeout in milliseconds. </td></tr>
+</table>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>

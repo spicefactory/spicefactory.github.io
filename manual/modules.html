@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>10 Building Modular Applications</title>
+
+<link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+
+</head>
+
+<body>
+
+<div id="doc_content">
+
+
+<h1><a name="intro"></a>10 Building Modular Applications</h1>
+
+<p class="paragraph">Parsley allows you to build a hierarchy of Contexts that can be 
+dynamically loaded and unloaded. This hierarchy can be built no matter whether you are using
+Flex Modules or not, even in pure AS3 applications. For Flex Modules Parsley just offers 
+an additional level of integration in that it makes it easier to deal with multiple different
+ApplicationDomains.</p>
+<h2><a name="context"></a>10.1 Modular Contexts</h2>
+
+<p class="paragraph">In larger applications you may want to split your application into modules which are
+loaded on demand. In this case it would be unfortunate to have a monolithic Context
+that is fully loaded and initialized at application startup. Even splitting the configuration into
+multiple files like shown in <a href="config.php#combine">3.7&nbsp;Combining multiple Configuration mechanisms</a> won't help since those files will be merged into
+a single Context and loaded and initialized as if it was a single large configuration file.</p>
+
+<p class="paragraph">This is where another feature of Parsley comes in handy: when creating a <code>Context</code>
+it can connect to a parent Context. The parent may be the main context loaded at
+application startup for example and the child context may be one required by a module loaded on demand.
+In the configuration for the child Context you can use any object from the parent Context for Dependency Injection 
+(but not vice versa). Messaging also works across Context boundaries, depending on the scope you dispatch through. 
+You can create deeply nested hierarchies of Contexts, but often the structure would be rather flat, with one 
+root context and any number of child Contexts on the same level.</p>
+
+<p class="paragraph">There are two different ways to initialize such a child Context:</p>
+
+
+
+<h3><a name="context_views"></a>10.1.1 Connecting a Context Hierarchy to a View Hierarchy</h3>
+
+<p class="paragraph">When you are specifying a view root with the ContextBuilder API
+or when you are using the MXML ContextBuilder tag introduced which automatically
+uses the document it is placed upon as a view root, then
+the <code>ViewManager</code> associated with the Context will use that view root for two purposes:
+it will listen for bubbling events from components that wish to get wired to the Context and
+it will listen for bubbling events from other ContextBuilders sitting somewhere below in the
+view hierarchy. This way you do not have to manually specify the parent Context or the
+ApplicationDomain, the framework will take care of that for you:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="{BookStoreConfig}"/&gt;
+</code></pre>
+
+<p class="paragraph">or:</p>
+
+<pre><code>var viewRoot:DisplayObject = ...;
+ContextBuilder
+    .newSetup()
+    <span style="color:#FF0000;">.viewRoot(viewRoot)</span>
+    .newBuilder()
+    .config(FlexConfig.forClass(BookStoreConfig))
+    .build();
+</code></pre>
+
+<p class="paragraph">In the examples above the new Context will use the view root to automatically look for a parent Context and to
+listen for child Contexts within the view hierarchy.</p>
+
+<p class="paragraph">In some scenarios you may want to keep the Context hierarchy separate from the view hierarchy.
+This is where the second option for building the hierarchy comes into play:</p>
+
+
+
+<h3><a name="context_manual"></a>10.1.2 Setting a Parent Context Manually</h3>
+
+<p class="paragraph">You can define an existing Context as the parent for a new Context when using the ContextBuilder
+API:</p>
+
+<pre><code>var parent:Context = ...;
+ContextBuilder
+    .newSetup()
+    <span style="color:#FF0000;">.parent(parent)</span>
+    .newBuilder()
+    .config(FlexConfig.forClass(BookStoreConfig))
+    .build();
+</code></pre>
+
+<p class="paragraph">In this case we did not specify a view root at all (note that you cannot dynamically wire views to this Context
+in this case) and instead specify the parent manually. You must also be aware of the fact that without a view root 
+the Context is not able to automatically detect the ApplicationDomain for reflection. So if you are not working in the
+root ApplicationDomain but instead in a child domain of a loaded Flex Module for example,
+you also have to pass the domain to the builder method:</p>
+
+<pre><code>var parent:Context = ...;
+var domain:ApplicationDomain = ...;
+ContextBuilder
+    .newSetup()
+    <span style="color:#FF0000;">.parent(parent)</span>
+    <span style="color:#FF0000;">.domain(domain)</span>
+    .newBuilder()
+    .config(FlexConfig.forClass(BookStoreConfig))
+    .build();
+</code></pre>
+
+<p class="paragraph">Again this is not necessary when specifying a view root, since the builder is then able
+to automatically detect the parent Context and the ApplicationDomain.</p>
+
+
+
+<h3><a name="context_multiple"></a>10.1.3 Using Multiple Parent Contexts</h3>
+
+<p class="paragraph">This is a feature that was introduced with version 2.4. Before that the Context hierarchy was limited to a tree structure,
+so while each Context could have multiple children, it always only had one parent. The option to specify more than one parent adds
+a lot more flexibility for building a Context hierarchy. For example it would allow to build a set of libraries that can depend
+on each other and connect their Contexts accordingly.</p>
+
+<p class="paragraph">Let's assume you are working with two modules that might be needed by multiple other (otherwise unrelated) 
+modules in the application and that both have their own Context:</p>
+
+<pre><code>var messaging:Context = ...;
+var persistence:Context = ...;
+</code></pre>
+
+<p class="paragraph">If you'd then build another Context that needs injections from messaging and persistence,
+you could instruct the ContextBuilder to use both Contexts as parents:</p>
+
+<pre><code>&lt;parsley:ContextBuilder config="{BookStoreConfig}" <span style="color:#FF0000;">parents="{[messaging, persistence]}"</span>/&gt;
+</code></pre>
+
+<p class="paragraph">When using the ContextBuilder tag it would also automatically look for a parent in the view hierarchy.
+So in case it would find a parent, you'd have three parents.</p>
+
+<p class="paragraph">You can alternatively instruct the ContextBuilder not to look for a parent in the hierarchy:</p>
+
+<pre><code>&lt;parsley:ContextBuilder 
+    config="{BookStoreConfig}" 
+    parents="{[messaging, persistence]}"
+    <span style="color:#FF0000;">findParentInView="false"</span>
+/&gt;
+</code></pre>
+
+<p class="paragraph">Finally, of course the ContextBuilder API also allows you to use this feature. You simply invoke
+the <code>parent</code> method multiple times:</p>
+
+<pre><code>ContextBuilder
+    .newSetup()
+    .viewRoot(viewRoot)
+    <span style="color:#FF0000;">.parent(messaging)</span>
+    <span style="color:#FF0000;">.parent(persistence)</span>
+    .newBuilder()
+    .config(FlexConfig.forClass(BookStoreConfig))
+    .build();
+</code></pre>
+
+
+<p class="subheadline"> Context Precedence for Dependency Lookups </p>
+
+<p class="paragraph">When a Context looks up a dependency, it first looks if it finds it amongst its own definitions. If unsuccessful
+it starts to look into the parents one after the other. The order will be the same that you specified when
+constructing the Context. When there is also a parent that was automatically found in the view hierarchy,
+it will always be used as the last Context for lookups.</p>
+
+<p class="paragraph">When using dependency injection by type (without specifying an id), it is important that the dependency
+is not ambiguous. It means that a single Context should not have more than managed object of a matching type.
+It does not matter whether other Contexts have matching types, too, as the lookup will stop at the Context
+where the first matching instance is found.</p>
+
+
+<p class="subheadline"> ApplicationDomains for Shared Contexts </p>
+
+<p class="paragraph">Realistically the only option for a Shared Context is to exist in the root ApplicationDomain. If you use
+multiple modules that all get loaded into a child ApplicationDomain, it would become difficult to share
+anything between those modules which is not in the root ApplicationDomain. This is because sibling 
+ApplicationDomains do not see each others class definitions. This also means that such a shared module
+cannot be unloaded once it has been used. This is important to keep in mind when planning for the
+maximum memory consumption of very large applications.</p> 
+
+
+<p class="subheadline"> Loading and Initializing Shared Contexts on Demand </p>
+
+<p class="paragraph">The features introduced with version 2.4 are only the start. That version added the low-level hooks in the
+core APIs to be able to build a flexible Context hierarchy where each Context can have multiple parents.
+As you could see from the samples given above, you still have to manage these shared Contexts yourself.
+So it is the responsibility of your application to know which parents are needed by which Context and
+where and how to obtain and construct these Context instances. So for a very large application you'd
+probably still build some level of infrastructure on top of this existing Parsley feature.</p>
+
+<p class="paragraph">In the future (sometime after the release of Parsley 3.0), there'll be a separate Parsley extension
+project that builds on top of this. It would allow you to specify available shared Contexts in a simple
+XML manifest and the framework will then load and initialize the parents when they are needed for the first
+time.</p>
+
+
+
+ 
+
+<h2><a name="lifecycle"></a>10.2 Context Lifecycle</h2>
+
+<p class="paragraph">If you load multiple <code>Context</code> instances as modules like described
+in the previous section, you may want to get rid of them when you unload a module - without
+affecting the parent. Actually that is quite easy, just do this:</p>
+
+<pre><code>context.destroy();
+</code></pre>
+
+<p class="paragraph">When connecting a Context hierarchy to a view hierarchy it is
+even easier. You don't have to explicitly destroy the Context then, it will happen automatically
+when the last view root associated with the Context gets removed from the stage. 
+This is the default behaviour of the <code>ViewManager</code> which can be adjusted in case
+you do not want the Context lifecycle to depend on the time the view is on the stage.
+You can finetune the behaviour with properties of the <code>ViewManagerFactory</code>.</p>
+
+<p class="paragraph">When a Context gets destroyed the following actions occur:</p>
+
+<ul>
+<li> All objects configured in the destroyed Context stop receiving messages dispatched by Parsleys central
+<code>MessageRouter</code>. This affects all elements annotated with <code>MessageHandler</code>, <code>MessageBinding</code>,
+<code>CommandResult</code> and so on. </li>
+
+<li> If any objects declared in the destroyed Context declared <code>ManagedEvents</code> they will be ignored from now
+on and no longer dispatched trough Parsleys messaging system. </li>
+
+<li> All methods annotated with <code>[Destroy]</code> (or the corresponding MXML or XML tags) 
+on any object of the destroyed Context get invoked. </li>
+
+<li> The destroyed Context will remove all internal references to the configured objects so they are eligible
+for garbage collection. (Of course you have to make sure that your application does not retain any references
+to those objects). </li>
+
+<li> The Context may no longer be used after invoking <code>destroy</code>. Any subsequent method invocations
+on that Context throw Errors. The parent of the destroyed Context (if any) is not affected and may continue
+to operate normally. </li>
+</ul>
+<h2><a name="flex"></a>10.3 Using Flex Modules</h2>
+
+<p class="paragraph">In version 2.0.x the framework offered a special <code>ContextModule</code> MXML tag to specify
+the configuration for the module. This is no longer needed. The framework specific ContextModule and ModuleLoader
+tags have been removed. Instead the support for Flex Modules is now fully transparent. You load
+a Module either with the regular Flex ModuleLoader tag or with the Flex ModuleManager.
+You can then create child Contexts anywhere within that Module, it does not have to happen in
+the root Module component. If you connect the Context hierarchy to the view hierarchy like demonstrated in the preceding sections
+the child Context will automatically determine the parent Context and the ApplicationDomain
+of the Module.</p>
+
+
+
+<br/>
+<br/>
+<br/>
+
+</div>
+
+</body>
+</html>
